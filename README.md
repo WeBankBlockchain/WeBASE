@@ -9,7 +9,7 @@ WeBASE（WeBank Blockchain Application Software Extension） 是在区块链应�
 
 # 2. <a id="chapter-2"></a>整体架构
 
-[图片]
+![[架构图]](./architecture.png)
 
 # 3. <a id="chapter-3"></a>各子系统介绍
 **1 webase-front (节点前置)**
