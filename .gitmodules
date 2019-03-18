@@ -1,0 +1,12 @@
+[submodule "webase-front"]
+	path = webase-front
+	url = https://github.com/WeBankFinTech/webase-front.git
+[submodule "webase-web"]
+	path = webase-web
+	url = https://github.com/WeBankFinTech/webase-web.git
+[submodule "webase-node-mgr"]
+	path = webase-node-mgr
+	url = https://github.com/WeBankFinTech/webase-node-mgr
+[submodule "webase-transcation"]
+	path = webase-transcation
+	url = https://github.com/WeBankFinTech/webase-transcation
