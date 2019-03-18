@@ -21,21 +21,21 @@ python | Python2.7
 # 2. <a id="chapter-2"></a>节点管理安装
 ## 2.1. 获取源代码
 ```
-git clone git@git.weoa.com:ttip/fisco-bcos-node-mgr.git
+git clone https://github.com/WeBankFinTech/webase-node-mgr.git
 ```
 
 ## 2.2 编译代码
-在代码的根目录webcaf-node-mgr执行构建命令：
+在代码的根目录webase-node-mgr执行构建命令：
 ```
 gradle build
 ```
-构建完成后，会在/usr/local/app/webcaf-node-mgr目录生成已编译的代码。
+构建完成后，会在/usr/local/app/webase-node-mgr目录生成已编译的代码。
 
 ## 2.3 创建数据库
 ### 2.3.1 修改脚本配置
 进入数据库脚本目录
 ```
-cd  /usr/local/app/webcaf-node-mgr/conf/script
+cd  /usr/local/app/webase-node-mgr/conf/script
 ```
 修改数据库连接信息：
 ```
@@ -59,7 +59,7 @@ sh  fisco-bcos.sh  123.207.235.12 3306
 ### 2.4.1 服务配置修改
 进入到已编译的代码根目录：
 ```
-cd /usr/local/app/webcaf-node-mgr/conf
+cd /usr/local/app/webase-node-mgr/conf
 ```
 修改服务配置：
 ```
@@ -73,7 +73,7 @@ cd /usr/local/app/webcaf-node-mgr/conf
 ### 2.4.2 服务启停
 进入到已编译的代码根目录：
 ```
-cd /usr/local/app/webcaf-node-mgr
+cd /usr/local/app/webase-node-mgr
 ```
 启动：
 ```
@@ -90,11 +90,11 @@ sh serverStatus.sh
 ### 2.4.3 查看日志
 全量日志：
 ```
-/usr/local/app/logs/webcaf-node-mgr/node-mgr.log
+/usr/local/app/logs/webase-node-mgr/node-mgr.log
 ```
 错误日志：
 ```
-/usr/local/app/logs/webcaf-node-mgr/node-mgr-error.log
+/usr/local/app/logs/webase-node-mgr/node-mgr-error.log
 ```
 
 ## 2.5 初始化基础合约
@@ -106,7 +106,7 @@ sh serverStatus.sh
 ### 2.5.2 修改脚本配置
 进入合约脚本目录：
 ```
-cd /usr/local/app/webcaf-node-mgr/conf/contract
+cd /usr/local/app/webase-node-mgr/conf/contract
 ```
 修改配置中的前置服务信息：
 ```
@@ -127,16 +127,16 @@ sh contract-init.sh
 
 执行命令：
 ```
-git clone http://xxx/webcaf-front.git
+git clone http://xxx/webase-front.git
 ```
 
 ## 3.2 编译代码
 
-在代码的根目录webcaf-front执行构建命令：
+在代码的根目录webase-front执行构建命令：
 ```
 gradle build
 ```
-构建完成后，会在根目录webcaf-front下生成已编译的代码目录dist。
+构建完成后，会在根目录webase-front下生成已编译的代码目录dist。
 
 ## 3.3 修改配置
 进入目录：
@@ -179,7 +179,7 @@ cd dist
 cd dist
 ```
 ```
-前置服务日志：tail -f log/webcaf-front.log
+前置服务日志：tail -f log/webase-front.log
 web3连接日志：tail -f log/web3sdk.log
 report服务日志：tail -f dist/report/log/report.log
 ```
