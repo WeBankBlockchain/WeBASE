@@ -221,7 +221,7 @@ server {
     listen      8088 default_server;  //配置服务端口，需要开通网络策略
      server_name   10.107.105.18;    //配置服务地址，可以配置为域名
      location / {    
-root    /data/fisco-bcos-web /dist;   //静态文件路径，请指向下载代码的dist目录
+root    /data/fisco-bcos-web/dist;   //静态文件路径，请指向下载代码的dist目录
         index  index.html index.htm;
         try_files $uri $uri/ /index.html =404;
      }
