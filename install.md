@@ -250,31 +250,27 @@ sed -i "s/ 10.0.0.1:8083 /${your_mgrServer_ipPort}/g" nginx.conf
 
 ```Nginx
 upstream node_mgr_server{
-        server 127.0.0.1:8082;   //配置mgr地址及端口
-}
-server {
-    listen      8088 default_server;  //配置服务端口，需要开通网络策略
-     server_name   127.0.0.1;    //配置服务地址，可以配置为域名
-     location / {    
-root    /data/fisco-bcos-web /dist;   //静态文件路径，请指向下载代码的dist目录
-        index  index.html index.htm;
-        try_files $uri $uri/ /index.html =404;
-     }
-  	# Load configuration files for the default server block.
-    include /etc/nginx/default.d/*.conf;
-location /api {
-proxy_pass    http:// node_mgr_server /;    
-       proxy_set_header         Host                          $host;
-       proxy_set_header         X-Real-IP                 $remote_addr;
-       proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+        server 10.0.0.1:8083; //步骤三 节点管理服务地址及端口
     }
-    error_page 404 /404.html;
-            location = /40x.html {
-    }
-   error_page 500 502 503 504 /50x.html;
-         location = /50x.html {
-   }
-}
+    server {
+        listen       3002 default_server;   //步骤一 前端端口
+        server_name  10.0.0.1;         //步骤一 前端地址，可配置为域名
+        location / {
+                root    /data/webase-web/dist;   //步骤二 前端文件路径
+                index  index.html index.htm;
+                try_files $uri $uri/ /index.html =404;
+                }
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location /mgr {
+                    proxy_pass    http://node_mgr_server/;    		
+                    proxy_set_header		Host				$host;
+                        proxy_set_header		X-Real-IP			$remote_addr;
+                        proxy_set_header		X-Forwarded-For		$proxy_add_x_forwarded_for;
+                }
+        }
 ```
 
 ## 4.4 启动服务
