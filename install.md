@@ -5,8 +5,7 @@
 > * [web管理平台安装](#chapter-4)
 
 
-本安装文档仅描述了在一台服务器上安装搭建区块链平台的过程，目的是为了让开发者对区块链平台的部署搭建、运行、测试等有个整体的认识。
-如要用于生产环境，部署安装的流程和原理是一样的，但需要更多考虑分布式系统下服务的部署，需要有容错、容灾等的能力。
+本安装文档仅描述了在一台服务器上安装搭建WeBASE的过程，目的是为了让开发者对WeBASE的部署搭建、运行、测试等有个整体的认识。如要用于生产环境，部署安装的流程和原理是一样的，但需要更多考虑分布式系统下服务的部署，需要有容错、容灾等的能力。
 
 # 1. <a id="chapter-1"></a>依赖环境
 软件 | 软件要求
@@ -250,7 +249,30 @@ sed -i "s/ 10.0.0.1:8083 /${your_mgrServer_ipPort}/g" nginx.conf
 
 ```Nginx
 upstream node_mgr_server{
+<<<<<<< HEAD
         server 10.0.0.1:8083; //步骤三 节点管理服务地址及端口
+=======
+        server 10.107.119.91:8082;   //配置mgr地址及端口
+}
+server {
+    listen      8088 default_server;  #配置服务端口，需要开通网络策略
+     server_name   10.107.105.18;    #配置服务地址，可以配置为域名
+     location / {    
+root    /data/fisco-bcos-web/dist;   #静态文件路径，请指向下载代码的dist目录
+        index  index.html index.htm;
+        try_files $uri $uri/ /index.html =404;
+     }
+  	# Load configuration files for the default server block.
+    include /etc/nginx/default.d/*.conf;
+location /api {
+proxy_pass    http:// node_mgr_server /;    
+       proxy_set_header         Host                          $host;
+       proxy_set_header         X-Real-IP                 $remote_addr;
+       proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+    }
+    error_page 404 /404.html;
+            location = /40x.html {
+>>>>>>> 942022a2ff7238e045d85e173eba0d5a2513dd73
     }
     server {
         listen       3002 default_server;   //步骤一 前端端口
