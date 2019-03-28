@@ -109,8 +109,8 @@ cd /usr/local/app/webase-node-mgr/conf/contract
 ```
 修改配置中的前置服务信息：
 ```
-修改前置服务IP：sed -i "s/defaultFrontIp /${your_front_ip}/g"  contract-init.sh
-修改前置服务的端口：sed -i "s/defaultFrontPort /${your_front_port}/g"  contract-init.sh
+修改前置服务IP：sed -i "s/defaultFrontIp/${your_front_ip}/g"  contract-init.sh
+修改前置服务的端口：sed -i "s/defaultFrontPort/${your_front_port}/g"  contract-init.sh
 ```
 ### 2.5.3 运行脚本
 执行命令：
@@ -215,7 +215,7 @@ vim nginx.conf
 
 ```
 upstream node_mgr_server{
-        server 10.107.119.91:8082;   //配置mgr地址及端口
+        server 10.107.119.91:8082;   #配置mgr地址及端口
 }
 server {
     listen      8088 default_server;  #配置服务端口，需要开通网络策略
@@ -228,7 +228,7 @@ root    /data/fisco-bcos-web/dist;   #静态文件路径，请指向下载代码
   	# Load configuration files for the default server block.
     include /etc/nginx/default.d/*.conf;
 location /api {
-proxy_pass    http:// node_mgr_server /;    
+proxy_pass    http://node_mgr_server /;    
        proxy_set_header         Host                          $host;
        proxy_set_header         X-Real-IP                 $remote_addr;
        proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
