@@ -184,7 +184,6 @@ report服务日志：tail -f dist/report/log/report.log
 ```
 
 # 4. <a id="chapter-4"></a>web管理平台安装
-<<<<<<< HEAD
 ## 4.1	部署前端
 ### 4.1.1依赖环境
 
@@ -245,59 +244,6 @@ sed -i "s/ 10.0.0.1:8083 /${your_mgrServer_ipPort}/g" nginx.conf
 
     upstream node_mgr_server{
         server 10.0.0.1:8083; #步骤三 节点管理服务地址及端口
-=======
-## 4.1	安装nginx
-### 4.1.1安装依赖
-```
-yum -y install gcc pcre-devel zlib-devel openssl openssl-devel
-```
-### 4.1.2获取nginx
-```
-cd /usr/local
-wge t http://nginx.org/download/nginx-1.10.2.tar.gz  (版本号可换)
-```
-### 4.1.3安装nginx
-```
-tar -zxvf nginx-1.10.2.tar.gz
-cd nginx-1.10.2
-./configure --prefix=/usr/local/nginx
-make
-make install
-```
-
-## 4.2 获取源代码
-```
-cd /usr/local/app
-git clone https://github.com/FISCO-BCOS//fisco-bcos-web.git
-```
-## 4.3 修改配置
-找到nginx配置文件，使用vim打开，下面标红的注释就是需要配置的位置
-vim nginx.conf
-修改配置（以下配置插入到http{}里面）
-
-```
-upstream node_mgr_server{
-        server 10.107.119.91:8082;   #配置mgr地址及端口
-}
-server {
-    listen      8088 default_server;  #配置服务端口，需要开通网络策略
-     server_name   10.107.105.18;    #配置服务地址，可以配置为域名
-     location / {    
-root    /data/fisco-bcos-web/dist;   #静态文件路径，请指向下载代码的dist目录
-        index  index.html index.htm;
-        try_files $uri $uri/ /index.html =404;
-     }
-  	# Load configuration files for the default server block.
-    include /etc/nginx/default.d/*.conf;
-location /api {
-proxy_pass    http://node_mgr_server /;    
-       proxy_set_header         Host                          $host;
-       proxy_set_header         X-Real-IP                 $remote_addr;
-       proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
-    }
-    error_page 404 /404.html;
-            location = /40x.html {
->>>>>>> f0d6d63bfcf4b85fe9840bf8f09dbf5f9e368a00
     }
     server {
         listen       3002 default_server;   //步骤一 前端端口（端口需要开通策略且不能被占用）
