@@ -184,80 +184,175 @@ report服务日志：tail -f dist/report/log/report.log
 ```
 
 # 4. <a id="chapter-4"></a>web管理平台安装
-## 4.1	安装nginx
-### 4.1.1安装依赖
+## 4.1	部署前端
+### 4.1.1依赖环境
+
+| 环境     | 版本              |
+| ------ | --------------- |
+| nginx   | nginx1.6或以上版本    |
+
+nginx安装请参考4.2 安装nginx
+
+### 4.1.2 拉取代码
+
+代码可以放在/data下面
+执行命令：
+
+    git clone https://github.com/WeBankFinTech/webase-web.git
+
+### 4.1.3 修改nginx配置
+
+在代码库中docs文件下有nginx配置文件，直接可以拿来替换安装的nginx的配置文件nginx.conf；
+然后修改nginx.conf；
+
+进入nginx配置文件（这里nginx安装在/usr/local下面，如果这里没找到，可以到/etc下寻找,如有权限问题，请加上sudo）
 ```
-yum -y install gcc pcre-devel zlib-devel openssl openssl-devel
-```
-### 4.1.2获取nginx
-```
-cd /usr/local
-wge t http://nginx.org/download/nginx-1.10.2.tar.gz  (版本号可换)
-```
-### 4.1.3安装nginx
-```
-tar -zxvf nginx-1.10.2.tar.gz
-cd nginx-1.10.2
-./configure --prefix=/usr/local/nginx
-make
-make install
+    cd /usr/local/nginx/conf
 ```
 
-## 4.2 获取源代码
+1、 修改web服务端口（端口需要开通策略且不能被占用）
 ```
-cd /usr/local/app
-git clone https://github.com/FISCO-BCOS//fisco-bcos-web.git
+    sed -i "s/3002/${your_server_port}/g" nginx.conf
 ```
-## 4.3 修改配置
-找到nginx配置文件，使用vim打开，下面标红的注释就是需要配置的位置
-vim nginx.conf
-修改配置（以下配置插入到http{}里面）
+例如：
+```
+    sed -i "s/3002/8080/g" nginx.conf   你修改的服务端口是8080
+```
 
+2、 修改服务ip
 ```
-upstream node_mgr_server{
-        server 127.0.0.1:8082;   #配置mgr地址及端口
-}
-server {
-    listen      8088 default_server;  #配置服务端口，需要开通网络策略
-     server_name   127.0.0.1;    #配置服务地址，可以配置为域名
-     location / {    
-root    /data/fisco-bcos-web/dist;   #静态文件路径，请指向下载代码的dist目录
-        index  index.html index.htm;
-        try_files $uri $uri/ /index.html =404;
-     }
-  	# Load configuration files for the default server block.
-    include /etc/nginx/default.d/*.conf;
-location /api {
-proxy_pass    http://node_mgr_server /;    
-       proxy_set_header         Host                          $host;
-       proxy_set_header         X-Real-IP                 $remote_addr;
-       proxy_set_header        X-Forwarded-For     $proxy_add_x_forwarded_for;
+    sed -i "s/ 10.0.0.1 /${your_server_ip}/g" nginx.conf
+```
+例如： 
+```
+    sed -i "s/ 10.0.0.1 /192.168.0.1/g" nginx.conf
+```
+你修改的服务ip是192.168.0.1,也可以修改成域名
+
+3、 修改静态文件路径(文件需要有权限访问)
+```
+    sed -i "s/\ /data\/webase-web \/dist /${your_file_route}/g" nginx.conf
+```
+
+4、 修改mgr服务ip和端口
+```
+sed -i "s/ 10.0.0.1:8083 /${your_mgrServer_ipPort}/g" nginx.conf
+````
+
+服务器已有nginx可按照以下修改，
+```Nginx
+
+    upstream node_mgr_server{
+        server 10.0.0.1:8083; #步骤三 节点管理服务地址及端口
     }
-    error_page 404 /404.html;
-            location = /40x.html {
-    }
-   error_page 500 502 503 504 /50x.html;
-         location = /50x.html {
-   }
-}
+    server {
+        listen       3002 default_server;   //步骤一 前端端口（端口需要开通策略且不能被占用）
+        server_name  10.0.0.1;         //步骤一 前端地址，可配置为域名
+        location / {
+                root    /data/webase-web/dist;   //步骤二 前端文件路径(文件需要有权限访问)
+                index  index.html index.htm;
+                try_files $uri $uri/ /index.html =404;
+                }
+
+        # Load configuration files for the default server block.
+        include /etc/nginx/default.d/*.conf;
+
+        location /mgr {
+                    proxy_pass    http://node_mgr_server/;    		
+                    proxy_set_header		Host				$host;
+                        proxy_set_header		X-Real-IP			$remote_addr;
+                        proxy_set_header		X-Forwarded-For		$proxy_add_x_forwarded_for;
+                }
+        }
 ```
 
-## 4.4 启动服务
-找到nginx服务目录
-可以使用命令：
-whereis nginx
-进入目录并启动：
-cd /usr/local/nginx
+## 4.1.3 启动nginx
+
+(1)、启动nginx。
 启动命令：
+
+	/usr/local/nginx/sbin/nginx    (nginx下载在/usr/local目录下)
+
+检查nginx是否启动成功
+
 ```
-/usr/local/nginx/sbin/nginx
+    ps -ef | grep nginx
 ```
-停止命令：
+观察进程是否起来
+
+启动报错重点排查：日志路径是否正确（error.log和access.log）,nginx有没有添加用户权限。
+
+(2)、打开页面，页面url是nginx配置的ip和端口。
+例如:上面配置文件的url为   http://10.0.0.1:3002
+
+(3)、打开页面后，请找运维提供帐号和密码登录。
+
+
+## 4.2 安装nginx（可参考[网络教程](http://www.runoob.com/linux/nginx-install-setup.html)）
+
+### 4.2.1 下载nginx依赖
+在安装nginx前首先要确认系统中安装了gcc、pcre-devel、zlib-devel、openssl-devel。如果没有，请执行命令
+
+	yum -y install gcc pcre-devel zlib-devel openssl openssl-devel
+执行命令时注意权限问题，如遇到，请加上sudo
+
+#### 4.2.2 下载nginx
+nginx下载地址：https://nginx.org/download/（下载最新稳定版本即可）
+或者使用命令：
+
+	wget http://nginx.org/download/nginx-1.10.2.tar.gz  (版本号可换)
+将下载的包移动到/usr/local/下
+
+### 4.2.3 安装nginx
+
+#### 4.2.3.1解压
+	tar -zxvf nginx-1.9.9.tar.gz
+
+#### 4.2.3.2进入nginx目录
+
+	cd nginx-1.9.9
+
+##### 4.2.3.3配置
+
+	./configure --prefix=/usr/local/nginx
+
+#### 4.2.3.4make
+
+	make
+	make install
+
+#### 4.2.3.5测试是否安装成功
+使用命令：
+
+	/usr/local/nginx/sbin/nginx –t
+正常情况的信息输出：
+
+	nginx: the configuration file /usr/local/nginx/conf/nginx.conf syntax is ok
+	nginx: configuration file /usr/local/nginx/conf/nginx.conf test is successful
+
+### 4.2.4常用nginx命令
+
+启动：
+
 ```
-/usr/local/nginx/sbin/nginx –s stop
+    /usr/local/nginx/sbin/nginx
+```
+停止：
+
+```
+    /usr/local/nginx/sbin/nginx -s stop
+```
+重启
+```
+    /usr/local/nginx/sbin/nginx -s reload
 ```
 
-## 4.5 打开浏览器
-输入url：上面的ip或域名+端口
-出现页面后输入初始帐号密码：admin/Abcd1234
+### 4.2.5 nginx日志
+
+nginx日志一般在nginx安装目录下，例如：/usr/local/nginx/log
+
+有access.log和error.log两个日志
+
+
+
 
