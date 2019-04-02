@@ -125,37 +125,39 @@ sh contract-init.sh
 ## 3.1 拉取代码
 
 执行命令：
-```
-git clone http://xxx/webase-front.git
+```shell
+git clone https://github.com/WeBankFinTech/webase-front.git
 ```
 
 ## 3.2 编译代码
 
 在代码的根目录webase-front执行构建命令：
-```
-gradle build
+```shell
+gradle build -x test
 ```
 构建完成后，会在根目录webase-front下生成已编译的代码目录dist。
 
 ## 3.3 修改配置
 进入目录：
-```
+```shell
 cd dist/conf
 ```
 ```
 修改当前服务端口：sed -i "s/8081/${your_server_port}/g" application.yml
 修改机构名称：sed -i "s/orgTest/${your_org_name}/g" application.yml
 修改节点目录：sed -i "s/\/data\/app\/build\/node0/${your_node_dir}/g" application.yml
-修改节点管理服务ip端口：sed -i "s/127.0.0.1:8082/${your_ip_port}/g" application.yml
+修改节点管理服务ip端口：sed -i "s/10.0.0.1:8082/${your_ip_port}/g" application.yml
 例子（将端口由8081改为8090）：sed -i "s/8081/8090/g" application.yml
 ```
+**备注：如果字符串中存在斜杠'/'，在前面加单个反斜杠'\\'转义**
+
 进入目录：
-```
+```shell
 cd dist/report
 ```
 ```
-修改节点管理服务ip：sed -i "s/127.0.0.1/${your_ip }/g" config.json
-修改节点管理服务端口：sed -i "s/8082/${your_ port}/g" config.json
+修改节点管理服务ip：sed -i "s/10.0.0.1/${your_ip}/g" config.json
+修改节点管理服务端口：sed -i "s/8082/${your_port}/g" config.json
 修改节点目录：sed -i "s/\/data\/app\/build\/node0/${your_node_dir}/g" config.json
 ```
 
@@ -180,7 +182,7 @@ cd dist
 ```
 前置服务日志：tail -f log/webase-front.log
 web3连接日志：tail -f log/web3sdk.log
-report服务日志：tail -f dist/report/log/report.log
+report服务日志：tail -f report/log/report.log
 ```
 
 # 4. <a id="chapter-4"></a>web管理平台安装
