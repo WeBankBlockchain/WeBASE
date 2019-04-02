@@ -205,7 +205,7 @@ make install
 
 ## 4.2 获取源代码
 ```
-cd /usr/local/app
+cd /data
 git clone https://github.com/WeBankFinTech/webase-web.git
 ```
 ## 4.3 修改配置
@@ -286,6 +286,12 @@ cd /usr/local/nginx
 ```
 /usr/local/nginx/sbin/nginx –s stop
 ```
+检查nginx是否启动成功
+
+```
+    ps -ef | grep nginx
+```
+观察进程是否起来
 
 ## 4.5 打开浏览器
 输入url：上面的ip或域名+端口
