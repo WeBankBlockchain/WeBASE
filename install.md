@@ -1,6 +1,6 @@
 # 目录
 > * [依赖环境](#chapter-1)
-> * [节点管理安装](#chapter-2)
+> * [节点管理安装](https://github.com/WeBankFinTech/webase-node-mgr/blob/dev-0.5/README.md)
 > * [节点前置服务安装](#chapter-3)
 > * [web管理平台安装](#chapter-4)
 
@@ -13,7 +13,7 @@
 gradle      |	gradle4.9或更高版本（构建工具）
 java        |   1.8.0_181或更高版本
 mysql版本   |   5.5及以上版本（框架运行依赖）
-python | Python2.7 
+python | Python2.7
 
 运行服务器要求：1台普通安装linux系统的机器即可。
 
