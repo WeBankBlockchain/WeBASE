@@ -35,9 +35,7 @@ WeBWeBASE所有子系统独立存在，均可独立部署，独立提供服务�
 
 
 # <a id="chapter-5"></a>安装说明
-请参考安装说明文档Install.md。
 请参考安装说明文档[install.md](https://github.com/WeBankFinTech/WeBASE/blob/dev/install.md)
-
 
 # <a id="chapter-6"></a>各子系统介绍
 **webase-front (节点前置)**
