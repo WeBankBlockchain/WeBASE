@@ -48,7 +48,7 @@ def startNode():
     if not os.path.exists("{}/nodes".format(currentDir)):
         doCmdIgnoreException("chmod u+x *.sh")
         doCmdIgnoreException("dos2unix *.sh")
-        result_build = doCmd("./build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+        result_build = doCmd("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
         if result_build["status"] == 0:
             if_build = 'completed' in result_build["output"]
             if not if_build:
@@ -60,11 +60,11 @@ def startNode():
     else:
         info = raw_input("节点目录nodes已经存在。是否重新安装？[y/n]:")
         if info == "y" or info == "Y":
-            doCmdIgnoreException("./nodes/127.0.0.1/stop_all.sh")
+            doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
             doCmd("rm -rf nodes")
             doCmdIgnoreException("chmod u+x *.sh")
             doCmdIgnoreException("dos2unix *.sh")
-            result_build = doCmd("./build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+            result_build = doCmd("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
             if result_build["status"] == 0:
                 if_build = 'completed' in result_build["output"]
                 if not if_build:
@@ -78,7 +78,7 @@ def startNode():
     os.chdir(node_dir)
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
-    os.system("./start_all.sh")
+    os.system("bash start_all.sh")
     print "============== node end...   =============="
     return
     
@@ -91,7 +91,7 @@ def stopNode():
     os.chdir(node_dir)
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
-    os.system("./stop_all.sh")
+    os.system("bash stop_all.sh")
     return
     
 def changeWebConfig():
@@ -206,7 +206,7 @@ def startMgr():
         os.chdir(script_dir)
         doCmdIgnoreException("chmod u+x *.sh")
         doCmdIgnoreException("dos2unix *.sh")
-        dbResult = doCmd('./webase.sh {} {}'.format(mysql_ip, mysql_port))
+        dbResult = doCmd('bash webase.sh {} {}'.format(mysql_ip, mysql_port))
         if dbResult["status"] == 0:
             if_success = 'success' in dbResult["output"]
             if if_success:
@@ -223,14 +223,14 @@ def startMgr():
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
-    result = doCmd("./start.sh")
+    result = doCmd("bash start.sh")
     if result["status"] == 0:
         if_started = 'started' in result["output"]
         if if_started:
             info = raw_input("mgr进程已经存在，是否kill进程强制安装？[y/n]:")
             if info == "y" or info == "Y":
-                doCmd("./stop.sh")
-                result_start = doCmd("./start.sh")
+                doCmd("bash stop.sh")
+                result_start = doCmd("bash start.sh")
                 if result_start["status"] == 0:
                     if_success = 'Success' in result_start["output"]
                     if if_success:
@@ -262,7 +262,7 @@ def stopMgr():
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
-    result = doCmd("./stop.sh")
+    result = doCmd("bash stop.sh")
     if result["status"] == 0:
         if_success = 'Success' in result["output"]
         if if_success:
@@ -325,13 +325,13 @@ def startFront():
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
-    result = doCmd("./start.sh")
+    result = doCmd("bash start.sh")
     if result["status"] == 0:
         if_started = 'started' in result["output"]
         if if_started:
             info = raw_input("front进程已经存在，是否kill进程强制安装？[y/n]:")
             if info == "y" or info == "Y":
-                doCmd("./stop.sh")
+                doCmd("bash stop.sh")
                 result_start = doCmd("sh start.sh")
                 if result_start["status"] == 0:
                     if_success = 'Success' in result_start["output"]
@@ -364,7 +364,7 @@ def stopFront():
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
-    result = doCmd("./stop.sh")
+    result = doCmd("bash stop.sh")
     if result["status"] == 0:
         if_success = 'Success' in result["output"]
         if if_success:
