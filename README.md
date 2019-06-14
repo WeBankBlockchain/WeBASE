@@ -1,22 +1,11 @@
-# 目录
-> * [介绍](#chapter-1)
-> * [支持平台](#chapter-2)
-> * [设计原则](#chapter-3)
-> * [整体架构](#chapter-4)
-> * [安装说明](#chapter-5)
-> * [各子系统介绍](#chapter-6)
-> * [应用开发步骤](#chapter-7)
-
-# <a id="chapter-1"></a>介绍
+# 介绍
 WeBASE（WeBank Blockchain Application Software Extension） 是在区块链应用和底层之间搭建的一套通用组件，围绕交易、合约、密钥管理，数据，可视化管理来设计各个模块，开发者可以根据业务所需，选择子系统进行部署。可以屏蔽区块链底层的复杂度，降低开发者的门槛，大幅提高区块链应用的开发效率。包含了节点前置、节点管理、交易链路，数据导出，Web管理平台等子系统。
 
 开发者搭建完区块链节点后，部署WeBASE，基于WeBASE开发区块链应用，将会大幅提升效率。
 
-# <a id="chapter-2"></a>支持平台
-目前运行的操作系统平台如下：
-Linux
 
-# <a id="chapter-3"></a>设计原则
+
+# 设计原则
 **按需部署**
 WeBASE抽象应用开发的诸多共性模块，形成各类服务组件，开发者根据需要部署所需组件。
 
@@ -29,15 +18,15 @@ WeBWeBASE所有子系统独立存在，均可独立部署，独立提供服务�
 **可定制**
 前端页面往往带有自身的业务属性，因此WeBASE采用前后端分离的技术，便于开发者基于后端接口定制自己的前端页面。
 
-# <a id="chapter-4"></a>整体架构
+# 整体架构
 
 ![[架构图]](./architecture.png)
 
 
-# <a id="chapter-5"></a>安装说明
+# 安装说明
 请参考安装说明文档[install.md](https://github.com/WeBankFinTech/WeBASE/blob/dev/install.md)
 
-# <a id="chapter-6"></a>各子系统介绍
+# 各子系统介绍
 
 <table style="width:100%;border-collapse:collapse">
     <thead>
@@ -72,7 +61,7 @@ WeBWeBASE所有子系统独立存在，均可独立部署，独立提供服务�
 </table>
 
 
-# <a id="chapter-7"></a>应用开发步骤
+# 应用开发步骤
 1 部署WeBASE。
 
 2 登录WeBASE管理平台，添加节点信息，私钥信息等。
@@ -83,3 +72,10 @@ WeBWeBASE所有子系统独立存在，均可独立部署，独立提供服务�
 
 5 登录管理平台查看交易详情，查看交易统计信息，在线运维管理
 
+# 贡献说明
+请阅读我们的贡献[文档](https://github.com/WeBankFinTech/WeBASE/blob/master/CONTRIBUTING.md)，了解如何贡献代码，并提交你的贡献。
+
+希望在您的参与下，WeBASE会越来越好！
+
+# 社区
+- 联系我们：webase@webank.com
