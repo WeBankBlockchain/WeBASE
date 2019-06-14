@@ -32,9 +32,9 @@ unzip webase-deploy.zip
 cd webase-deploy
 ```
 
-## 3、修改配置（没有变化可以不修改）
+## 3、修改配置
 
-① 可以使用以下命令修改，也可以直接修改文件（vi common.properties）
+① 可以使用以下命令修改，也可以直接修改文件（vi common.properties），没有变化的可以不修改
 
 ② 数据库需要提前安装（数据库安装请参看 [附录7.4](#74-数据库部署)）
 
