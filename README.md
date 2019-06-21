@@ -20,7 +20,7 @@ WeBWeBASE所有子系统独立存在，均可独立部署，独立提供服务�
 
 # 整体架构
 
-![[架构图]](./architecture.png)
+![[架构图]](./images/architecture.png)
 
 
 # 安装说明
