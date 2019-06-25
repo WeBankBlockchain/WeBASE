@@ -16,7 +16,7 @@ def do():
     startMgr()
     startFront()
     print "=====================    deploy   end...   ====================="
-    print "=====================    version  dev-0.8  ====================="
+    print "=====================    version  V1.0.0   ====================="
     return
     
 def end():
@@ -294,7 +294,7 @@ def changeFrontConfig():
     # change server config
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
     doCmd('sed -i "s/8081/{}/g" {}/application.yml'.format(frontPort, server_dir))
-    doCmd('sed -i "s/10.0.0.1:8080/{}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
+    doCmd('sed -i "s/127.0.0.1:8080/{}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
     doCmd('sed -i "s%h2Path%{}%g" {}/application.yml'.format(db_dir, server_dir))
     doCmd('sed -i "s%front_db%{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%/data%{}%g" {}/application.yml'.format(monitorDisk, server_dir))
