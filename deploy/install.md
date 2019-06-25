@@ -2,7 +2,7 @@
 
 [TOC]
 
-​	一键部署可以快速搭建WeBASE环境。包括节点（fisco-bcos）、节点前置（WeBASE-Front）、节点管理（WeBASE-Node-Manager）、管理平台（WeBASE-Web）。
+​	一键部署可以快速搭建WeBASE环境。包括节点（fisco-bcos）、节点前置子系统（WeBASE-Front）、节点管理子系统（WeBASE-Node-Manager）、管理平台（WeBASE-Web）。
 
 ​	部署脚本会拉取相关安装包进行部署（需保持网络畅通），重复部署可根据提示进行相关操作。
 
@@ -47,9 +47,9 @@ cd webase-deploy
 数据库密码：sed -i "s%dbPassword%${your_db_password}%g" common.properties
 数据库名称：sed -i "s%db_mgr%${your_db_name}%g" common.properties
 
-web服务端口：sed -i "s%8080%${your_web_port}%g" common.properties
-mgr服务端口：sed -i "s%8081%${your_mgr_port}%g" common.properties
-front服务端口：sed -i "s%8082%${your_front_port}%g" common.properties
+管理平台服务端口：sed -i "s%8080%${your_web_port}%g" common.properties
+节点管理子系统服务端口：sed -i "s%8081%${your_mgr_port}%g" common.properties
+节点前置子系统服务端口：sed -i "s%8082%${your_front_port}%g" common.properties
 
 节点fisco版本：sed -i "s%2.0.0-rc2%${your_fisco_version}%g" common.properties
 节点安装个数：sed -i "s%nodeCounts%${your_node_counts}%g" common.properties
@@ -224,7 +224,7 @@ mysql -utest -p123456 -h 127.0.0.1 -P 3306
 创建数据库
 
 ```sql
-mysql > create database db_browser;
+mysql > create database db_mgr;
 ```
 
 ## 8、常见问题
