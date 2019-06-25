@@ -89,7 +89,7 @@ http://{deployIP}:{webPort}
 节点前置控制台：
 
 ```
-http://{deployIP}:{frontPort}/webase-front
+http://{deployIP}:{frontPort}/WeBASE-Front
 ```
 
 **备注：**部署服务器IP和相关服务端口需对应修改
@@ -259,7 +259,7 @@ Traceback (most recent call last):
 ImportError: No module named MySQLdb
 ```
 
-答：MySQL-python安装请参看部署附录7.3
+答：MySQL-python安装请参看部署 [附录7.3](#73-MySQL-python部署)
 
 ### 8.3 部署时编译包下载慢
 
