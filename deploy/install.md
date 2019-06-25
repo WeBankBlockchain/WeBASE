@@ -2,7 +2,7 @@
 
 [TOC]
 
-​	一键部署可以快速搭建WeBASE环境。包括节点（fisco-bcos）、节点前置（webase-front）、节点管理（webase-node-mgr）、管理平台（webase-web）。
+​	一键部署可以快速搭建WeBASE环境。包括节点（fisco-bcos）、节点前置（WeBASE-Front）、节点管理（WeBASE-Node-Manager）、管理平台（WeBASE-Web）。
 
 ​	部署脚本会拉取相关安装包进行部署（需保持网络畅通），重复部署可根据提示进行相关操作。
 
@@ -273,7 +273,7 @@ Saving to: ‘webase-front.zip’
  0% [                                                                                                                                ] 77,974      37.8KB/s    
 ```
 
-答：部署过程会下载工程编译包，可能会因为网络原因导致过慢。此时，可以先手动下载（ [webase-web](https://github.com/mingzhenliu/sss/releases/download/111/webase-web.zip) 、[webase-node-mgr](https://github.com/mingzhenliu/sss/releases/download/111/webase-node-mgr.zip) 、[webase-front](https://github.com/mingzhenliu/sss/releases/download/111/webase-front.zip)），再上传至服务器webase-deploy目录，在部署过程中根据提示不再重新下载编译包。
+答：部署过程会下载工程编译包，可能会因为网络原因导致过慢。此时，可以先手动下载（ [webase-web](https://github.com/WeBankFinTech/WeBASELargeFiles/releases/download/WeBASEV1.0.0/webase-web.zip) 、[webase-node-mgr](https://github.com/WeBankFinTech/WeBASELargeFiles/releases/download/WeBASEV1.0.0/webase-node-mgr.zip) 、[webase-front](https://github.com/WeBankFinTech/WeBASELargeFiles/releases/download/WeBASEV1.0.0/webase-front.zip)），再上传至服务器webase-deploy目录，在部署过程中根据提示不再重新下载编译包。
 
 ### 8.4 部署时数据库访问报错
 
