@@ -117,17 +117,16 @@ def hasInstallServer(server):
 
 def installByYum(server):
     if isCentos():
-        result = doCmd("sudo yum -y install {}".format(server))
-        if result["status"] !=0:
-            os.system("yum install epel-release")
-            os.system("sudo yum install python-pip")
-            os.system("pip install --upgrade pip")
+        result = doCmdIgnoreException("sudo yum -y install {}".format(server))
+        if result["status"] != 0:
+            os.system("sudo yum -y install epel-release")
+            os.system("sudo yum -y install python-pip")
             os.system("pip install requests")
-            result = doCmd("yum install {}".format(server))
+            result = doCmd("sudo yum -y install {}".format(server))
     elif isSuse():
-        os.system("sudo zypper install  -y {}".format(server))
+        os.system("sudo zypper install -y {}".format(server))
     elif isUbuntu():
-        os.system("sudo apt-get install  -y {}".format(server))
+        os.system("sudo apt-get install -y {}".format(server))
     else:
         raise Exception("error,not support this platform,only support centos,suse,ubuntu.")
     return
