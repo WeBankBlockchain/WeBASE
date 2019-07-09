@@ -25,7 +25,7 @@ def installRequirements():
         hasInstall = hasInstallServer(require)
         if not hasInstall:
             installByYum(require)
-        print "check finished Sucessfully."
+        print "check finished sucessfully."
     return
 
 def checkSoft():
@@ -34,15 +34,45 @@ def checkSoft():
     if res1["status"] != 0:
         print "  error! java is not install or configure!"
         sys.exit(0)
-    print "check finished Sucessfully."
+    print "check finished sucessfully."
     return
-    
+
 def checkNodePort():
     print "check node port..."
+    if_exist_fisco = getCommProperties("if.exist.fisco")
+    if if_exist_fisco == "yes":
+        checkExistedNodePort()
+    elif if_exist_fisco == "no":
+        checkNewNodePort()
+    else:
+        print "  error! param if.exist.fisco must be yes or no, current is {}. please check.".format(if_exist_fisco)
+        sys.exit(0)
+    print "check finished sucessfully."
+
+def checkExistedNodePort():
+    deploy_ip = "127.0.0.1"
+    node_rpcPort = int(getCommProperties("node.rpcPort"))
+    node_p2pPort = int(getCommProperties("node.p2pPort"))
+    node_channelPort = int(getCommProperties("node.channelPort"))
+    res_rpcPort = net_if_used_no_msg("127.0.0.1",node_rpcPort)
+    if not res_rpcPort:
+        print "  error! rpc port {} is not alive. please check.".format(node_rpcPort)
+        sys.exit(0)
+    res_p2pPort = net_if_used_no_msg("127.0.0.1",node_p2pPort)
+    if not res_p2pPort:
+        print "  error! p2p port {} is not alive. please check.".format(node_p2pPort)
+        sys.exit(0)
+    res_channelPort = net_if_used_no_msg("127.0.0.1",node_channelPort)
+    if not res_channelPort:
+        print "  error! channel port {} is not alive. please check.".format(node_channelPort)
+        sys.exit(0)
+    return
+    
+def checkNewNodePort():
     deploy_ip = "127.0.0.1"
     nodes = getCommProperties("node.counts")
     node_counts = 2
-    if nodes is not "nodeCounts":
+    if nodes != "nodeCounts":
         node_counts = int(nodes)
     node_rpcPort = int(getCommProperties("node.rpcPort"))
     node_p2pPort = int(getCommProperties("node.p2pPort"))
@@ -57,7 +87,6 @@ def checkNodePort():
         res_channelPort = net_if_used("127.0.0.1",node_channelPort+i)
         if res_channelPort:
             sys.exit(0)
-    print "check finished Sucessfully."
     return
     
 def checkWebPort():
@@ -67,7 +96,7 @@ def checkWebPort():
     res_web = net_if_used(deploy_ip,web_port)
     if res_web:
         sys.exit(0)
-    print "check finished Sucessfully."
+    print "check finished sucessfully."
     return
     
 def checkMgrPort():
@@ -77,7 +106,7 @@ def checkMgrPort():
     res_mgr = net_if_used(deploy_ip,mgr_port)
     if res_mgr:
         sys.exit(0)
-    print "check finished Sucessfully."
+    print "check finished sucessfully."
     return
     
 def checkFrontPort():
@@ -87,7 +116,7 @@ def checkFrontPort():
     res_front = net_if_used(deploy_ip,front_port)
     if res_front:
         sys.exit(0)
-    print "check finished Sucessfully."
+    print "check finished sucessfully."
     return
     
 def checkDbConnect():
@@ -98,7 +127,7 @@ def checkDbConnect():
     if not ifLink:
         print 'The database ip:{} port:{} is disconnected, please confirm.'.format(mysql_ip, mysql_port)
         sys.exit(0)
-    print "check finished Sucessfully."
+    print "check finished sucessfully."
     return
         
 def checkSdkDir():
