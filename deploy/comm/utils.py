@@ -40,6 +40,18 @@ def net_if_used(ip,port):
     finally:
         s.close()
 
+def net_if_used_no_msg(ip,port):
+    s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
+    s.settimeout(0.5)
+    try:
+        result=s.connect_ex((ip, int(port)))
+        if result==0:
+            return True
+        else:
+            return False
+    finally:
+        s.close()
+
 def isUbuntu():
     return platformStr.lower().find("ubuntu") > -1
 
