@@ -21,10 +21,10 @@ def do():
         commBuild.startWeb()
     elif "stopWeb" == param:
         commBuild.stopWeb()
-    elif "startMgr" == param:
-        commBuild.startMgr()
-    elif "stopMgr" == param:
-        commBuild.stopMgr()
+    elif "startManager" == param:
+        commBuild.startManager()
+    elif "stopManager" == param:
+        commBuild.stopManager()
     elif "startFront" == param:
         commBuild.startFront()
     elif "stopFront" == param:
@@ -42,17 +42,17 @@ def help():
 Usage: python deploy [Parameter]
 
 Parameter:
-    check : check the environment
-    installAll : check the environment, deploy all server
-    stopAll : stop all server
-    startNode : start nodes
-    stopNode : stop nodes
-    startWeb : start web server
-    stopWeb : stop web server
-    startMgr : start mgr server
-    stopMgr : stop mgr server
-    startFront : start front server
-    stopFront : stop front server
+    check:        check the environment
+    installAll:   check the environment, deploy all server
+    stopAll:      stop all server
+    startNode:    start FISCO-BCOS nodes
+    stopNode:     stop FISCO-BCOS nodes
+    startWeb:     start WeBASE-Web server
+    stopWeb:      stop WeBASE-Web server
+    startManager: start WeBASE-Node-Manager server
+    stopManager:  stop WeBASE-Node-Manager server
+    startFront:   start WeBASE-Front server
+    stopFront:    stop WeBASE-Front server
     
 Attention:
     1. Need to install python2.7, jdk1.8, mysql 5.6, MySQL-python first
@@ -63,8 +63,8 @@ Attention:
     return
 
 def paramError():
-    print "Param error! Please check."
     print ""
+    print "Param error! Please check."
     help()
     return
 
