@@ -27,7 +27,7 @@ WeBASE将区块链应用开发标准化，搭建完fisco bcos节点后，只需�
 
 
 ## 贡献说明
-请阅读我们的贡献文档，了解如何贡献代码，并提交你的贡献。
+请阅读我们的[贡献文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/CONTRIBUTING.html)，了解如何贡献代码，并提交你的贡献。
 
 希望在您的参与下，WeBASE会越来越好！
 
