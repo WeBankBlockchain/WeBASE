@@ -9,6 +9,17 @@ log = deployLog.getLogger()
 checkDependent = ["git","openssl","curl","nginx"]
 
 def do():
+    print "================================================================",
+    webaseMsg = '''
+              _    _     ______  ___  _____ _____ 
+             | |  | |    | ___ \/ _ \/  ___|  ___|
+             | |  | | ___| |_/ / /_\ \ `--.| |__  
+             | |/\| |/ _ | ___ |  _  |`--. |  __| 
+             \  /\  |  __| |_/ | | | /\__/ | |___ 
+              \/  \/ \___\____/\_| |_\____/\____/  
+    '''
+    print webaseMsg
+    print "================================================================"
     print "===================== envrionment check... ====================="
     installRequirements()
     checkSoft()
@@ -18,6 +29,7 @@ def do():
     checkFrontPort()
     checkDbConnect()
     print "===================== envrionment ready... ====================="
+    print "================================================================"
 
 def installRequirements():
     for require in checkDependent:
@@ -30,15 +42,23 @@ def installRequirements():
 
 def checkSoft():
     print "check java..."
-    res1 = doCmdIgnoreException("java -version")
-    if res1["status"] != 0:
+    res_check = doCmdIgnoreException("java -version")
+    if res_check["status"] != 0:
         print "  error! java is not install or configure!"
+        sys.exit(0)
+    if_openJDK = 'OpenJDK' in res_check["output"]
+    if if_openJDK:
+        print "  error! OpenJDK cann't be supported, please change!"
+        sys.exit(0)
+    if_version = '1.8.' in res_check["output"]
+    if not if_version:
+        print "  error! java version must be 1.8, please check!"
         sys.exit(0)
     print "check finished sucessfully."
     return
 
 def checkNodePort():
-    print "check node port..."
+    print "check FISCO-BCOS node port..."
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco == "yes":
         checkExistedNodePort()
@@ -90,7 +110,7 @@ def checkNewNodePort():
     return
     
 def checkWebPort():
-    print "check web port..."
+    print "check WeBASE-Web port..."
     deploy_ip = "127.0.0.1"
     web_port = getCommProperties("web.port")
     res_web = net_if_used(deploy_ip,web_port)
@@ -100,7 +120,7 @@ def checkWebPort():
     return
     
 def checkMgrPort():
-    print "check mgr port..."
+    print "check WeBASE-Node-Manager port..."
     deploy_ip = "127.0.0.1"
     mgr_port = getCommProperties("mgr.port")
     res_mgr = net_if_used(deploy_ip,mgr_port)
@@ -110,7 +130,7 @@ def checkMgrPort():
     return
     
 def checkFrontPort():
-    print "check front port..."
+    print "check WeBASE-Front port..."
     deploy_ip = "127.0.0.1"
     front_port = getCommProperties("front.port")
     res_front = net_if_used(deploy_ip,front_port)
@@ -120,7 +140,7 @@ def checkFrontPort():
     return
     
 def checkDbConnect():
-    print "check db connection..."
+    print "check database connection..."
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = getCommProperties("mysql.port")
     ifLink = do_telnet(mysql_ip,mysql_port)
@@ -129,13 +149,6 @@ def checkDbConnect():
         sys.exit(0)
     print "check finished sucessfully."
     return
-        
-def checkSdkDir():
-    print "checking sdk dir"
-    nodeDir = getCommProperties("node.sdkDir")
-    if not os.path.exists(nodeDir):
-        print "{} is not exists".format(nodeDir)
-        return
 
 def hasInstallServer(server):
     result = doCmdIgnoreException("which {}".format(server))
