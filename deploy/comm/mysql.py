@@ -27,7 +27,7 @@ def dbConnect():
         drop_db = 'DROP DATABASE IF EXISTS {}'.format(mysql_database)
         create_db = 'CREATE DATABASE IF NOT EXISTS {}'.format(mysql_database)
         if result == 1:
-            info = raw_input("数据库{}已经存在，是否删除重建？[y/n]:".format(mysql_database))
+            info = raw_input("WeBASE-Node-Manager数据库{}已经存在，是否删除重建？[y/n]:".format(mysql_database))
             if info == "y" or info == "Y":
                 log.info(drop_db)
                 cursor.execute(drop_db)
