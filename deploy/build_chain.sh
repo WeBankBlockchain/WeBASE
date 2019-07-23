@@ -907,7 +907,7 @@ download_bin()
     Download_Link="https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v${compatibility_version}/${package_name}"
     LOG_INFO "Downloading fisco-bcos binary from ${Download_Link} ..." 
     if [ $(curl -IL -o /dev/null -s -w %{http_code}  https://www.fisco.com.cn/cdn/fisco-bcos/releases/download/v${compatibility_version}/${package_name}) == 200 ];then
-        curl -LO ${Download_Link} --speed-time 3 --speed-limit 100 -m ${download_timeout} || {
+        curl -LO ${Download_Link} --speed-time 3 --speed-limit 204800 -m ${download_timeout} || {
             LOG_INFO "Download speed is too low, try https://www.fisco.com.cn/cdn/fisco-bcos/releases/download/v${compatibility_version}/${package_name}"
             curl -LO https://www.fisco.com.cn/cdn/fisco-bcos/releases/download/v${compatibility_version}/${package_name}
         }
