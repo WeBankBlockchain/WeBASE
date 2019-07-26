@@ -201,7 +201,7 @@ def changeManagerConfig():
     # change script config
     doCmd('sed -i "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
     doCmd('sed -i "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
-    doCmd('sed -i "s/fisco-bcos-data/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
+    doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
     
     # change server config
     doCmd('sed -i "s/5001/{}/g" {}/application.yml'.format(mgr_port, conf_dir))
