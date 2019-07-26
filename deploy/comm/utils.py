@@ -172,7 +172,7 @@ def pullSourceExtract(urlName,fileName):
             sys.exit(0)
     else:
         info1 = raw_input("{}.zip编译包已经解压。是否重新解压？[y/n]:".format(fileName))
-        if info == "y" or info == "Y":
+        if info1 == "y" or info1 == "Y":
             doCmd("rm -rf {}".format(fileName))
             doCmd("unzip -o {}.zip".format(fileName))
             if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
