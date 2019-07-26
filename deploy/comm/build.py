@@ -16,7 +16,7 @@ def do():
     installManager()
     installFront()
     print "=====================    deploy   end...   ====================="
-    print "=====================    version  V1.0.1   ====================="
+    print "=====================    version  V1.0.2   ====================="
     print "================================================================"
     return
     
@@ -70,7 +70,7 @@ def installNode():
                 doCmdIgnoreException("chmod u+x *.sh")
                 doCmdIgnoreException("dos2unix *.sh")
                 os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-    startNode()
+        startNode()
     
 def startNode():
     print "==============      FISCO-BCOS      start...  =============="
@@ -122,8 +122,8 @@ def changeWebConfig():
     web_log_dir = web_dir + "/log"
     doCmd('mkdir -p {}'.format(web_log_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
-    doCmd('sed -i "s/3002/{}/g" {}/comm/nginx.conf'.format(web_port, currentDir))
-    doCmd('sed -i "s/10.0.0.1:8083/{}:{}/g" {}/comm/nginx.conf'.format(deploy_ip, mgr_port, currentDir))
+    doCmd('sed -i "s/5000/{}/g" {}/comm/nginx.conf'.format(web_port, currentDir))
+    doCmd('sed -i "s/10.0.0.1:5001/{}:{}/g" {}/comm/nginx.conf'.format(deploy_ip, mgr_port, currentDir))
     doCmd('sed -i "s:log_path:{}:g" {}/comm/nginx.conf'.format(web_log_dir, currentDir))
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
 
@@ -154,12 +154,12 @@ def startWeb():
     if res["status"] == 0:
         res2 = doCmd("sudo " + res["output"] + " -c " + nginx_config_dir)
         if res2["status"] == 0:
-            print "=======      WeBASE-Web      start success! ======="
+            print "=======      WeBASE-Web     start success!  ======="
         else:
-            print "=======      WeBASE-Web      start  fail!   ======="
+            print "=======      WeBASE-Web     start  fail!    ======="
             sys.exit(0)
     else:
-        print "=======      WeBASE-Web      start  fail!   ======="
+        print "=======      WeBASE-Web     start  fail!    ======="
         sys.exit(0)
     print "==============      WeBASE-Web      end...    =============="
     return
@@ -171,7 +171,7 @@ def stopWeb():
         cmd = "sudo kill -QUIT {}".format(pid)
         os.system(cmd)
         doCmdIgnoreException("sudo rm -rf /run/nginx-webase-web.pid")
-        print "=======      WeBASE-Web      stop success!  ======="
+        print "=======      WeBASE-Web     stop  success!  ======="
     else:
         print "=======      WeBASE-Web     is not running! ======="
     return
@@ -201,15 +201,15 @@ def changeManagerConfig():
     # change script config
     doCmd('sed -i "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
     doCmd('sed -i "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
-    doCmd('sed -i "s/fisco-bcos-data/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
+    doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
     
     # change server config
-    doCmd('sed -i "s/8080/{}/g" {}/application.yml'.format(mgr_port, conf_dir))
+    doCmd('sed -i "s/5001/{}/g" {}/application.yml'.format(mgr_port, conf_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/application.yml'.format(mysql_ip, conf_dir))
     doCmd('sed -i "s/3306/{}/g" {}/application.yml'.format(mysql_port, conf_dir))
     doCmd('sed -i "s/defaultAccount/{}/g" {}/application.yml'.format(mysql_user, conf_dir))
     doCmd('sed -i "s/defaultPassword/{}/g" {}/application.yml'.format(mysql_password, conf_dir))
-    doCmd('sed -i "s/fisco-bcos-data/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
+    doCmd('sed -i "s/webasenodemanager/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
 
     return
     
@@ -309,6 +309,7 @@ def changeFrontConfig():
     deploy_ip = "127.0.0.1"
     mgr_port = getCommProperties("mgr.port")
     frontPort = getCommProperties("front.port")
+    nodeListenIp = getCommProperties("node.listenIp")
     nodeChannelPort = getCommProperties("node.channelPort")
     
     if_exist_fisco = getCommProperties("if.exist.fisco")
@@ -326,11 +327,12 @@ def changeFrontConfig():
         doCmd('cp -f {}/temp.yml {}/application.yml'.format(server_dir, server_dir))
         
     # change server config
+    doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
+    doCmd('sed -i "s/0.0.0.0/{}/g" {}/application.yml'.format(nodeListenIp, server_dir))
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
-    doCmd('sed -i "s/8081/{}/g" {}/application.yml'.format(frontPort, server_dir))
-    doCmd('sed -i "s/127.0.0.1:8080/{}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
-    doCmd('sed -i "s%h2Path%{}%g" {}/application.yml'.format(db_dir, server_dir))
+    doCmd('sed -i "s/127.0.0.1:5001/{}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
     doCmd('sed -i "s%/data%{}%g" {}/application.yml'.format(fisco_dir, server_dir))
+    doCmd('sed -i "s%h2Path%{}%g" {}/application.yml'.format(db_dir, server_dir))
 
     return
     
@@ -342,13 +344,13 @@ def installFront():
     changeFrontConfig()
     
     # check front db
-    # frontDb = getCommProperties("front.h2.db")
-    # db_dir = currentDir+"/h2"
-    # res_file = checkFileName(db_dir,frontDb)
-    # if res_file:
-    #     info = raw_input("front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
-    #     if info == "y" or info == "Y":
-    #         doCmdIgnoreException("rm -rf {}/{}.*".format(db_dir,frontDb))
+    frontDb = "webasefront"
+    db_dir = currentDir+"/h2"
+    res_file = checkFileName(db_dir,frontDb)
+    if res_file:
+        info = raw_input("WeBASE-Front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
+        if info == "y" or info == "Y":
+            doCmdIgnoreException("rm -rf {}/{}.*".format(db_dir,frontDb))
     
     # copy node crt
     if_exist_fisco = getCommProperties("if.exist.fisco")
