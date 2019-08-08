@@ -123,7 +123,7 @@ def changeWebConfig():
     doCmd('mkdir -p {}'.format(web_log_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
     doCmd('sed -i "s/5000/{}/g" {}/comm/nginx.conf'.format(web_port, currentDir))
-    doCmd('sed -i "s/10.0.0.1:5001/{}:{}/g" {}/comm/nginx.conf'.format(deploy_ip, mgr_port, currentDir))
+    doCmd('sed -i "s/server 127.0.0.1:5001/server {}:{}/g" {}/comm/nginx.conf'.format(deploy_ip, mgr_port, currentDir))
     doCmd('sed -i "s:log_path:{}:g" {}/comm/nginx.conf'.format(web_log_dir, currentDir))
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
 
@@ -319,8 +319,6 @@ def changeFrontConfig():
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
-    db_dir = currentDir + "/h2"
-    doCmdIgnoreException("mkdir -p {}".format(db_dir))
     if not os.path.exists(server_dir + "/temp.yml"):
         doCmd('cp -f {}/application.yml {}/temp.yml'.format(server_dir, server_dir))
     else:
@@ -328,11 +326,10 @@ def changeFrontConfig():
         
     # change server config
     doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
-    doCmd('sed -i "s/0.0.0.0/{}/g" {}/application.yml'.format(nodeListenIp, server_dir))
+    doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
-    doCmd('sed -i "s/127.0.0.1:5001/{}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
-    doCmd('sed -i "s%/data%{}%g" {}/application.yml'.format(fisco_dir, server_dir))
-    doCmd('sed -i "s%h2Path%{}%g" {}/application.yml'.format(db_dir, server_dir))
+    doCmd('sed -i "s/keyServer: 127.0.0.1:5001/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
+    doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
 
     return
     
@@ -345,7 +342,8 @@ def installFront():
     
     # check front db
     frontDb = "webasefront"
-    db_dir = currentDir+"/h2"
+    db_dir = currentDir+"/webase-front/h2"
+    doCmdIgnoreException("mkdir -p {}".format(db_dir))
     res_file = checkFileName(db_dir,frontDb)
     if res_file:
         info = raw_input("WeBASE-Front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
