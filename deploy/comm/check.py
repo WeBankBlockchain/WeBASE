@@ -6,7 +6,7 @@ import sys
 from utils import *
 
 log = deployLog.getLogger()
-checkDependent = ["git","openssl","curl","nginx"]
+checkDependent = ["git","openssl","curl"]
 
 def do():
     print "================================================================",
@@ -22,7 +22,8 @@ def do():
     print "================================================================"
     print "===================== envrionment check... ====================="
     installRequirements()
-    checkSoft()
+    checkNginx()
+    checkJava()
     checkNodePort()
     checkWebPort()
     checkMgrPort()
@@ -30,7 +31,7 @@ def do():
     checkDbConnect()
     print "===================== envrionment ready... ====================="
     print "================================================================"
-
+    
 def installRequirements():
     for require in checkDependent:
         print "check {}...".format(require)
@@ -39,8 +40,16 @@ def installRequirements():
             installByYum(require)
         print "check finished sucessfully."
     return
+    
+def checkNginx():
+    print "check nginx..."
+    require = "nginx"
+    hasInstall = hasInstallServer(require)
+    if not hasInstall:
+        installByYum(require)
+    print "check finished sucessfully."
 
-def checkSoft():
+def checkJava():
     print "check java..."
     res_check = doCmdIgnoreException("java -version")
     if res_check["status"] != 0:
