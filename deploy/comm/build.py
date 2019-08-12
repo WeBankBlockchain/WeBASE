@@ -21,7 +21,9 @@ def do():
     return
     
 def end():
-    stopNode()
+    if_exist_fisco = getCommProperties("if.exist.fisco")
+    if if_exist_fisco == "no":
+        stopNode()
     stopWeb()
     stopManager()
     stopFront()
@@ -311,6 +313,7 @@ def changeFrontConfig():
     frontPort = getCommProperties("front.port")
     nodeListenIp = getCommProperties("node.listenIp")
     nodeChannelPort = getCommProperties("node.channelPort")
+    frontDb = getCommProperties("front.h2.name")
     
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
@@ -329,6 +332,7 @@ def changeFrontConfig():
     doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
     doCmd('sed -i "s/keyServer: 127.0.0.1:5001/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
+    doCmd('sed -i "s%webasefront%{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
 
     return
@@ -341,7 +345,7 @@ def installFront():
     changeFrontConfig()
     
     # check front db
-    frontDb = "webasefront"
+    frontDb = getCommProperties("front.h2.name")
     db_dir = currentDir+"/webase-front/h2"
     doCmdIgnoreException("mkdir -p {}".format(db_dir))
     res_file = checkFileName(db_dir,frontDb)
