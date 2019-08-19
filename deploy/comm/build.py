@@ -1,29 +1,29 @@
-#!/usr/bin/python
+#!/usr/bin/python3
 # encoding: utf-8
 
 import sys
 import os
-from utils import *
-from mysql import *
+from .utils import *
+from .mysql import dbConnect
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
 
 def do():
-    print "=====================    deploy   start... ====================="
+    print ("=====================    deploy   start... =====================")
     installNode()
     installWeb()
     installManager()
     installFront()
-    print "=====================    deploy   end...   ====================="
-    print "=====================    version  V1.0.2   ====================="
-    print "================================================================"
+    print ("=====================    deploy   end...   =====================")
+    os.chdir(currentDir)
+    version = getCommProperties("webase.version")
+    print ("=====================    version  {}   =====================".format(version))
+    print ("================================================================")
     return
     
 def end():
-    if_exist_fisco = getCommProperties("if.exist.fisco")
-    if if_exist_fisco == "no":
-        stopNode()
+    stopNode()
     stopWeb()
     stopManager()
     stopFront()
@@ -38,8 +38,8 @@ def installNode():
     node_counts = getCommProperties("node.counts")
     
     if if_exist_fisco == "no":
-        print "================================================================"
-        print "==============      FISCO-BCOS     install... =============="
+        print ("================================================================")
+        print ("==============      FISCO-BCOS     install... ==============")
         # init configure file
         if not os.path.exists(currentDir + "/nodetemp"):
             doCmd('cp -f nodeconf nodetemp')
@@ -55,40 +55,35 @@ def installNode():
             doCmdIgnoreException("chmod u+x *.sh")
             doCmdIgnoreException("dos2unix *.sh")
             os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-            # result_build = doCmd("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-            # if result_build["status"] == 0:
-            #     if_build = 'completed' in result_build["output"]
-            #     if not if_build:
-            #         print "======= FISCO-BCOS build fail! ======="
-            #         sys.exit(0)
-            # else:
-            #     print "======= FISCO-BCOS build fail! ======="
-            #     sys.exit(0)
         else:
-            info = raw_input("FISCO-BCOS节点目录nodes已经存在。是否重新安装？[y/n]:")
+            info = "n"
+            if sys.version_info.major == 2:
+                info = raw_input("FISCO-BCOS节点目录nodes已经存在。是否重新安装？[y/n]:")
+            else:
+                info = input("FISCO-BCOS节点目录nodes已经存在。是否重新安装？[y/n]:")
             if info == "y" or info == "Y":
                 doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
                 doCmd("rm -rf nodes")
                 doCmdIgnoreException("chmod u+x *.sh")
                 doCmdIgnoreException("dos2unix *.sh")
                 os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-        startNode()
+    startNode()
     
 def startNode():
-    print "==============      FISCO-BCOS      start...  =============="
+    print ("==============      FISCO-BCOS      start...  ==============")
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
     
     if not os.path.exists(fisco_dir + "/start_all.sh"):
-        print "======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir)
+        print ("======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir))
         sys.exit(0)
     os.chdir(fisco_dir)
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
     os.system("bash start_all.sh")
-    print "==============      FISCO-BCOS      end...    =============="
+    print ("==============      FISCO-BCOS      end...    ==============")
     return
     
 def stopNode():
@@ -98,7 +93,7 @@ def stopNode():
         fisco_dir = currentDir + "/nodes/127.0.0.1"
     
     if not os.path.exists(fisco_dir + "/stop_all.sh"):
-        print "======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir)
+        print ("======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir))
         sys.exit(0)
     os.chdir(fisco_dir)
     doCmdIgnoreException("chmod u+x *.sh")
@@ -132,17 +127,23 @@ def changeWebConfig():
     return
 
 def installWeb():
-    print "================================================================"
-    print "==============      WeBASE-Web     install... =============="
+    print ("================================================================")
+    print ("==============      WeBASE-Web     install... ==============")
     os.chdir(currentDir)
-    pullSourceExtract("web.package.url","webase-web")
+    version = getCommProperties("webase.version")
+    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-web.zip".format(version)
+    pullSourceExtract(gitComm,"webase-web")
     changeWebConfig()
     startWeb()
     
 def startWeb():
-    print "==============      WeBASE-Web      start...  =============="
+    print ("==============      WeBASE-Web      start...  ==============")
     if os.path.exists("/run/nginx-webase-web.pid"):
-        info = raw_input("WeBASE-Web进程已经存在，是否kill进程强制重启？[y/n]:")
+        info = "n"
+        if sys.version_info.major == 2:
+            info = raw_input("WeBASE-Web进程已经存在，是否kill进程强制重启？[y/n]:")
+        else:
+            info = input("WeBASE-Web进程已经存在，是否kill进程强制重启？[y/n]:")
         if info == "y" or info == "Y":
             fin = open('/run/nginx-webase-web.pid', 'r')
             pid = fin.read()
@@ -156,14 +157,14 @@ def startWeb():
     if res["status"] == 0:
         res2 = doCmd("sudo " + res["output"] + " -c " + nginx_config_dir)
         if res2["status"] == 0:
-            print "=======      WeBASE-Web     start success!  ======="
+            print ("=======      WeBASE-Web     start success!  =======")
         else:
-            print "=======      WeBASE-Web     start  fail!    ======="
+            print ("=======      WeBASE-Web     start  fail!    =======")
             sys.exit(0)
     else:
-        print "=======      WeBASE-Web     start  fail!    ======="
+        print ("=======      WeBASE-Web     start  fail!    =======")
         sys.exit(0)
-    print "==============      WeBASE-Web      end...    =============="
+    print ("==============      WeBASE-Web      end...    ==============")
     return
     
 def stopWeb():
@@ -173,9 +174,9 @@ def stopWeb():
         cmd = "sudo kill -QUIT {}".format(pid)
         os.system(cmd)
         doCmdIgnoreException("sudo rm -rf /run/nginx-webase-web.pid")
-        print "=======      WeBASE-Web     stop  success!  ======="
+        print ("=======      WeBASE-Web     stop  success!  =======")
     else:
-        print "=======      WeBASE-Web     is not running! ======="
+        print ("=======      WeBASE-Web     is not running! =======")
     return
 
 def changeManagerConfig():
@@ -216,10 +217,12 @@ def changeManagerConfig():
     return
     
 def installManager():
-    print "================================================================"
-    print "============== WeBASE-Node-Manager install... =============="
+    print ("================================================================")
+    print ("============== WeBASE-Node-Manager install... ==============")
     os.chdir(currentDir)
-    pullSourceExtract("mgr.package.url","webase-node-mgr")
+    version = getCommProperties("webase.version")
+    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-node-mgr.zip".format(version)
+    pullSourceExtract(gitComm,"webase-node-mgr")
     changeManagerConfig()
     dbConnect()
     
@@ -228,7 +231,11 @@ def installManager():
     server_dir = currentDir + "/webase-node-mgr"
     script_dir = server_dir + "/script"
     
-    info = raw_input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
+    info = "n"
+    if sys.version_info.major == 2:
+        info = raw_input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
+    else:
+        info = input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
     if info == "y" or info == "Y":
         os.chdir(script_dir)
         doCmdIgnoreException("chmod u+x *.sh")
@@ -237,19 +244,21 @@ def installManager():
         if dbResult["status"] == 0:
             if_success = 'success' in dbResult["output"]
             if if_success:
-                print "======= script init success! ======="
+                print ("======= script init success! =======")
             else:
-                print "======= script init  fail!   ======="
-                print dbResult["output"]
+                print ("======= script init  fail!   =======")
+                print (dbResult["output"])
                 sys.exit(0)
         else:
-            print "======= script init  fail!   ======="
+            print ("======= script init  fail!   =======")
             sys.exit(0)
     startManager()
     return
     
 def startManager():
-    print "============== WeBASE-Node-Manager  start...  =============="
+    print ("============== WeBASE-Node-Manager  start...  ==============")
+    os.chdir(currentDir)
+    managerPort = getCommProperties("front.port")
     server_dir = currentDir + "/webase-node-mgr"
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
@@ -257,36 +266,26 @@ def startManager():
     doCmdIgnoreException("dos2unix *.sh")
     result = doCmd("bash start.sh")
     if result["status"] == 0:
-        if_started = 'started' in result["output"]
+        if_occupied = 'been occupied' in result["output"]
+        if if_occupied:
+            pid = get_str_btw(result["output"], "(", ")")
+            print ("Port {} has been occupied by other server PID({})".format(managerPort,pid))
+            sys.exit(0)
+        if_started = 'is running' in result["output"]
         if if_started:
-            info = raw_input("WeBASE-Node-Manager进程已经存在，是否kill进程强制重启？[y/n]:")
-            if info == "y" or info == "Y":
-                doCmd("bash stop.sh")
-                result_start = doCmd("bash start.sh")
-                if result_start["status"] == 0:
-                    if_success = 'Success' in result_start["output"]
-                    if if_success:
-                        print "======= WeBASE-Node-Manager start success!  ======="
-                        print "============== WeBASE-Node-Manager  end...    =============="
-                        return
-                    else:
-                        print "======= WeBASE-Node-Manager start  fail!    ======="
-                        sys.exit(0)
-                else:
-                    print "======= WeBASE-Node-Manager start  fail!    ======="
-                    sys.exit(0)
-            else:
-                sys.exit(0)
+            pid = get_str_btw(result["output"], "(", ")")
+            print ("WeBASE-Node-Manager Port {} is running PID({})".format(managerPort,pid))
+            sys.exit(0)
         if_success = 'Success' in result["output"]
         if if_success:
-            print "======= WeBASE-Node-Manager start success!  ======="
+            print ("======= WeBASE-Node-Manager start success!  =======")
         else:
-            print "======= WeBASE-Node-Manager start  fail!    ======="
+            print ("======= WeBASE-Node-Manager start  fail!    =======")
             sys.exit(0)
     else:
-        print "======= WeBASE-Node-Manager start  fail!    ======="
+        print ("======= WeBASE-Node-Manager start  fail!    =======")
         sys.exit(0)
-    print "============== WeBASE-Node-Manager  end...    =============="
+    print ("============== WeBASE-Node-Manager  end...    ==============")
     return
         
 def stopManager():
@@ -299,11 +298,11 @@ def stopManager():
     if result["status"] == 0:
         if_success = 'Success' in result["output"]
         if if_success:
-            print "======= WeBASE-Node-Manager stop  success!  ======="
+            print ("======= WeBASE-Node-Manager stop  success!  =======")
         else:
-            print "======= WeBASE-Node-Manager is not running! ======="
+            print ("======= WeBASE-Node-Manager is not running! =======")
     else:
-        print "======= WeBASE-Node-Manager stop   fail!    ======="
+        print ("======= WeBASE-Node-Manager stop   fail!    =======")
     return
         
 def changeFrontConfig():
@@ -338,19 +337,25 @@ def changeFrontConfig():
     return
     
 def installFront():
-    print "================================================================"
-    print "==============     WeBASE-Front    install... =============="
+    print ("================================================================")
+    print ("==============     WeBASE-Front    install... ==============")
     os.chdir(currentDir)
-    pullSourceExtract("front.package.url","webase-front")
+    version = getCommProperties("webase.version")
+    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front.zip".format(version)
+    pullSourceExtract(gitComm,"webase-front")
     changeFrontConfig()
     
     # check front db
     frontDb = getCommProperties("front.h2.name")
-    db_dir = currentDir+"/webase-front/h2"
+    db_dir = currentDir+"/h2"
     doCmdIgnoreException("mkdir -p {}".format(db_dir))
     res_file = checkFileName(db_dir,frontDb)
     if res_file:
-        info = raw_input("WeBASE-Front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
+        info = "n"
+        if sys.version_info.major == 2:
+            info = raw_input("WeBASE-Front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
+        else:
+            info = input("WeBASE-Front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
         if info == "y" or info == "Y":
             doCmdIgnoreException("rm -rf {}/{}.*".format(db_dir,frontDb))
     
@@ -361,7 +366,7 @@ def installFront():
         fisco_dir = currentDir + "/nodes/127.0.0.1"
     sdk_dir = fisco_dir + "/sdk"
     if not os.path.exists(sdk_dir):
-        print "======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir)
+        print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
         sys.exit(0)
     server_dir = currentDir + "/webase-front"
     os.chdir(server_dir)
@@ -371,7 +376,9 @@ def installFront():
     return
     
 def startFront():
-    print "==============     WeBASE-Front     start...  =============="
+    print ("==============     WeBASE-Front     start...  ==============")
+    os.chdir(currentDir)
+    frontPort = getCommProperties("front.port")
     server_dir = currentDir + "/webase-front"
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
@@ -379,37 +386,27 @@ def startFront():
     doCmdIgnoreException("dos2unix *.sh")
     result = doCmd("bash start.sh")
     if result["status"] == 0:
-        if_started = 'started' in result["output"]
+        if_occupied = 'been occupied' in result["output"]
+        if if_occupied:
+            pid = get_str_btw(result["output"], "(", ")")
+            print ("Port {} has been occupied by other server PID({})".format(frontPort,pid))
+            sys.exit(0)
+        if_started = 'is running' in result["output"]
         if if_started:
-            info = raw_input("WeBASE-Front进程已经存在，是否kill进程强制重启？[y/n]:")
-            if info == "y" or info == "Y":
-                doCmd("bash stop.sh")
-                result_start = doCmd("bash start.sh")
-                if result_start["status"] == 0:
-                    if_success = 'Success' in result_start["output"]
-                    if if_success:
-                        print "=======     WeBASE-Front    start success!  ======="
-                        print "==============     WeBASE-Front     end...    =============="
-                        return
-                    else:
-                        print "=======     WeBASE-Front    start  fail!    ======="
-                        sys.exit(0)
-                else:
-                    print "=======     WeBASE-Front    start  fail!    ======="
-                    sys.exit(0)
-            else:
-                sys.exit(0)
+            pid = get_str_btw(result["output"], "(", ")")
+            print ("WeBASE-Front Port {} is running PID({})".format(frontPort,pid))
+            sys.exit(0)
         if_success = 'Success' in result["output"]
         if if_success:
-            print "=======     WeBASE-Front    start success!  ======="
+            print ("=======     WeBASE-Front    start success!  =======")
         else:
-            print "=======     WeBASE-Front    start  fail!    ======="
+            print ("=======     WeBASE-Front    start  fail!    =======")
             sys.exit(0)
     else:
-        print "=======     WeBASE-Front    start  fail!    ======="
+        print ("=======     WeBASE-Front    start  fail!    =======")
         sys.exit(0)
-    print "==============     WeBASE-Front     end...    =============="
-    print "================================================================"
+    print ("==============     WeBASE-Front     end...    ==============")
+    print ("================================================================")
     return
         
 def stopFront():
@@ -422,9 +419,9 @@ def stopFront():
     if result["status"] == 0:
         if_success = 'Success' in result["output"]
         if if_success:
-            print "=======     WeBASE-Front    stop  success!  ======="
+            print ("=======     WeBASE-Front    stop  success!  =======")
         else:
-            print "=======     WeBASE-Front    is not running! ======="
+            print ("=======     WeBASE-Front    is not running! =======")
     else:
-        print "=======     WeBASE-Front    stop   fail!    ======="
+        print ("=======     WeBASE-Front    stop   fail!    =======")
     return
