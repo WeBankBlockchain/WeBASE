@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # encoding: utf-8
 
 import logging, os
@@ -20,7 +20,7 @@ class Logger:
         self.logger.info(message)
 
     def infoPrint(self, mesage):
-        print (mesage)
+        print mesage
         self.logger.info(mesage)
 
     def war(self, message):
@@ -34,7 +34,7 @@ class Logger:
 
 
 loggermap = {}
-def getLocalLogger():
+def getLogger():
     logPath ="./log/"
     logName="info.log"
     isExists=os.path.exists(logPath)
@@ -48,5 +48,5 @@ def getLocalLogger():
         return logger
 
 if __name__ == '__main__':
-    log = getLocalLogger()
+    log = getLogger()
     log.info("vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv")
