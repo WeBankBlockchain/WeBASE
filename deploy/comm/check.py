@@ -1,15 +1,15 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 
-import log as deployLog
+from . import log as deployLog
 import sys
-from utils import *
+from .utils import *
 
-log = deployLog.getLogger()
+log = deployLog.getLocalLogger()
 checkDependent = ["git","openssl","curl"]
 
 def do():
-    print "================================================================",
+    print ("================================================================"),
     webaseMsg = '''
               _    _     ______  ___  _____ _____ 
              | |  | |    | ___ \/ _ \/  ___|  ___|
@@ -18,9 +18,9 @@ def do():
              \  /\  |  __| |_/ | | | /\__/ | |___ 
               \/  \/ \___\____/\_| |_\____/\____/  
     '''
-    print webaseMsg
-    print "================================================================"
-    print "===================== envrionment check... ====================="
+    print (webaseMsg)
+    print ("================================================================")
+    print ("===================== envrionment check... =====================")
     installRequirements()
     checkNginx()
     checkJava()
@@ -29,50 +29,51 @@ def do():
     checkMgrPort()
     checkFrontPort()
     checkDbConnect()
-    print "===================== envrionment ready... ====================="
-    print "================================================================"
+    print ("===================== envrionment ready... =====================")
+    print ("================================================================")
     
 def installRequirements():
     for require in checkDependent:
-        print "check {}...".format(require)
+        print ("check {}...".format(require))
         hasInstall = hasInstallServer(require)
         if not hasInstall:
             installByYum(require)
-        print "check finished sucessfully."
+        print ("check finished sucessfully.")
     return
     
 def checkNginx():
-    print "check nginx..."
+    print ("check nginx...")
     require = "nginx"
     hasInstall = hasInstallServer(require)
     if not hasInstall:
         installByYum(require)
-    print "check finished sucessfully."
+    print ("check finished sucessfully.")
 
 def checkJava():
-    print "check java..."
+    print ("check java...")
     res_check = doCmdIgnoreException("java -version")
     if res_check["status"] != 0:
-        print "  error! java has not been installed or configured!"
+        print ("  error! java has not been installed or configured!")
         sys.exit(0)
     res_home = doCmd("echo $JAVA_HOME")
     if res_home["output"].strip() == "":
-        print "  error! JAVA_HOME has not been configured!"
+        print ("  error! JAVA_HOME has not been configured!")
         sys.exit(0)
-    print "check finished sucessfully."
+    print ("check finished sucessfully.")
     return
 
 def checkNodePort():
-    print "check FISCO-BCOS node port..."
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco == "yes":
-        checkExistedNodePort()
+        # checkExistedNodePort()
+        return
     elif if_exist_fisco == "no":
+        print ("check FISCO-BCOS node port...")
         checkNewNodePort()
+        print ("check finished sucessfully.")
     else:
-        print "  error! param if.exist.fisco must be yes or no, current is {}. please check.".format(if_exist_fisco)
+        print ("  error! param if.exist.fisco must be yes or no, current is {}. please check.".format(if_exist_fisco))
         sys.exit(0)
-    print "check finished sucessfully."
 
 def checkExistedNodePort():
     listen_ip = getCommProperties("node.listenIp")
@@ -81,15 +82,15 @@ def checkExistedNodePort():
     node_channelPort = int(getCommProperties("node.channelPort"))
     res_rpcPort = net_if_used_no_msg(listen_ip,node_rpcPort)
     if not res_rpcPort:
-        print "  error! rpc port {} is not alive. please check.".format(node_rpcPort)
+        print ("  error! rpc port {} is not alive. please check.".format(node_rpcPort))
         sys.exit(0)
     res_p2pPort = net_if_used_no_msg(listen_ip,node_p2pPort)
     if not res_p2pPort:
-        print "  error! p2p port {} is not alive. please check.".format(node_p2pPort)
+        print ("  error! p2p port {} is not alive. please check.".format(node_p2pPort))
         sys.exit(0)
     res_channelPort = net_if_used_no_msg(listen_ip,node_channelPort)
     if not res_channelPort:
-        print "  error! channel port {} is not alive. please check.".format(node_channelPort)
+        print ("  error! channel port {} is not alive. please check.".format(node_channelPort))
         sys.exit(0)
     return
     
@@ -115,44 +116,44 @@ def checkNewNodePort():
     return
     
 def checkWebPort():
-    print "check WeBASE-Web port..."
+    print ("check WeBASE-Web port...")
     deploy_ip = "127.0.0.1"
     web_port = getCommProperties("web.port")
     res_web = net_if_used(deploy_ip,web_port)
     if res_web:
         sys.exit(0)
-    print "check finished sucessfully."
+    print ("check finished sucessfully.")
     return
     
 def checkMgrPort():
-    print "check WeBASE-Node-Manager port..."
+    print ("check WeBASE-Node-Manager port...")
     deploy_ip = "127.0.0.1"
     mgr_port = getCommProperties("mgr.port")
     res_mgr = net_if_used(deploy_ip,mgr_port)
     if res_mgr:
         sys.exit(0)
-    print "check finished sucessfully."
+    print ("check finished sucessfully.")
     return
     
 def checkFrontPort():
-    print "check WeBASE-Front port..."
+    print ("check WeBASE-Front port...")
     deploy_ip = "127.0.0.1"
     front_port = getCommProperties("front.port")
     res_front = net_if_used(deploy_ip,front_port)
     if res_front:
         sys.exit(0)
-    print "check finished sucessfully."
+    print ("check finished sucessfully.")
     return
     
 def checkDbConnect():
-    print "check database connection..."
+    print ("check database connection...")
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = getCommProperties("mysql.port")
     ifLink = do_telnet(mysql_ip,mysql_port)
     if not ifLink:
-        print 'The database ip:{} port:{} is disconnected, please confirm.'.format(mysql_ip, mysql_port)
+        print ('The database ip:{} port:{} is disconnected, please confirm.'.format(mysql_ip, mysql_port))
         sys.exit(0)
-    print "check finished sucessfully."
+    print ("check finished sucessfully.")
     return
 
 def hasInstallServer(server):
