@@ -1,29 +1,19 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python
 # encoding: utf-8
 
-import os
-import sys
-try:
-    import ConfigParser
-except:
-    try:
-        import configparser as ConfigParser
-    except:
-        from six.moves import configparser as ConfigParser
-if sys.version_info.major == 2:
-    import commands
-else:
-    import subprocess
-from . import log as deployLog
+import ConfigParser
+import commands
+import log as deployLog
 import socket
 import fcntl
 import struct
 import telnetlib
+import os
 import platform
 import shutil
 from distutils.dir_util import copy_tree
 
-log = deployLog.getLocalLogger()
+log = deployLog.getLogger()
 platformStr = platform.platform()
 
 def getIpAddress(ifname):
@@ -43,7 +33,7 @@ def net_if_used(ip,port):
     try:
         result=s.connect_ex((ip, int(port)))
         if result==0:
-            print ("  error! port {} has been used. please check.".format(port))
+            print "  error! port {} has been used. please check.".format(port)
             return True
         else:
             return False
@@ -90,10 +80,7 @@ def copytree(src, dst):
 def doCmd(cmd):
     log.info(" execute cmd  start ,cmd : {}".format(cmd))
     result = dict()
-    if sys.version_info.major == 2:
-        (status, output) = commands.getstatusoutput(cmd)
-    else:
-        (status, output) = subprocess.getstatusoutput(cmd)
+    (status, output) = commands.getstatusoutput(cmd)
     result["status"] = status
     result["output"] = output
     log.info(" execute cmd  end ,cmd : {},status :{} , output: {}".format(cmd,status,output))
@@ -104,10 +91,7 @@ def doCmd(cmd):
 def doCmdIgnoreException(cmd):
     log.info(" execute cmd  start ,cmd : {}".format(cmd))
     result = dict()
-    if sys.version_info.major == 2:
-        (status, output) = commands.getstatusoutput(cmd)
-    else:
-        (status, output) = subprocess.getstatusoutput(cmd)
+    (status, output) = commands.getstatusoutput(cmd)
     result["status"] = status
     result["output"] = output
     log.info(" execute cmd  end ,cmd : {},status :{} , output: {}".format(cmd, status, output))
@@ -125,7 +109,7 @@ def getCommProperties(paramsKey):
     
 def replaceConf(fileName,oldStr,newStr):
     if not os.path.isfile(fileName):
-        print ("{} is not a file ".format(fileName))
+        print "{} is not a file ".format(fileName)
         return
     oldData =""
     with open(fileName, "r") as f:
@@ -139,7 +123,7 @@ def replaceConf(fileName,oldStr,newStr):
 
 def replaceConfDir(filePath,oldStr,newStr):
     if not os.path.isdir(filePath):
-        print ("{} is not a dir ".format(filePath))
+        print "{} is not a dir ".format(filePath)
         return
     for root, dirs, files in os.walk(filePath):
         for file in files:
@@ -169,37 +153,30 @@ def do_telnet(host,port):
         return False
     return True
             
-def pullSourceExtract(gitComm,fileName):
+def pullSourceExtract(urlName,fileName):
+    git_comm = "wget " + getCommProperties(urlName)
     if not os.path.exists("{}/{}.zip".format(getCurrentBaseDir(),fileName)):
-        print (gitComm)
-        os.system(gitComm)
+        print git_comm
+        os.system(git_comm)
     else:
-        info = "n"
-        if sys.version_info.major == 2:
-            info = raw_input("{}.zip编译包已经存在。是否重新下载？[y/n]:".format(fileName))
-        else:
-            info = input("{}.zip编译包已经存在。是否重新下载？[y/n]:".format(fileName))
+        info = raw_input("{}.zip编译包已经存在。是否重新下载？[y/n]:".format(fileName))
         if info == "y" or info == "Y":
             doCmd("rm -rf {}.zip".format(fileName))
             doCmd("rm -rf {}".format(fileName))
-            print (gitComm)
-            os.system(gitComm)
+            print git_comm
+            os.system(git_comm)
     if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
         doCmd("unzip -o {}.zip".format(fileName))
         if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
-            print ("{}.zip extract failed!".format(fileName))
+            print "{}.zip extract failed!".format(fileName)
             sys.exit(0)
     else:
-        info1 = "n"
-        if sys.version_info.major == 2:
-            info1 = raw_input("{}.zip编译包已经解压。是否重新解压？[y/n]:".format(fileName))
-        else:
-            info1 = input("{}.zip编译包已经解压。是否重新解压？[y/n]:".format(fileName))
+        info1 = raw_input("{}.zip编译包已经解压。是否重新解压？[y/n]:".format(fileName))
         if info1 == "y" or info1 == "Y":
             doCmd("rm -rf {}".format(fileName))
             doCmd("unzip -o {}.zip".format(fileName))
             if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
-                print ("{}.zip extract failed!".format(fileName))
+                print "{}.zip extract failed!".format(fileName)
                 sys.exit(0)
                 
 def checkFileName(dir,fileName):
@@ -211,10 +188,6 @@ def checkFileName(dir,fileName):
         return True
     else:
         return False
-        
-def get_str_btw(s, f, b):
-    par = s.partition(f)
-    return (par[2].partition(b))[0][:]
 
 if __name__ == '__main__':
     print(getIpAddress("eth0"))

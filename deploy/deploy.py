@@ -1,6 +1,5 @@
-#!/usr/bin/python3
+#!/usr/bin/python
 # encoding: utf-8
-
 import sys
 import comm.check as commCheck
 import comm.build as commBuild
@@ -56,16 +55,16 @@ Parameter:
     stopFront:    stop WeBASE-Front server
     
 Attention:
-    1. Need to install python, jdk, mysql, MySQL-python or PyMySQL first
+    1. Need to install python2.7, jdk1.8, mysql 5.6, MySQL-python first
     2. Need to ensure a smooth network
     3. You need to install git, wget, nginx; if it is not installed, the installation script will automatically install these components, but this may fail.
     '''
-    print (helpMsg)
+    print helpMsg
     return
 
 def paramError():
-    print ("")
-    print ("Param error! Please check.")
+    print ""
+    print "Param error! Please check."
     help()
     return
 
