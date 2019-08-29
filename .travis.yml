@@ -35,4 +35,5 @@ script:
   - sed -i "s%dbUsername%root%g" common.properties
   - sed -i "s%dbPassword%%g" common.properties
   - python deploy.py installAll travis
+after_success:
   - python telnet.py
