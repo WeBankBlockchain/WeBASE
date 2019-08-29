@@ -152,6 +152,8 @@ def startWeb():
             doCmdIgnoreException("sudo rm -rf /run/nginx-webase-web.pid")
         else:
             sys.exit(0)
+    web_log_dir = currentDir + "/webase-web/log"
+    doCmd('mkdir -p {}'.format(web_log_dir))
     nginx_config_dir = currentDir + "/comm/nginx.conf"
     res = doCmd("which nginx")
     if res["status"] == 0:
@@ -159,10 +161,10 @@ def startWeb():
         if res2["status"] == 0:
             print ("=======      WeBASE-Web     start success!  =======")
         else:
-            print ("=======      WeBASE-Web     start  fail!    =======")
+            print ("=======      WeBASE-Web     start  fail. Please view log file (default path:./webase-web/log/).    =======")
             sys.exit(0)
     else:
-        print ("=======      WeBASE-Web     start  fail!    =======")
+        print ("=======      WeBASE-Web     start  fail. Please view log file (default path:./log/).    =======")
         sys.exit(0)
     print ("==============      WeBASE-Web      end...    ==============")
     return
@@ -231,27 +233,30 @@ def installManager():
     server_dir = currentDir + "/webase-node-mgr"
     script_dir = server_dir + "/script"
     
-    info = "n"
-    if sys.version_info.major == 2:
-        info = raw_input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
+    if len(sys.argv) == 3 and sys.argv[2] == "travis":
+        print ("Travis CI 不初始化数据库") 
     else:
-        info = input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
-    if info == "y" or info == "Y":
-        os.chdir(script_dir)
-        doCmdIgnoreException("chmod u+x *.sh")
-        doCmdIgnoreException("dos2unix *.sh")
-        dbResult = doCmd('bash webase.sh {} {}'.format(mysql_ip, mysql_port))
-        if dbResult["status"] == 0:
-            if_success = 'success' in dbResult["output"]
-            if if_success:
-                print ("======= script init success! =======")
-            else:
-                print ("======= script init  fail!   =======")
-                print (dbResult["output"])
-                sys.exit(0)
+        info = "n"
+        if sys.version_info.major == 2:
+            info = raw_input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
         else:
-            print ("======= script init  fail!   =======")
-            sys.exit(0)
+            info = input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
+        if info == "y" or info == "Y":
+            os.chdir(script_dir)
+            doCmdIgnoreException("chmod u+x *.sh")
+            doCmdIgnoreException("dos2unix *.sh")
+            dbResult = doCmd('bash webase.sh {} {}'.format(mysql_ip, mysql_port))
+            if dbResult["status"] == 0:
+                if_success = 'success' in dbResult["output"]
+                if if_success:
+                    print ("======= script init success! =======")
+                else:
+                    print ("======= script init  fail!   =======")
+                    print (dbResult["output"])
+                    sys.exit(0)
+            else:
+                print ("======= script init  fail. Please view log file (default path:./log/).   =======")
+                sys.exit(0)
     startManager()
     return
     
@@ -280,10 +285,10 @@ def startManager():
         if if_success:
             print ("======= WeBASE-Node-Manager start success!  =======")
         else:
-            print ("======= WeBASE-Node-Manager start  fail!    =======")
+            print ("======= WeBASE-Node-Manager start  fail. Please view log file (default path:./webase-node-mgr/log/).    =======")
             sys.exit(0)
     else:
-        print ("======= WeBASE-Node-Manager start  fail!    =======")
+        print ("======= WeBASE-Node-Manager start  fail. Please view log file (default path:./log/).    =======")
         sys.exit(0)
     print ("============== WeBASE-Node-Manager  end...    ==============")
     return
@@ -302,7 +307,7 @@ def stopManager():
         else:
             print ("======= WeBASE-Node-Manager is not running! =======")
     else:
-        print ("======= WeBASE-Node-Manager stop   fail!    =======")
+        print ("======= WeBASE-Node-Manager stop   fail. Please view log file (default path:./log/).    =======")
     return
         
 def changeFrontConfig():
@@ -331,7 +336,7 @@ def changeFrontConfig():
     doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
     doCmd('sed -i "s/keyServer: 127.0.0.1:5001/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
-    doCmd('sed -i "s%webasefront%{}%g" {}/application.yml'.format(frontDb, server_dir))
+    doCmd('sed -i "s%./h2/webasefront%../h2/{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
 
     return
@@ -400,10 +405,10 @@ def startFront():
         if if_success:
             print ("=======     WeBASE-Front    start success!  =======")
         else:
-            print ("=======     WeBASE-Front    start  fail!    =======")
+            print ("=======     WeBASE-Front    start  fail. Please view log file (default path:./webase-front/log/).    =======")
             sys.exit(0)
     else:
-        print ("=======     WeBASE-Front    start  fail!    =======")
+        print ("=======     WeBASE-Front    start  fail. Please view log file (default path:./log/).    =======")
         sys.exit(0)
     print ("==============     WeBASE-Front     end...    ==============")
     print ("================================================================")
@@ -423,5 +428,5 @@ def stopFront():
         else:
             print ("=======     WeBASE-Front    is not running! =======")
     else:
-        print ("=======     WeBASE-Front    stop   fail!    =======")
+        print ("=======     WeBASE-Front    stop   fail. Please view log file (default path:./log/).    =======")
     return
