@@ -34,6 +34,4 @@ script:
   - cd deploy
   - sed -i "s%dbUsername%root%g" common.properties
   - sed -i "s%dbPassword%%g" common.properties
-  - python deploy.py installAll travis
-after_success:
-  - python telnet.py
+  - python deploy.py installAll travis && python telnet.py
