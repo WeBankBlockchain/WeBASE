@@ -1,0 +1,37 @@
+language: python
+sudo: enabled
+services:
+  - mysql
+matrix:
+  include:
+    - name: "Python 2.7 on Xenial Linux"
+      python: 2.7
+      dist: xenial
+      before_install:
+        - pip install MySQL-python
+    - name: "Python 3.7 on Xenial Linux"
+      python: 3.7
+      dist: xenial
+      before_install:
+        - pip install PyMySQL
+addons:
+  apt:
+    packages:
+    - git
+    - openssl
+    - curl
+    - nginx
+  homebrew:
+    packages:
+    - git
+    - openssl
+    - curl
+    - nginx
+install:
+  - pip install -r requirements.txt
+script:
+  - java -version
+  - cd deploy
+  - sed -i "s%dbUsername%root%g" common.properties
+  - sed -i "s%dbPassword%%g" common.properties
+  - python deploy.py installAll travis && python telnet.py
