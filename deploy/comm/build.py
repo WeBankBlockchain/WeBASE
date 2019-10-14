@@ -321,8 +321,10 @@ def changeFrontConfig():
     
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
+    node_dir = getCommProperties("node.dir") 
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
+        node_dir = currentDir + "/nodes/127.0.0.1/node0"
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
@@ -338,6 +340,7 @@ def changeFrontConfig():
     doCmd('sed -i "s/keyServer: 127.0.0.1:5001/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
     doCmd('sed -i "s%./h2/webasefront%../h2/{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
+    doCmd('sed -i "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(node_dir, server_dir))
 
     return
     

@@ -9,6 +9,21 @@ matrix:
       dist: xenial
       before_install:
         - pip install MySQL-python
+    - name: "Python 3.4 on Xenial Linux"
+      python: 3.4
+      dist: xenial
+      before_install:
+        - pip install PyMySQL
+    - name: "Python 3.5 on Xenial Linux"
+      python: 3.5
+      dist: xenial
+      before_install:
+        - pip install PyMySQL
+    - name: "Python 3.6 on Xenial Linux"
+      python: 3.6
+      dist: xenial
+      before_install:
+        - pip install PyMySQL
     - name: "Python 3.7 on Xenial Linux"
       python: 3.7
       dist: xenial
