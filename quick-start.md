@@ -42,14 +42,15 @@ contract HelloWorld{
 ## 4 应用层开发
 
 ### 4.1 根据所写合约和交易api的格式，发送交易。
-请参考[交易接口](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE-Front/interface.html#id222)
+请参考[交易接口](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE-Front/interface.html#id235)
 
 从IDE中的输出信息，拷贝合约地址，合约名，方法名等信息，同时获取用户的公钥信息，调用交易接口。
 具体代码请参考 [HelloWorld范例](https://github.com/WeBankFinTech/WeBASE/tree/master/quick-start)
+
 ### 4.2 接口调用的主要代码：
 * application.yml
 ```
-transactionUrl: http://127.0.0.1:8082/webase-front/trans/handle
+transactionUrl: http://127.0.0.1:5002/WeBASE-Front/trans/handle
 groupId: 1
 userAddress: "0x4f08eac5af5e77b7006d11bee94adba2f721def8"
 useAes: true
