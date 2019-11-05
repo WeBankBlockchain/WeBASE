@@ -33,7 +33,7 @@ Export the basic data on the blockchain, such as the current block height, total
 ## Contribution
 Please read our [contribution document](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/CONTRIBUTING.html) to learn how to contribute your code and submit your contribution.
 
-I hope that with your participation, webase will get better and better!
+I hope that with your participation, WeBASE will get better and better!
 
 ## Community
-Contact us：webase@webank.com
+Contact us: webase@webank.com
