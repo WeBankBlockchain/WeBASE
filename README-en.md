@@ -1,3 +1,5 @@
+[中文](README.md)|English
+
 ![image](https://webasedoc.readthedocs.io/zh_CN/latest/_images/logo.jpg)
 
 # What's WeBASE?
