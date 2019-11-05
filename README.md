@@ -1,4 +1,4 @@
-[中文](README.md)|[English](README-en.md)
+中文|[English](README-en.md)
 
 # 什么是WeBASE
 
