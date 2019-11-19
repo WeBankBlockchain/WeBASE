@@ -12,6 +12,9 @@ def do():
     if "installAll" == param:
         commCheck.do()
         commBuild.do()
+    if "startAll" == param:
+        commCheck.checkPort()
+        commBuild.start()
     elif "stopAll" == param:
         commBuild.end()
     elif "startNode" == param:
@@ -45,6 +48,7 @@ Usage: python deploy [Parameter]
 Parameter:
     check:        check the environment
     installAll:   check the environment, deploy all server
+    startAll:     check server port, start all server
     stopAll:      stop all server
     startNode:    start FISCO-BCOS nodes
     stopNode:     stop FISCO-BCOS nodes

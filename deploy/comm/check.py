@@ -32,6 +32,11 @@ def do():
     print ("===================== envrionment ready... =====================")
     print ("================================================================")
     
+def checkPort():
+    checkWebPort()
+    checkMgrPort()
+    checkFrontPort()
+    
 def installRequirements():
     for require in checkDependent:
         print ("check {}...".format(require))
