@@ -192,9 +192,9 @@ def pullSourceExtract(gitComm,fileName):
     else:
         info1 = "n"
         if sys.version_info.major == 2:
-            info1 = raw_input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
+            info1 = raw_input("{}.zip has been unzipped. Whether to re-unzip？[y/n]:".format(fileName))
         else:
-            info1 = input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
+            info1 = input("{}.zip has been unzipped. Whether to re-unzip？[y/n]:".format(fileName))
         if info1 == "y" or info1 == "Y":
             doCmd("rm -rf {}".format(fileName))
             doCmd("unzip -o {}.zip".format(fileName))
