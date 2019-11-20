@@ -176,9 +176,9 @@ def pullSourceExtract(gitComm,fileName):
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("{}.zip编译包已经存在。是否重新下载？[y/n]:".format(fileName))
+            info = raw_input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
         else:
-            info = input("{}.zip编译包已经存在。是否重新下载？[y/n]:".format(fileName))
+            info = input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
         if info == "y" or info == "Y":
             doCmd("rm -rf {}.zip".format(fileName))
             doCmd("rm -rf {}".format(fileName))
@@ -192,9 +192,9 @@ def pullSourceExtract(gitComm,fileName):
     else:
         info1 = "n"
         if sys.version_info.major == 2:
-            info1 = raw_input("{}.zip编译包已经解压。是否重新解压？[y/n]:".format(fileName))
+            info1 = raw_input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
         else:
-            info1 = input("{}.zip编译包已经解压。是否重新解压？[y/n]:".format(fileName))
+            info1 = input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
         if info1 == "y" or info1 == "Y":
             doCmd("rm -rf {}".format(fileName))
             doCmd("unzip -o {}.zip".format(fileName))
