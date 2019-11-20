@@ -22,6 +22,13 @@ def do():
     print ("================================================================")
     return
     
+def start():
+    startNode()
+    startWeb()
+    startManager()
+    startFront()
+    return
+    
 def end():
     stopNode()
     stopWeb()
@@ -58,9 +65,9 @@ def installNode():
         else:
             info = "n"
             if sys.version_info.major == 2:
-                info = raw_input("FISCO-BCOS节点目录nodes已经存在。是否重新安装？[y/n]:")
+                info = raw_input("FISCO-BCOS node directory “nodes” already exists. Reinstall or not？[y/n]:")
             else:
-                info = input("FISCO-BCOS节点目录nodes已经存在。是否重新安装？[y/n]:")
+                info = input("FISCO-BCOS node directory “nodes” already exists. Reinstall or not？[y/n]:")
             if info == "y" or info == "Y":
                 doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
                 doCmd("rm -rf nodes")
@@ -141,9 +148,9 @@ def startWeb():
     if os.path.exists("/run/nginx-webase-web.pid"):
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("WeBASE-Web进程已经存在，是否kill进程强制重启？[y/n]:")
+            info = raw_input("WeBASE-Web Process already exists. Kill process to force restart？[y/n]:")
         else:
-            info = input("WeBASE-Web进程已经存在，是否kill进程强制重启？[y/n]:")
+            info = input("WeBASE-Web Process already exists. Kill process to force restart？[y/n]:")
         if info == "y" or info == "Y":
             fin = open('/run/nginx-webase-web.pid', 'r')
             pid = fin.read()
@@ -234,13 +241,13 @@ def installManager():
     script_dir = server_dir + "/script"
     
     if len(sys.argv) == 3 and sys.argv[2] == "travis":
-        print ("Travis CI 不初始化数据库") 
+        print ("Travis CI do not initialize database") 
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
+            info = raw_input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)？[y/n]:")
         else:
-            info = input("是否初始化数据(首次部署或重建库需执行)？[y/n]:")
+            info = input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)？[y/n]:")
         if info == "y" or info == "Y":
             os.chdir(script_dir)
             doCmdIgnoreException("chmod u+x *.sh")
@@ -361,9 +368,9 @@ def installFront():
     if res_file:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("WeBASE-Front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
+            info = raw_input("WeBASE-Front database {} already exists, delete rebuild or not？[y/n]:".format(frontDb))
         else:
-            info = input("WeBASE-Front数据库{}已经存在，是否删除重建？[y/n]:".format(frontDb))
+            info = input("WeBASE-Front database {} already exists, delete rebuild or not？[y/n]:".format(frontDb))
         if info == "y" or info == "Y":
             doCmdIgnoreException("rm -rf {}/{}.*".format(db_dir,frontDb))
     
