@@ -22,6 +22,13 @@ def do():
     print ("================================================================")
     return
     
+def start():
+    startNode()
+    startWeb()
+    startManager()
+    startFront()
+    return
+    
 def end():
     stopNode()
     stopWeb()
