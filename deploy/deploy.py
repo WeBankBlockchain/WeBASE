@@ -12,7 +12,7 @@ def do():
     if "installAll" == param:
         commCheck.do()
         commBuild.do()
-    if "startAll" == param:
+    elif "startAll" == param:
         commCheck.checkPort()
         commBuild.start()
     elif "stopAll" == param:
