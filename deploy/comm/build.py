@@ -43,7 +43,7 @@ def installNode():
     node_rpcPort = int(getCommProperties("node.rpcPort"))
     fisco_version = getCommProperties("fisco.version")
     node_counts = getCommProperties("node.counts")
-    encrypt_type = getCommProperties("encrypt.type")
+    encrypt_type = int(getCommProperties("encrypt.type"))
     
     if if_exist_fisco == "no":
         print ("================================================================")
@@ -204,21 +204,21 @@ def changeManagerConfig():
     mysql_user = getCommProperties("mysql.user")
     mysql_password = getCommProperties("mysql.password")
     mysql_database = getCommProperties("mysql.database")
-    encrypt_type = getCommProperties("encrypt.type")
+    encrypt_type = int(getCommProperties("encrypt.type"))
         
     # init file
     server_dir = currentDir + "/webase-node-mgr"
     script_dir = server_dir + "/script"
     script_dir_gm = script_dir + "/gm"
     conf_dir = server_dir + "/conf"
-    if not os.path.exists(script_dir + "/temp.sh"):
-        if encrypt_type == 1:
+    if encrypt_type == 1:
+        if not os.path.exists(script_dir + "/temp-gm.sh"):
             doCmd('cp -f {}/webase-gm.sh {}/temp-gm.sh'.format(script_dir_gm, script_dir_gm))
         else:
-            doCmd('cp -f {}/webase.sh {}/temp.sh'.format(script_dir, script_dir))
-    else:
-        if encrypt_type == 1:
             doCmd('cp -f {}/temp-gm.sh {}/webase-gm.sh'.format(script_dir_gm, script_dir_gm))
+    else:
+        if not os.path.exists(script_dir + "/temp.sh"):
+            doCmd('cp -f {}/webase.sh {}/temp.sh'.format(script_dir, script_dir))
         else:
             doCmd('cp -f {}/temp.sh {}/webase.sh'.format(script_dir, script_dir))
     if not os.path.exists(conf_dir + "/temp.yml"):
@@ -252,7 +252,7 @@ def installManager():
     print ("============== WeBASE-Node-Manager install... ==============")
     os.chdir(currentDir)
     version = getCommProperties("webase.version")
-    encrypt_type = getCommProperties("encrypt.type")
+    encrypt_type = int(getCommProperties("encrypt.type"))
     gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-node-mgr.zip".format(version)
     pullSourceExtract(gitComm,"webase-node-mgr")
     changeManagerConfig()
@@ -352,7 +352,7 @@ def changeFrontConfig():
     nodeListenIp = getCommProperties("node.listenIp")
     nodeChannelPort = getCommProperties("node.channelPort")
     frontDb = getCommProperties("front.h2.name")
-    encrypt_type = getCommProperties("encrypt.type")
+    encrypt_type = int(getCommProperties("encrypt.type"))
     
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
@@ -387,7 +387,7 @@ def installFront():
     print ("==============     WeBASE-Front    install... ==============")
     os.chdir(currentDir)
     version = getCommProperties("webase.version")
-    encrypt_type = getCommProperties("encrypt.type")
+    encrypt_type = int(getCommProperties("encrypt.type"))
     gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front.zip".format(version)
     frontPackage = "webase-front"
     if encrypt_type == 1:
@@ -430,7 +430,7 @@ def startFront():
     print ("==============     WeBASE-Front     start...  ==============")
     os.chdir(currentDir)
     frontPort = getCommProperties("front.port")
-    encrypt_type = getCommProperties("encrypt.type")
+    encrypt_type = int(getCommProperties("encrypt.type"))
     frontPackage = "webase-front"
     if encrypt_type == 1:
         frontPackage = "webase-front-gm"
@@ -465,7 +465,7 @@ def startFront():
         
 def stopFront():
     os.chdir(currentDir)
-    encrypt_type = getCommProperties("encrypt.type")
+    encrypt_type = int(getCommProperties("encrypt.type"))
     server_dir = currentDir + "/webase-front"
     if encrypt_type == 1:
         server_dir = currentDir + "/webase-front-gm"
