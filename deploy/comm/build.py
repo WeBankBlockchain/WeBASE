@@ -59,7 +59,7 @@ def installNode():
             node_nums = int(node_counts)
         doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
         
-        gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if not os.path.exists("{}/nodes".format(currentDir)):
             print (gitComm)
             os.system(gitComm)
@@ -212,7 +212,7 @@ def changeManagerConfig():
     script_dir_gm = script_dir + "/gm"
     conf_dir = server_dir + "/conf"
     if encrypt_type == 1:
-        if not os.path.exists(script_dir + "/temp-gm.sh"):
+        if not os.path.exists(script_dir_gm + "/temp-gm.sh"):
             doCmd('cp -f {}/webase-gm.sh {}/temp-gm.sh'.format(script_dir_gm, script_dir_gm))
         else:
             doCmd('cp -f {}/temp-gm.sh {}/webase-gm.sh'.format(script_dir_gm, script_dir_gm))
