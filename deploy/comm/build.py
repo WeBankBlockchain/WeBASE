@@ -305,21 +305,16 @@ def startManager():
     doCmdIgnoreException("dos2unix *.sh")
     result = doCmd("bash start.sh")
     if result["status"] == 0:
-        if_occupied = 'been occupied' in result["output"]
-        if if_occupied:
-            pid = get_str_btw(result["output"], "(", ")")
-            print ("Port {} has been occupied by other server PID({})".format(managerPort,pid))
-            sys.exit(0)
         if_started = 'is running' in result["output"]
         if if_started:
             pid = get_str_btw(result["output"], "(", ")")
             print ("WeBASE-Node-Manager Port {} is running PID({})".format(managerPort,pid))
             sys.exit(0)
-        if_success = 'Success' in result["output"]
+        if_success = 'Starting' in result["output"]
         if if_success:
-            print ("======= WeBASE-Node-Manager start success!  =======")
+            print ("======= WeBASE-Node-Manager  starting . Please check through the log file (default path:./webase-node-mgr/log/). =======")
         else:
-            print ("======= WeBASE-Node-Manager start  fail. Please view log file (default path:./webase-node-mgr/log/).    =======")
+            print ("======= WeBASE-Node-Manager start fail. Please check through the log file (default path:./webase-node-mgr/log/). =======")
             sys.exit(0)
     else:
         print ("======= WeBASE-Node-Manager start  fail. Please view log file (default path:./log/).    =======")
@@ -440,21 +435,16 @@ def startFront():
     doCmdIgnoreException("dos2unix *.sh")
     result = doCmd("bash start.sh")
     if result["status"] == 0:
-        if_occupied = 'been occupied' in result["output"]
-        if if_occupied:
-            pid = get_str_btw(result["output"], "(", ")")
-            print ("Port {} has been occupied by other server PID({})".format(frontPort,pid))
-            sys.exit(0)
         if_started = 'is running' in result["output"]
         if if_started:
             pid = get_str_btw(result["output"], "(", ")")
             print ("WeBASE-Front Port {} is running PID({})".format(frontPort,pid))
             sys.exit(0)
-        if_success = 'Success' in result["output"]
+        if_success = 'Starting' in result["output"]
         if if_success:
-            print ("=======     WeBASE-Front    start success!  =======")
+            print ("=======     WeBASE-Front    starting .  Please check through the log file (default path:./{}/log/).    =======".format(frontPackage))
         else:
-            print ("=======     WeBASE-Front    start  fail. Please view log file (default path:./{}/log/).    =======".format(frontPackage))
+            print ("=======     WeBASE-Front    start fail. Please check through the log file (default path:./{}/log/).    =======".format(frontPackage))
             sys.exit(0)
     else:
         print ("=======     WeBASE-Front    start  fail. Please view log file (default path:./log/).    =======")
