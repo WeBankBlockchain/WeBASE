@@ -6,7 +6,7 @@
 
 **WeBASE**将区块链应用开发标准化，搭建完FISCO BCOS节点后，只需按照五步标准流程进行区块链应用开发，开发流程请参阅 [使用WeBASE开发区块链应用](https://github.com/WeBankFinTech/WeBASE-Doc/blob/master/docs/WeBASE/quick-start.md)
 
-**一键部署(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Web)**可以参考文档[WeBASE一键部署](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/install.html)，**WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
+**WeBASE一键部署**(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Web)可以参考[WeBASE一键部署文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/install.html)，**WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
 
 ## 各子系统简介
 * **节点前置服务 [WeBASE-Front](https://github.com/WeBankFinTech/WeBASE-Front)** 
