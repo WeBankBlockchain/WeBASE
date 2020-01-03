@@ -4,22 +4,26 @@
 
 # What's WeBASE?
 
-WeBASE (WeBank Blockchain Application Software Extension) is a set of general components building between blockchain application and FISCO-BCOS Nodes. Each module is designed around transaction, contract, key management, data and visual management. Developers can choose subsystems for deployment according to business needs. WeBASE shields the complexity of the bottom layer of the blockchain, reduces the threshold of developers, and greatly improves the development efficiency of the blockchain application. it includes subsystems such as node front, node management, transaction link, data export, web management platform, etc.For details, please refer to [WeBASE Online documentation](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
+**WeBASE** (WeBank Blockchain Application Software Extension) is a set of general components building between blockchain application and FISCO-BCOS Nodes. Each module is designed around blockchain transaction, contract, key management, data and visual management. Developers can choose subsystems for deployment according to business needs.
 
-WeBASE standardizes the application and development of blockchain. After building the FISCO BCOS nodes, only five step standard process is needed for the application and development of blockchain. For the development process, please refer to [using webase to develop blockchain application](https://github.com/WeBankFinTech/WeBASE-Doc/blob/master/docs/WeBASE/quick-start.md)
+**WeBASE** shields the complexity of the bottom layer of the blockchain, reduces the threshold of developers, and greatly improves the development efficiency of the blockchain application. It includes subsystems such as node front, node management, web management platform, sign service, data export etc..
+
+**WeBASE** standardizes the application and development of blockchain. After building the FISCO BCOS nodes, only five steps needed to develop and build the application of blockchain. For details of developing process, please refer to [Using WeBASE to develop blockchain application](https://github.com/WeBankFinTech/WeBASE-Doc/blob/master/docs/WeBASE/quick-start.md)
+
+ **WeBASE One Click Installation** (including FISCO BCOS nodes + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Web) refers to [WeBASE One-Click-Installation Documentation](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/install.html)，**WeBASE**'s overall structure design and the detailed introduction of the functions and installation of each subsystem, please refer to [WeBASE Online Documentation](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
 
 ## Subsystem introduction
 * **Node Front service [WeBASE-Front](https://github.com/WeBankFinTech/WeBASE-Front)** 
-It integrates web3jsdk and provides restful interface. The client can interact with the node in the form of HTTP. The built-in memory database collects the health data of the node. Built in Web console to realize the visual operation of nodes.
+It integrates web3sdk and provides restful interface. The client can interact with the node in the form of HTTP. The built-in memory database collects the health data of the node. Built in Web console to realize the visual operation of nodes and solidity IDE etc..
 
 * **Node management service [WeBASE-Node-Manager](https://github.com/WeBankFinTech/WeBASE-Node-Manager)**
-Handle all web requests on the front-end page, manage the status of each node, manage all smart contracts on the chain, make statistics and Analysis on the data of the blockchain, audit abnormal transactions, private key management, etc.
+Based on WeBASE-Front, handle all web requests from WeBASE-Web pages, manage the status of each node, manage all smart contracts on the chain, make statistics and Analysis on the data of the blockchain, audit abnormal transactions, private key management, etc.
 
 * **WeBASE management platform [WeBASE-Web](https://github.com/WeBankFinTech/WeBASE-Web)**
 Visual operation platform, based on which node information can be viewed and smart contracts can be developed.
 
 * **Transcation service [WeBASE-Transcation](https://github.com/WeBankFinTech/WeBASE-Transcation)**
-Receive transaction request, cache transaction to database and asynchronously chain up, which can greatly improve throughput and solve the TPS bottleneck of blockchain.
+Receive transaction request, cache transaction to database and asynchronously chain up, which can greatly improve throughput and solve the TPS bottleneck problem of blockchain.
 
 * **Private key Hosting and cloud signature service [WeBASE-Sign](https://github.com/WeBankFinTech/WeBASE-Sign)**
 Hosting user private key, providing cloud signature.
