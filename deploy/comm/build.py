@@ -57,7 +57,7 @@ def installNode():
         node_nums = 2
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
-        doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
+        doCmd('sed -i '' "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
         
         gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if not os.path.exists("{}/nodes".format(currentDir)):
@@ -133,11 +133,11 @@ def changeWebConfig():
     web_dir = currentDir + "/webase-web"
     web_log_dir = web_dir + "/log"
     doCmd('mkdir -p {}'.format(web_log_dir))
-    doCmd('sed -i "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
-    doCmd('sed -i "s/5000/{}/g" {}/comm/nginx.conf'.format(web_port, currentDir))
-    doCmd('sed -i "s/server 127.0.0.1:5001/server {}:{}/g" {}/comm/nginx.conf'.format(deploy_ip, mgr_port, currentDir))
-    doCmd('sed -i "s:log_path:{}:g" {}/comm/nginx.conf'.format(web_log_dir, currentDir))
-    doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
+    doCmd('sed -i '' "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
+    doCmd('sed -i '' "s/5000/{}/g" {}/comm/nginx.conf'.format(web_port, currentDir))
+    doCmd('sed -i '' "s/server 127.0.0.1:5001/server {}:{}/g" {}/comm/nginx.conf'.format(deploy_ip, mgr_port, currentDir))
+    doCmd('sed -i '' "s:log_path:{}:g" {}/comm/nginx.conf'.format(web_log_dir, currentDir))
+    doCmd('sed -i '' "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
 
     return
 
@@ -228,22 +228,22 @@ def changeManagerConfig():
         
     # change script config
     if encrypt_type == 1:
-        doCmd('sed -i "s/defaultAccount/{}/g" {}/webase-gm.sh'.format(mysql_user, script_dir_gm))
-        doCmd('sed -i "s/defaultPassword/{}/g" {}/webase-gm.sh'.format(mysql_password, script_dir_gm))
-        doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase-gm.sh'.format(mysql_database, script_dir_gm))
+        doCmd('sed -i '' "s/defaultAccount/{}/g" {}/webase-gm.sh'.format(mysql_user, script_dir_gm))
+        doCmd('sed -i '' "s/defaultPassword/{}/g" {}/webase-gm.sh'.format(mysql_password, script_dir_gm))
+        doCmd('sed -i '' "s/webasenodemanager/{}/g" {}/webase-gm.sh'.format(mysql_database, script_dir_gm))
     else:
-        doCmd('sed -i "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
-        doCmd('sed -i "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
-        doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
+        doCmd('sed -i '' "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
+        doCmd('sed -i '' "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
+        doCmd('sed -i '' "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
     
     # change server config
-    doCmd('sed -i "s/5001/{}/g" {}/application.yml'.format(mgr_port, conf_dir))
-    doCmd('sed -i "s/127.0.0.1/{}/g" {}/application.yml'.format(mysql_ip, conf_dir))
-    doCmd('sed -i "s/3306/{}/g" {}/application.yml'.format(mysql_port, conf_dir))
-    doCmd('sed -i "s/defaultAccount/{}/g" {}/application.yml'.format(mysql_user, conf_dir))
-    doCmd('sed -i "s/defaultPassword/{}/g" {}/application.yml'.format(mysql_password, conf_dir))
-    doCmd('sed -i "s/webasenodemanager/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
-    doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, conf_dir))
+    doCmd('sed -i '' "s/5001/{}/g" {}/application.yml'.format(mgr_port, conf_dir))
+    doCmd('sed -i '' "s/127.0.0.1/{}/g" {}/application.yml'.format(mysql_ip, conf_dir))
+    doCmd('sed -i '' "s/3306/{}/g" {}/application.yml'.format(mysql_port, conf_dir))
+    doCmd('sed -i '' "s/defaultAccount/{}/g" {}/application.yml'.format(mysql_user, conf_dir))
+    doCmd('sed -i '' "s/defaultPassword/{}/g" {}/application.yml'.format(mysql_password, conf_dir))
+    doCmd('sed -i '' "s/webasenodemanager/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
+    doCmd('sed -i '' "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, conf_dir))
 
     return
     
@@ -366,14 +366,14 @@ def changeFrontConfig():
         doCmd('cp -f {}/temp.yml {}/application.yml'.format(server_dir, server_dir))
         
     # change server config
-    doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
-    doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
-    doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
-    doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
-    doCmd('sed -i "s/keyServer: 127.0.0.1:5001/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
-    doCmd('sed -i "s%./h2/webasefront%../h2/{}%g" {}/application.yml'.format(frontDb, server_dir))
-    doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
-    doCmd('sed -i "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(node_dir, server_dir))
+    doCmd('sed -i '' "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
+    doCmd('sed -i '' "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
+    doCmd('sed -i '' "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
+    doCmd('sed -i '' "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
+    doCmd('sed -i '' "s/keyServer: 127.0.0.1:5001/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
+    doCmd('sed -i '' "s%./h2/webasefront%../h2/{}%g" {}/application.yml'.format(frontDb, server_dir))
+    doCmd('sed -i '' "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
+    doCmd('sed -i '' "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(node_dir, server_dir))
 
     return
     
