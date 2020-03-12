@@ -4,7 +4,7 @@
 import sys
 import os
 from .utils import *
-from .mysql import dbConnect
+from .mysql import *
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
@@ -505,8 +505,8 @@ def changeSignConfig():
     doCmd('sed -i "s/5004/{}/g" {}/application.yml'.format(sign_port, conf_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/application.yml'.format(mysql_ip, conf_dir))
     doCmd('sed -i "s/3306/{}/g" {}/application.yml'.format(mysql_port, conf_dir))
-    doCmd('sed -i "s/defaultAccount/{}/g" {}/application.yml'.format(mysql_user, conf_dir))
-    doCmd('sed -i "s/defaultPassword/{}/g" {}/application.yml'.format(mysql_password, conf_dir))
+    doCmd('sed -i "s/dbUsername/{}/g" {}/application.yml'.format(mysql_user, conf_dir))
+    doCmd('sed -i "s/dbPassword/{}/g" {}/application.yml'.format(mysql_password, conf_dir))
     doCmd('sed -i "s/webasenodesign/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
 
     return
