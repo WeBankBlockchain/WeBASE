@@ -27,14 +27,17 @@ def do():
     checkNodePort()
     checkWebPort()
     checkMgrPort()
-    checkFrontPort()
-    checkDbConnect()
+    checkSignPort()
+    checkFrontPort()    
+    checkSignDbConnect()
+    checkMgrDbConnect()
     print ("===================== envrionment ready... =====================")
     print ("================================================================")
     
 def checkPort():
     checkWebPort()
     checkMgrPort()
+    checkSignPort()
     checkFrontPort()
     
 def installRequirements():
@@ -149,14 +152,35 @@ def checkFrontPort():
         sys.exit(0)
     print ("check finished sucessfully.")
     return
+
+def checkSignPort():
+    print ("check WeBASE-Sign port...")
+    deploy_ip = "127.0.0.1"
+    sign_port = getCommProperties("sign.port")
+    res_sign = net_if_used(deploy_ip,sign_port)
+    if res_sign:
+        sys.exit(0)
+    print ("check finished sucessfully.")
+    return
     
-def checkDbConnect():
+def checkMgrDbConnect():
     print ("check database connection...")
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = getCommProperties("mysql.port")
     ifLink = do_telnet(mysql_ip,mysql_port)
     if not ifLink:
-        print ('The database ip:{} port:{} is disconnected, please confirm.'.format(mysql_ip, mysql_port))
+        print ('Mgr database ip:{} port:{} is disconnected, please confirm.'.format(mysql_ip, mysql_port))
+        sys.exit(0)
+    print ("check finished sucessfully.")
+    return
+
+def checkSignDbConnect():
+    print ("check database connection...")
+    mysql_ip = getCommProperties("sign.mysql.ip")
+    mysql_port = getCommProperties("sign.mysql.port")
+    ifLink = do_telnet(mysql_ip,mysql_port)
+    if not ifLink:
+        print ('Sign database ip:{} port:{} is disconnected, please confirm.'.format(mysql_ip, mysql_port))
         sys.exit(0)
     print ("check finished sucessfully.")
     return
