@@ -17,8 +17,13 @@ def do():
     installFront()
     print ("=====================    deploy   end...   =====================")
     os.chdir(currentDir)
-    version = getCommProperties("webase.version")
-    print ("=====================    version  {}   =====================".format(version))
+    web_version = getCommProperties("webase.web.version")
+    mgr_version = getCommProperties("webase.mgr.version")
+    front_version = getCommProperties("webase.front.version")
+
+    print ("=====================    webase-web version  {}   =====================".format(web_version))
+    print ("=====================    webase-node-mgr version  {}   =====================".format(mgr_version))
+    print ("=====================    webase-front version  {}   =====================".format(front_version))
     print ("================================================================")
     return
     
@@ -145,8 +150,8 @@ def installWeb():
     print ("================================================================")
     print ("==============      WeBASE-Web     install... ==============")
     os.chdir(currentDir)
-    version = getCommProperties("webase.version")
-    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-web.zip".format(version)
+    web_version = getCommProperties("webase.web.version")
+    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-web.zip".format(web_version)
     pullSourceExtract(gitComm,"webase-web")
     changeWebConfig()
     startWeb()
@@ -251,9 +256,9 @@ def installManager():
     print ("================================================================")
     print ("============== WeBASE-Node-Manager install... ==============")
     os.chdir(currentDir)
-    version = getCommProperties("webase.version")
+    mgr_version = getCommProperties("webase.mgr.version")
     encrypt_type = int(getCommProperties("encrypt.type"))
-    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-node-mgr.zip".format(version)
+    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-node-mgr.zip".format(mgr_version)
     pullSourceExtract(gitComm,"webase-node-mgr")
     changeManagerConfig()
     dbConnect()
@@ -381,12 +386,12 @@ def installFront():
     print ("================================================================")
     print ("==============     WeBASE-Front    install... ==============")
     os.chdir(currentDir)
-    version = getCommProperties("webase.version")
+    front_version = getCommProperties("webase.front.version")
     encrypt_type = int(getCommProperties("encrypt.type"))
-    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front.zip".format(version)
+    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front.zip".format(front_version)
     frontPackage = "webase-front"
     if encrypt_type == 1:
-        gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front-gm.zip".format(version)
+        gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front-gm.zip".format(front_version)
         frontPackage = "webase-front-gm"
     server_dir = currentDir + "/" + frontPackage
     pullSourceExtract(gitComm,frontPackage)
