@@ -28,7 +28,7 @@ def do():
     checkWebPort()
     checkMgrPort()
     checkSignPort()
-    checkFrontPort()    
+    checkFrontPort()
     checkSignDbConnect()
     checkMgrDbConnect()
     print ("===================== envrionment ready... =====================")
