@@ -68,6 +68,7 @@ def installNode():
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
         doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
+        doCmdIgnoreException("dos2unix nodeconf")
         
         gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if not os.path.exists("{}/nodes".format(currentDir)):
