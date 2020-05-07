@@ -518,7 +518,6 @@ def installSign():
     os.chdir(currentDir)
     sign_version = getCommProperties("webase.sign.version")
     gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-sign.zip".format(sign_version)
-    # test pull sign url, put webase-sign.zip
     pullSourceExtract(gitComm,"webase-sign")
     changeSignConfig()
     signDbConnect()
