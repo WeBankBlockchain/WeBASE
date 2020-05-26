@@ -33,6 +33,10 @@ def do():
         commBuild.startFront()
     elif "stopFront" == param:
         commBuild.stopFront()
+    elif "startFront" == param:
+        commBuild.startSign()
+    elif "stopFront" == param:
+        commBuild.stopSign()
     elif "check"== param:
         commCheck.do()
     elif "help"== param:
@@ -58,7 +62,9 @@ Parameter:
     stopManager:  stop WeBASE-Node-Manager server
     startFront:   start WeBASE-Front server
     stopFront:    stop WeBASE-Front server
-    
+    startSign:    start WeBASE-Sign server
+    stopSign:     stop WeBASE-Sign server
+
 Attention:
     1. Need to install python, jdk, mysql, MySQL-python or PyMySQL first
     2. Need to ensure a smooth network
