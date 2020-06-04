@@ -369,8 +369,6 @@ def changeFrontConfig():
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
-    if encrypt_type == 1:
-        server_dir = currentDir + "/webase-front-gm/conf"
     if not os.path.exists(server_dir + "/temp.yml"):
         doCmd('cp -f {}/application.yml {}/temp.yml'.format(server_dir, server_dir))
     else:
@@ -393,12 +391,8 @@ def installFront():
     print ("==============     WeBASE-Front    install... ==============")
     os.chdir(currentDir)
     front_version = getCommProperties("webase.front.version")
-    encrypt_type = int(getCommProperties("encrypt.type"))
     gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front.zip".format(front_version)
     frontPackage = "webase-front"
-    if encrypt_type == 1:
-        gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front-gm.zip".format(front_version)
-        frontPackage = "webase-front-gm"
     server_dir = currentDir + "/" + frontPackage
     pullSourceExtract(gitComm,frontPackage)
     changeFrontConfig()
@@ -436,10 +430,7 @@ def startFront():
     print ("==============     WeBASE-Front     start...  ==============")
     os.chdir(currentDir)
     frontPort = getCommProperties("front.port")
-    encrypt_type = int(getCommProperties("encrypt.type"))
     frontPackage = "webase-front"
-    if encrypt_type == 1:
-        frontPackage = "webase-front-gm"
     os.chdir(currentDir + "/" + frontPackage)
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
@@ -466,10 +457,7 @@ def startFront():
         
 def stopFront():
     os.chdir(currentDir)
-    encrypt_type = int(getCommProperties("encrypt.type"))
     server_dir = currentDir + "/webase-front"
-    if encrypt_type == 1:
-        server_dir = currentDir + "/webase-front-gm"
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
