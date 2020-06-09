@@ -33,9 +33,9 @@ def do():
         commBuild.startFront()
     elif "stopFront" == param:
         commBuild.stopFront()
-    elif "startFront" == param:
+    elif "startSign" == param:
         commBuild.startSign()
-    elif "stopFront" == param:
+    elif "stopSign" == param:
         commBuild.stopSign()
     elif "check"== param:
         commCheck.do()
