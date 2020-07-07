@@ -34,6 +34,15 @@
 * **数据导出服务 [WeBASE-Collect-Bee](https://github.com/WeBankFinTech/WeBASE-Collect-Bee)**
 导出区块链上的基础数据，如当前块高、交易总量等，通过智能合约的配置，导出区块链上合约的业务数据，包括event、构造函数、合约地址、执行函数的信息等。
 
+* **链管理服务 [WeBASE-Chain-Manager](https://github.com/WeBankFinTech/WeBASE-Chain-Manager)** 
+链管理服务支持管理多条链，支持国密链、非国密链。对外提供群组的增删查改接口，让用户可以便捷地建立自己应用的群组。
+
+* **合约安全检测服务 [WeBASE-Solidity-Security](https://github.com/WeBankFinTech/WeBASE-Solidity-Security)** 
+合约安全检测服务继承了solidity合约检测工具slither，对外提供检测接口。
+
+* **数据统计服务 [WeBASE-Stat](https://github.com/WeBankFinTech/WeBASE-Stat)** 
+统计数据服务以前置为基础，拉取CPU、内存、IO、群组大小、群组gas、群组网络流量的数据，记录数据库。
+
 
 ## 贡献说明
 请阅读我们的[贡献文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/CONTRIBUTING.html)，了解如何贡献代码，并提交你的贡献。
