@@ -194,6 +194,7 @@ def hasInstallServer(server):
         return False
 
 def installByYum(server):
+    dependencies = ["git","openssl","curl","nginx"]
     if isCentos():
         result = doCmdIgnoreException("sudo yum -y install {}".format(server))
         if result["status"] != 0:
@@ -206,12 +207,12 @@ def installByYum(server):
     elif isUbuntu():
         os.system("sudo apt-get install -y {}".format(server))
     else:
-        print ('current system platform is not in target list(centos/redhat, ubuntu, suse), please install dependency of [{}] on your own'.format(server))
+        print ('current system platform is not in target list(centos/redhat, ubuntu, suse), please install dependency of [{}] on your own'.format(dependencies))
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+            info = raw_input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(dependencies))
         else:
-            info = input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+            info = input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(dependencies))
         if info == "y" or info == "Y":
             return
         else:
