@@ -36,7 +36,7 @@ def getIpAddress(ifname):
 
 def getLocalIp():
     return getIpAddress("eth0")
-    
+
 def net_if_used(ip,port):
     s = socket.socket(socket.AF_INET,socket.SOCK_STREAM)
     s.settimeout(0.5)
@@ -122,7 +122,7 @@ def getCommProperties(paramsKey):
     cf.sections()
     value = cf.get('common', paramsKey)
     return value
-    
+
 def replaceConf(fileName,oldStr,newStr):
     if not os.path.isfile(fileName):
         print ("{} is not a file ".format(fileName))
@@ -146,21 +146,21 @@ def replaceConfDir(filePath,oldStr,newStr):
             replaceConf(os.path.join(root,file),oldStr,newStr)
     return
 
-def copyFiles(sourceDir, targetDir):   
-    log.info(" copyFiles sourceDir: {} ".format(sourceDir)) 
-    for f in os.listdir(sourceDir):   
-        sourceF = os.path.join(sourceDir, f)   
-        targetF = os.path.join(targetDir, f)   
-        if os.path.isfile(sourceF):  
+def copyFiles(sourceDir, targetDir):
+    log.info(" copyFiles sourceDir: {} ".format(sourceDir))
+    for f in os.listdir(sourceDir):
+        sourceF = os.path.join(sourceDir, f)
+        targetF = os.path.join(targetDir, f)
+        if os.path.isfile(sourceF):
             # check dir
-            if not os.path.exists(targetDir):   
-                os.makedirs(targetDir)   
+            if not os.path.exists(targetDir):
+                os.makedirs(targetDir)
             # copy file
             shutil.copy(sourceF,targetF)
         # check sub folder
-        if os.path.isdir(sourceF):   
-            copyFiles(sourceF, targetF)   
-            
+        if os.path.isdir(sourceF):
+            copyFiles(sourceF, targetF)
+
 def do_telnet(host,port):
     try:
         tn = telnetlib.Telnet(host, port, timeout=5)
@@ -168,7 +168,29 @@ def do_telnet(host,port):
     except:
         return False
     return True
-            
+
+def pullDockerImage(gitComm,fileName,imageName):
+    if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
+        print (gitComm)
+        os.system(gitComm)
+    else:
+        info = "n"
+        if sys.version_info.major == 2:
+            info = raw_input("{} already exists. Download again or not？[y/n]:".format(fileName))
+        else:
+            info = input("{} already exists. Download again or not？[y/n]:".format(fileName))
+        if info == "y" or info == "Y":
+            doCmd("rm -rf {}".format(fileName))
+            print (gitComm)
+            os.system(gitComm)
+
+    doCmd("sudo docker load -i {}".format(fileName))
+
+    result = doCmd("docker image ls {} | wc -l".format(imageName))
+    if result <= 1 :
+        print ("Unzip docker image failed!".format(fileName))
+        sys.exit(0)
+
 def pullSourceExtract(gitComm,fileName):
     if not os.path.exists("{}/{}.zip".format(getCurrentBaseDir(),fileName)):
         print (gitComm)
@@ -201,7 +223,7 @@ def pullSourceExtract(gitComm,fileName):
             if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
                 print ("{}.zip extract failed!".format(fileName))
                 sys.exit(0)
-                
+
 def checkFileName(dir,fileName):
     Files=os.listdir(dir)
     for k in range(len(Files)):
@@ -211,7 +233,7 @@ def checkFileName(dir,fileName):
         return True
     else:
         return False
-        
+
 def get_str_btw(s, f, b):
     par = s.partition(f)
     return (par[2].partition(b))[0][:]
