@@ -66,7 +66,8 @@ def isUbuntu():
     return platformStr.lower().find("ubuntu") > -1
 
 def isCentos():
-    return platformStr.lower().find("centos") > -1
+    flag = platformStr.lower().find("centos") > -1 || platformStr.lower().find("redhat") > -1
+    return flag
 
 def isSuse():
     return platformStr.lower().find("suse") > -1
