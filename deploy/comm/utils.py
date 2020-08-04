@@ -25,6 +25,7 @@ from distutils.dir_util import copy_tree
 
 log = deployLog.getLocalLogger()
 platformStr = platform.platform()
+unameStr = platform.uname()[1]
 
 def getIpAddress(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -66,8 +67,8 @@ def isUbuntu():
     return platformStr.lower().find("ubuntu") > -1
 
 def isCentos():
-    flag = platformStr.lower().find("centos") > -1 || platformStr.lower().find("redhat") > -1
-    return flag
+    # support redhat
+    return platformStr.lower().find("centos") > -1 or unameStr.lower().find("centos") > -1
 
 def isSuse():
     return platformStr.lower().find("suse") > -1
