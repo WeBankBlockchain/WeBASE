@@ -25,6 +25,7 @@ from distutils.dir_util import copy_tree
 
 log = deployLog.getLocalLogger()
 platformStr = platform.platform()
+unameStr = platform.uname()[1]
 
 def getIpAddress(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -63,13 +64,14 @@ def net_if_used_no_msg(ip,port):
         s.close()
 
 def isUbuntu():
-    return platformStr.lower().find("ubuntu") > -1
+    return platformStr.lower().find("ubuntu") > -1 or unameStr.lower().find("ubuntu") > -1
 
 def isCentos():
-    return platformStr.lower().find("centos") > -1
+    # support redhat
+    return platformStr.lower().find("centos") > -1 or unameStr.lower().find("centos") > -1 or unameStr.lower().find("redhat") > -1
 
 def isSuse():
-    return platformStr.lower().find("suse") > -1
+    return platformStr.lower().find("suse") > -1  or unameStr.lower().find("suse") > -1
 
 def getBaseDir():
     cwd = os.getcwd()

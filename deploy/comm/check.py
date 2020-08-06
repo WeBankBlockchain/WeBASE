@@ -2,6 +2,7 @@
 # encoding: utf-8
 
 from . import log as deployLog
+import os
 import sys
 from .utils import *
 
@@ -41,6 +42,8 @@ def checkPort():
     checkFrontPort()
     
 def installRequirements():
+   print ("================================================================")
+   print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
     for require in checkDependent:
         print ("check {}...".format(require))
         hasInstall = hasInstallServer(require)
@@ -205,7 +208,18 @@ def installByYum(server):
     elif isUbuntu():
         os.system("sudo apt-get install -y {}".format(server))
     else:
-        raise Exception("error,not support this platform,only support centos,suse,ubuntu.")
+        print ("=========================================================================")
+        print ('current system platform is not in target list(centos/redhat, ubuntu, suse')
+        print ('======== please install dependency of [{}] on your own ========'.format(server))
+        info = "n"
+        if sys.version_info.major == 2:
+            info = raw_input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+        else:
+            info = input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+        if info == "y" or info == "Y":
+            return
+        else:
+            raise Exception("error, not support this platform, only support centos/redhat, suse, ubuntu.")
     return
 
 if __name__ == '__main__':
