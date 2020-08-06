@@ -547,7 +547,7 @@ def installDockerImage():
     os.chdir(currentDir)
     image_version = getCommProperties("fisco.webase.docker.version")
     gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/docker-fisco-webase.tar".format(image_version)
-    pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase:{}".format(image_version))
+    pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase:{}".format(image_version))
 
     gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
     pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase:{}-gm".format(image_version))

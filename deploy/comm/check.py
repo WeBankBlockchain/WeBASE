@@ -70,14 +70,13 @@ def checkPort():
 def installRequirements():
    print ("================================================================")
    print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
-    for require in checkDependent:
-        print ("check {}...".format(require))
-        hasInstall = hasInstallServer(require)
-        if not hasInstall:
-            installByYum(require)
-        print ("check finished sucessfully.")
-    return
-    
+   for require in checkDependent:
+      print ("check {}...".format(require))
+      hasInstall = hasInstallServer(require)
+      if not hasInstall:
+        installByYum(require)
+      print ("check finished sucessfully.")
+
 def checkNginx():
     print ("check nginx...")
     require = "nginx"
@@ -204,7 +203,7 @@ def checkSignIp():
     print ("check WeBASE-Sign IP for visual deploy...")
     sign_ip = getCommProperties("sign.ip")
     if isBlank(sign_ip) or sign_ip == "127.0.0.1":
-        print ("When using visual deploy, sign IP should be the external IP of this host.")
+        print ("When using visual deploy, sign IP should be the external IP of this host, not 127.0.0.1.")
         sys.exit(0)
     print ("check finished sucessfully.")
     return
