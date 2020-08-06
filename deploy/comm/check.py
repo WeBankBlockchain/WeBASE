@@ -70,7 +70,7 @@ def checkPort():
 def installRequirements():
    print ("================================================================")
    print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
-    for require in checkDependent:
+   for require in checkDependent:
         print ("check {}...".format(require))
         hasInstall = hasInstallServer(require)
         if not hasInstall:
