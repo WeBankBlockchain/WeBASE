@@ -71,12 +71,12 @@ def installRequirements():
    print ("================================================================")
    print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
    for require in checkDependent:
-        print ("check {}...".format(require))
-        hasInstall = hasInstallServer(require)
-        if not hasInstall:
-            installByYum(require)
-        print ("check finished sucessfully.")
-    return
+      print ("check {}...".format(require))
+      hasInstall = hasInstallServer(require)
+      if not hasInstall:
+        installByYum(require)
+      print ("check finished sucessfully.")
+   return
     
 def checkNginx():
     print ("check nginx...")
