@@ -7,7 +7,7 @@ import sys
 from .utils import *
 
 log = deployLog.getLocalLogger()
-checkDependent = ["git","openssl","curl"]
+checkDependent = ["git","openssl","curl","wget"]
 
 def do():
     print ("================================================================"),
@@ -34,7 +34,33 @@ def do():
     checkMgrDbConnect()
     print ("===================== envrionment ready... =====================")
     print ("================================================================")
-    
+
+def visual_do():
+    print ("================================================================"),
+    webaseMsg = '''
+              _    _     ______  ___  _____ _____ 
+             | |  | |    | ___ \/ _ \/  ___|  ___|
+             | |  | | ___| |_/ / /_\ \ `--.| |__  
+             | |/\| |/ _ | ___ |  _  |`--. |  __| 
+             \  /\  |  __| |_/ | | | /\__/ | |___ 
+              \/  \/ \___\____/\_| |_\____/\____/  
+    '''
+    print (webaseMsg)
+    print ("================================================================")
+    print ("===================== envrionment check... =====================")
+    installRequirements()
+    checkDocker()
+    checkNginx()
+    checkJava()
+    checkWebPort()
+    checkMgrPort()
+    checkSignIp()
+    checkSignPort()
+    checkSignDbConnect()
+    checkMgrDbConnect()
+    print ("===================== envrionment ready... =====================")
+    print ("================================================================")
+
 def checkPort():
     checkWebPort()
     checkMgrPort()
@@ -58,6 +84,14 @@ def checkNginx():
     hasInstall = hasInstallServer(require)
     if not hasInstall:
         installByYum(require)
+    print ("check finished sucessfully.")
+
+def checkDocker():
+    print ("check Docker...")
+    require = "docker"
+    hasInstall = hasInstallServer(require)
+    if not hasInstall:
+        doCmd("bash <(curl -s -L get.docker.com)")
     print ("check finished sucessfully.")
 
 def checkJava():
@@ -165,7 +199,19 @@ def checkSignPort():
         sys.exit(0)
     print ("check finished sucessfully.")
     return
-    
+
+def checkSignIp():
+    print ("check WeBASE-Sign IP for visual deploy...")
+    sign_ip = getCommProperties("sign.ip")
+    if isBlank(sign_ip) or sign_ip == "127.0.0.1":
+        print ("When using visual deploy, sign IP should be the external IP of this host.")
+        sys.exit(0)
+    print ("check finished sucessfully.")
+    return
+
+def isBlank (str):
+    return not (str and str.strip())
+
 def checkMgrDbConnect():
     print ("check database connection...")
     mysql_ip = getCommProperties("mysql.ip")
