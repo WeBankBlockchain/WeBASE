@@ -4,7 +4,7 @@
 import sys
 import os
 from .utils import *
-from .mysql import dbConnect
+from .mysql import *
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
@@ -14,15 +14,18 @@ def do():
     installNode()
     installWeb()
     installManager()
+    installSign()
     installFront()
     print ("=====================    deploy   end...   =====================")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
     mgr_version = getCommProperties("webase.mgr.version")
+    sign_version = getCommProperties("webase.sign.version")
     front_version = getCommProperties("webase.front.version")
 
     print ("=====================    webase-web version  {}   =====================".format(web_version))
     print ("=====================    webase-node-mgr version  {}   =====================".format(mgr_version))
+    print ("=====================    webase-sign version  {}   =====================".format(sign_version))
     print ("=====================    webase-front version  {}   =====================".format(front_version))
     print ("================================================================")
     return
@@ -31,6 +34,7 @@ def start():
     startNode()
     startWeb()
     startManager()
+    startSign()
     startFront()
     return
     
@@ -38,6 +42,7 @@ def end():
     stopNode()
     stopWeb()
     stopManager()
+    stopSign()
     stopFront()
     return
 
@@ -63,6 +68,7 @@ def installNode():
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
         doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
+        doCmdIgnoreException("dos2unix nodeconf")
         
         gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if not os.path.exists("{}/nodes".format(currentDir)):
@@ -302,7 +308,7 @@ def installManager():
 def startManager():
     print ("============== WeBASE-Node-Manager  start...  ==============")
     os.chdir(currentDir)
-    managerPort = getCommProperties("front.port")
+    managerPort = getCommProperties("mgr.port")
     server_dir = currentDir + "/webase-node-mgr"
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
@@ -347,7 +353,7 @@ def stopManager():
 def changeFrontConfig():
     # get properties
     deploy_ip = "127.0.0.1"
-    mgr_port = getCommProperties("mgr.port")
+    sign_port = getCommProperties("sign.port")
     frontPort = getCommProperties("front.port")
     nodeListenIp = getCommProperties("node.listenIp")
     nodeChannelPort = getCommProperties("node.channelPort")
@@ -363,8 +369,6 @@ def changeFrontConfig():
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
-    if encrypt_type == 1:
-        server_dir = currentDir + "/webase-front-gm/conf"
     if not os.path.exists(server_dir + "/temp.yml"):
         doCmd('cp -f {}/application.yml {}/temp.yml'.format(server_dir, server_dir))
     else:
@@ -375,7 +379,7 @@ def changeFrontConfig():
     doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
     doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
-    doCmd('sed -i "s/keyServer: 127.0.0.1:5001/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, mgr_port, server_dir))
+    doCmd('sed -i "s/keyServer: 127.0.0.1:5004/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, sign_port, server_dir))
     doCmd('sed -i "s%/webasefront%/{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
     doCmd('sed -i "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(node_dir, server_dir))
@@ -387,12 +391,8 @@ def installFront():
     print ("==============     WeBASE-Front    install... ==============")
     os.chdir(currentDir)
     front_version = getCommProperties("webase.front.version")
-    encrypt_type = int(getCommProperties("encrypt.type"))
     gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front.zip".format(front_version)
     frontPackage = "webase-front"
-    if encrypt_type == 1:
-        gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-front-gm.zip".format(front_version)
-        frontPackage = "webase-front-gm"
     server_dir = currentDir + "/" + frontPackage
     pullSourceExtract(gitComm,frontPackage)
     changeFrontConfig()
@@ -430,10 +430,7 @@ def startFront():
     print ("==============     WeBASE-Front     start...  ==============")
     os.chdir(currentDir)
     frontPort = getCommProperties("front.port")
-    encrypt_type = int(getCommProperties("encrypt.type"))
     frontPackage = "webase-front"
-    if encrypt_type == 1:
-        frontPackage = "webase-front-gm"
     os.chdir(currentDir + "/" + frontPackage)
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
@@ -460,10 +457,7 @@ def startFront():
         
 def stopFront():
     os.chdir(currentDir)
-    encrypt_type = int(getCommProperties("encrypt.type"))
     server_dir = currentDir + "/webase-front"
-    if encrypt_type == 1:
-        server_dir = currentDir + "/webase-front-gm"
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
@@ -477,4 +471,88 @@ def stopFront():
             print ("=======     WeBASE-Front    is not running! =======")
     else:
         print ("=======     WeBASE-Front    stop   fail. Please view log file (default path:./log/).    =======")
+    return
+
+def changeSignConfig():
+    # get properties
+    sign_port = getCommProperties("sign.port")
+    mysql_ip = getCommProperties("sign.mysql.ip")
+    mysql_port = getCommProperties("sign.mysql.port")
+    mysql_user = getCommProperties("sign.mysql.user")
+    mysql_password = getCommProperties("sign.mysql.password")
+    mysql_database = getCommProperties("sign.mysql.database")
+        
+    # init file
+    server_dir = currentDir + "/webase-sign"
+    conf_dir = server_dir + "/conf"
+    if not os.path.exists(conf_dir + "/temp.yml"):
+        doCmd('cp -f {}/application.yml {}/temp.yml'.format(conf_dir, conf_dir))
+    else:
+        doCmd('cp -f {}/temp.yml {}/application.yml'.format(conf_dir, conf_dir))
+    
+    # change server config
+    doCmd('sed -i "s/5004/{}/g" {}/application.yml'.format(sign_port, conf_dir))
+    doCmd('sed -i "s/127.0.0.1/{}/g" {}/application.yml'.format(mysql_ip, conf_dir))
+    doCmd('sed -i "s/3306/{}/g" {}/application.yml'.format(mysql_port, conf_dir))
+    doCmd('sed -i "s/dbUsername/{}/g" {}/application.yml'.format(mysql_user, conf_dir))
+    doCmd('sed -i "s/dbPassword/{}/g" {}/application.yml'.format(mysql_password, conf_dir))
+    doCmd('sed -i "s/webasesign/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
+
+    return
+
+def installSign():
+    print ("================================================================")
+    print ("============== WeBASE-Sign install... ==============")
+    os.chdir(currentDir)
+    sign_version = getCommProperties("webase.sign.version")
+    gitComm = "wget https://www.fisco.com.cn/cdn/webase/releases/download/{}/webase-sign.zip".format(sign_version)
+    pullSourceExtract(gitComm,"webase-sign")
+    changeSignConfig()
+    signDbConnect()
+    startSign()
+    return
+    
+def startSign():
+    print ("============== WeBASE-Sign  start...  ==============")
+    os.chdir(currentDir)
+    signPort = getCommProperties("sign.port")
+    server_dir = currentDir + "/webase-sign"
+    os.chdir(server_dir)
+    doCmdIgnoreException("source /etc/profile")
+    doCmdIgnoreException("chmod u+x *.sh")
+    doCmdIgnoreException("dos2unix *.sh")
+    result = doCmd("bash start.sh")
+    if result["status"] == 0:
+        if_started = 'is running' in result["output"]
+        if if_started:
+            pid = get_str_btw(result["output"], "(", ")")
+            print ("WeBASE-Sign Port {} is running PID({})".format(signPort,pid))
+            sys.exit(0)
+        if_success = 'Starting' in result["output"]
+        if if_success:
+            print ("======= WeBASE-Sign starting. Please check through the log file (default path:./webase-sign/log/). =======")
+        else:
+            print ("======= WeBASE-Sign start fail. Please check through the log file (default path:./webase-sign/log/). =======")
+            sys.exit(0)
+    else:
+        print ("======= WeBASE-Sign start fail. Please view log file (default path:./log/).    =======")
+        sys.exit(0)
+    print ("============== WeBASE-Sign  end...    ==============")
+    return
+        
+def stopSign():
+    server_dir = currentDir + "/webase-sign"
+    os.chdir(server_dir)
+    doCmdIgnoreException("source /etc/profile")
+    doCmdIgnoreException("chmod u+x *.sh")
+    doCmdIgnoreException("dos2unix *.sh")
+    result = doCmd("bash stop.sh")
+    if result["status"] == 0:
+        if_success = 'Success' in result["output"]
+        if if_success:
+            print ("======= WeBASE-Sign stop success!  =======")
+        else:
+            print ("======= WeBASE-Sign is not running! =======")
+    else:
+        print ("======= WeBASE-Sign stop fail. Please view log file (default path:./log/).    =======")
     return

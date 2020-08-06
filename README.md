@@ -10,7 +10,7 @@
 
 **WeBASE**将区块链应用开发标准化，搭建完FISCO BCOS节点后，只需按照五步标准流程进行区块链应用开发，开发流程请参阅 [使用WeBASE开发区块链应用](https://github.com/WeBankFinTech/WeBASE-Doc/blob/master/docs/WeBASE/quick-start.md)
 
-**WeBASE一键部署**(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Web)可以参考[WeBASE一键部署文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/install.html)，**WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
+**WeBASE一键部署**(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Sign + WeBASE-Web)可以参考[WeBASE一键部署文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/install.html)，**WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
 
 ## 各子系统简介
 * **节点前置服务 [WeBASE-Front](https://github.com/WeBankFinTech/WeBASE-Front)** 
@@ -33,6 +33,15 @@
 
 * **数据导出服务 [WeBASE-Collect-Bee](https://github.com/WeBankFinTech/WeBASE-Collect-Bee)**
 导出区块链上的基础数据，如当前块高、交易总量等，通过智能合约的配置，导出区块链上合约的业务数据，包括event、构造函数、合约地址、执行函数的信息等。
+
+* **链管理服务 [WeBASE-Chain-Manager](https://github.com/WeBankFinTech/WeBASE-Chain-Manager)** 
+链管理服务支持管理多条链，支持国密链、非国密链。对外提供群组的增删查改接口，让用户可以便捷地建立自己应用的群组。
+
+* **合约安全检测服务 [WeBASE-Solidity-Security](https://github.com/WeBankFinTech/WeBASE-Solidity-Security)** 
+合约安全检测服务继承了solidity合约检测工具slither，对外提供检测接口。
+
+* **数据统计服务 [WeBASE-Stat](https://github.com/WeBankFinTech/WeBASE-Stat)** 
+统计数据服务以前置为基础，拉取CPU、内存、IO、群组大小、群组gas、群组网络流量的数据，记录数据库。
 
 
 ## 贡献说明
