@@ -3,6 +3,8 @@
 
 import os
 import sys
+import comm.global_var as gl
+
 try:
     import ConfigParser
 except:
@@ -118,11 +120,11 @@ def doCmdIgnoreException(cmd):
 def getCommProperties(paramsKey):
     current_dir = getCurrentBaseDir()
     cf = ConfigParser.ConfigParser()
-    propertiesDir =current_dir+"/common.properties"
+    propertiesDir =current_dir + '/' + gl.get_file()
     cf.read(propertiesDir)
     log.info(" commProperties is {} ".format(propertiesDir))
     cf.sections()
-    value = cf.get('common', paramsKey)
+    value = cf.get('common', paramsKey,fallback=None)
     return value
 
 def replaceConf(fileName,oldStr,newStr):
@@ -171,7 +173,7 @@ def do_telnet(host,port):
         return False
     return True
 
-def pullDockerImage(gitComm,fileName,imageName):
+def pullDockerImage(gitComm,fileName,repo_name):
     if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
         print (gitComm)
         os.system(gitComm)
@@ -188,9 +190,10 @@ def pullDockerImage(gitComm,fileName,imageName):
 
     doCmd("sudo docker load -i {}".format(fileName))
 
-    result = doCmd("docker image ls {} | wc -l".format(imageName))
-    if result <= 1 :
-        print ("Unzip docker image failed!".format(fileName))
+    result = doCmd("docker image ls {} | wc -l".format(repo_name))
+    print ("Uzip image result {} ".format(result))
+    if int(result["output"]) <= 1 :
+        print ("Unzip docker image from file {} failed!".format(fileName))
         sys.exit(0)
 
 def pullSourceExtract(gitComm,fileName):
