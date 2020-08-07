@@ -124,7 +124,7 @@ def getCommProperties(paramsKey):
     cf.read(propertiesDir)
     log.info(" commProperties is {} ".format(propertiesDir))
     cf.sections()
-    value = cf.get('common', paramsKey)
+    value = cf.get('common', paramsKey,fallback=None)
     return value
 
 def replaceConf(fileName,oldStr,newStr):

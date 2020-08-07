@@ -183,6 +183,11 @@ def checkFrontPort():
     print ("check WeBASE-Front port...")
     deploy_ip = "127.0.0.1"
     front_port = getCommProperties("front.port")
+
+    if front_port is None:
+        print ("======= WeBASE-Front is not deploy. return! =======")
+        return
+
     res_front = net_if_used(deploy_ip,front_port)
     if res_front:
         sys.exit(0)
