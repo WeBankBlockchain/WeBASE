@@ -120,7 +120,7 @@ def doCmdIgnoreException(cmd):
 def getCommProperties(paramsKey):
     current_dir = getCurrentBaseDir()
     cf = ConfigParser.ConfigParser()
-    propertiesDir =current_dir + gl.get_file()
+    propertiesDir =current_dir + '/' + gl.get_file()
     cf.read(propertiesDir)
     log.info(" commProperties is {} ".format(propertiesDir))
     cf.sections()
