@@ -66,7 +66,13 @@ def checkPort():
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
-    
+
+def visualCheckPort():
+    checkWebPort()
+    checkMgrPort()
+    checkSignPort()
+    checkFrontPort()
+
 def installRequirements():
    print ("================================================================")
    print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
