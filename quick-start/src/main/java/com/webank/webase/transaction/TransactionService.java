@@ -34,6 +34,8 @@ public class TransactionService {
     private String funcName;
     @Value("${contract.funcParam}")
     private String funcParam;
+    @Value("${contract.contractAbi}")
+    private String contractAbi;
 
     public void sendTransaction() {
 
@@ -46,6 +48,7 @@ public class TransactionService {
             transParam.setContractName(contractName);
             transParam.setFuncName(funcName);
             transParam.setFuncParam(JSONArray.parseArray(funcParam));
+            transParam.setContractAbi(JSONArray.parseArray(contractAbi));
 
             log.info("transaction param:{}", JSON.toJSONString(transParam));
             Object rsp = rest.postForObject(url, transParam, Object.class);
