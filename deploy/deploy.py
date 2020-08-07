@@ -4,15 +4,19 @@
 import sys
 import comm.check as commCheck
 import comm.build as commBuild
+import comm.global_var as gl
+
 def do():
     if len(sys.argv)==1:
         help()
         return
     param = sys.argv[1]
     if "installAll" == param:
+        gl.set_install_all()
         commCheck.do()
         commBuild.do()
     elif "visualDeploy" == param:
+        gl.set_visual_deploy()
         commCheck.visual_do()
         commBuild.visual_do()
     elif "startAll" == param:

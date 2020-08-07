@@ -3,6 +3,8 @@
 
 import os
 import sys
+import comm.global_var as gl
+
 try:
     import ConfigParser
 except:
@@ -118,7 +120,7 @@ def doCmdIgnoreException(cmd):
 def getCommProperties(paramsKey):
     current_dir = getCurrentBaseDir()
     cf = ConfigParser.ConfigParser()
-    propertiesDir =current_dir+"/common.properties"
+    propertiesDir =current_dir + gl.get_file()
     cf.read(propertiesDir)
     log.info(" commProperties is {} ".format(propertiesDir))
     cf.sections()
