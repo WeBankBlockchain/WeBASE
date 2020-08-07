@@ -1,9 +1,10 @@
 transactionUrl: http://127.0.0.1:5002/WeBASE-Front/trans/handle
 groupId: 1
-userAddress: "0x4f08eac5af5e77b7006d11bee94adba2f721def8"
+userAddress: "0x0a2db6c29e5bda45e8e2cd74c2ea2cf7be59c0a2"
 useAes: true
 contract:
   name: HelloWorld
-  address: "0xca597170829f4ad5054b618425a56e0be23cbc55"
+  address: "0xaaed0c18786747b4d4c90ba072dee16dda08ccc3"
   funcName: set
   funcParam: "[\"abc\"]"
+  contractAbi: "[{\"constant\":false,\"inputs\":[{\"name\":\"n\",\"type\":\"string\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}]"
