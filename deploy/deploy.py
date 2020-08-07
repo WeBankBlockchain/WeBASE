@@ -15,15 +15,20 @@ def do():
         gl.set_install_all()
         commCheck.do()
         commBuild.do()
-    elif "visualDeploy" == param:
-        gl.set_visual_deploy()
-        commCheck.visual_do()
-        commBuild.visual_do()
     elif "startAll" == param:
         commCheck.checkPort()
         commBuild.start()
     elif "stopAll" == param:
         commBuild.end()
+    elif "visualDeploy" == param:
+        gl.set_visual_deploy()
+        commCheck.visual_do()
+        commBuild.visual_do()
+    elif "startVisual" == param:
+        commCheck.visualCheckPort()
+        commBuild.visualStart()
+    elif "stopVisual" == param:
+        commBuild.visualEnd()
     elif "startNode" == param:
         commBuild.startNode()
     elif "stopNode" == param:

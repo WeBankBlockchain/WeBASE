@@ -48,20 +48,23 @@ def visual_do():
     print ("================================================================")
     return
 
-def start():
-    startNode()
-    startWeb()
-    startManager()
-    startSign()
-    startFront()
-    return
-
 def end():
     stopNode()
     stopWeb()
     stopManager()
     stopSign()
     stopFront()
+    return
+
+def visualStart():
+    startWeb()
+    startManager()
+    startSign()
+    return
+def visualEnd():
+    stopWeb()
+    stopManager()
+    stopSign()
     return
 
 def installNode():
