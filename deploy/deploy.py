@@ -64,9 +64,11 @@ Usage: python deploy [Parameter]
 Parameter:
     check:          check the environment
     installAll:     check the environment, deploy all server
-    visualDeploy:   check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front server.
     startAll:       check server port, start all server
     stopAll:        stop all server
+    visualDeploy:   check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front server.
+    startVisual:    check server port, start all server deploy under visual deploy model
+    stopVisual:     stop all server deploy under visual deploy model
     startNode:      start FISCO-BCOS nodes
     stopNode:       stop FISCO-BCOS nodes
     startWeb:       start WeBASE-Web server
