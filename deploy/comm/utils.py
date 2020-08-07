@@ -171,7 +171,7 @@ def do_telnet(host,port):
         return False
     return True
 
-def pullDockerImage(gitComm,fileName,imageName):
+def pullDockerImage(gitComm,fileName,repo_name):
     if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
         print (gitComm)
         os.system(gitComm)
@@ -188,9 +188,10 @@ def pullDockerImage(gitComm,fileName,imageName):
 
     doCmd("sudo docker load -i {}".format(fileName))
 
-    result = doCmd("docker image ls {} | wc -l".format(imageName))
-    if result <= 1 :
-        print ("Unzip docker image failed!".format(fileName))
+    result = doCmd("docker image ls {} | wc -l".format(repo_name))
+    print ("Uzip image result {} ".format(result))
+    if int(result["output"]) <= 1 :
+        print ("Unzip docker image from file {} failed!".format(fileName))
         sys.exit(0)
 
 def pullSourceExtract(gitComm,fileName):
