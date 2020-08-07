@@ -116,6 +116,10 @@ def installNode():
 def startNode():
     print ("==============      FISCO-BCOS      start...  ==============")
     if_exist_fisco = getCommProperties("if.exist.fisco")
+    if if_exist_fisco is None:
+        print ("======= FISCO-BCOS is not deploy. return! =======")
+        return
+
     fisco_dir = getCommProperties("fisco.dir")
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
@@ -132,6 +136,10 @@ def startNode():
 
 def stopNode():
     if_exist_fisco = getCommProperties("if.exist.fisco")
+    if if_exist_fisco is None:
+        print ("======= FISCO-BCOS is not deploy. return! =======")
+        return
+
     fisco_dir = getCommProperties("fisco.dir")
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
@@ -459,6 +467,10 @@ def startFront():
     print ("==============     WeBASE-Front     start...  ==============")
     os.chdir(currentDir)
     frontPort = getCommProperties("front.port")
+    if frontPort is None:
+        print ("======= WeBASE-Front is not deploy. return! =======")
+        return
+
     frontPackage = "webase-front"
     os.chdir(currentDir + "/" + frontPackage)
     doCmdIgnoreException("source /etc/profile")
@@ -487,6 +499,10 @@ def startFront():
 def stopFront():
     os.chdir(currentDir)
     server_dir = currentDir + "/webase-front"
+    if not os.path.exists(server_dir):
+        print ("======= WeBASE-Front is not deploy. return! =======")
+        return
+
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
