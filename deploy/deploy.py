@@ -66,7 +66,7 @@ Parameter:
     installAll:     check the environment, deploy all server
     startAll:       check server port, start all server
     stopAll:        stop all server
-    installWeBASE:   check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front server.
+    installWeBASE:  check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front server.
     startWeBASE:    check server port, start all server deploy under visual deploy model
     stopWeBASE:     stop all server deploy under visual deploy model
     startNode:      start FISCO-BCOS nodes
