@@ -32,4 +32,6 @@ public class TransactionParam {
     private String contractAddress;
     private Boolean useAes;
     private List<Object> funcParam;
+    private  List<Object> contractAbi;
+
 }
