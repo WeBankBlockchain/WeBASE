@@ -3,7 +3,7 @@
 
 default='default'
 install_all='installAll'
-visual_deploy='visualDeploy'
+visual_deploy='installWeBASE'
 
 ## deploy type to file mapping
 _type_file_dict = {
