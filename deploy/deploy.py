@@ -20,14 +20,14 @@ def do():
         commBuild.start()
     elif "stopAll" == param:
         commBuild.end()
-    elif "visualDeploy" == param:
+    elif "installWeBASE" == param:
         gl.set_visual_deploy()
         commCheck.visual_do()
         commBuild.visual_do()
-    elif "startVisual" == param:
+    elif "startWeBASE" == param:
         commCheck.visualCheckPort()
         commBuild.visualStart()
-    elif "stopVisual" == param:
+    elif "stopWeBASE" == param:
         commBuild.visualEnd()
     elif "startNode" == param:
         commBuild.startNode()
@@ -66,9 +66,9 @@ Parameter:
     installAll:     check the environment, deploy all server
     startAll:       check server port, start all server
     stopAll:        stop all server
-    visualDeploy:   check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front server.
-    startVisual:    check server port, start all server deploy under visual deploy model
-    stopVisual:     stop all server deploy under visual deploy model
+    installWeBASE:  check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front server.
+    startWeBASE:    check server port, start all server deploy under visual deploy model
+    stopWeBASE:     stop all server deploy under visual deploy model
     startNode:      start FISCO-BCOS nodes
     stopNode:       stop FISCO-BCOS nodes
     startWeb:       start WeBASE-Web server
