@@ -238,7 +238,6 @@ def stopWeb():
 
 def changeManagerConfig(visual_deploy=False):
     # get properties
-    sign_ip = getCommProperties("sign.ip")
     sign_port = getCommProperties("sign.port")
     mgr_port = getCommProperties("mgr.port")
     mysql_ip = getCommProperties("mysql.ip")
@@ -248,9 +247,12 @@ def changeManagerConfig(visual_deploy=False):
     mysql_database = getCommProperties("mysql.database")
     encrypt_type = int(getCommProperties("encrypt.type"))
     deploy_type = 1 if visual_deploy is True else 0
-    ssh_user = getCommProperties("mgr.ssh.user")
-    ssh_port = int(getCommProperties("mgr.ssh.port"))
-    root_dir_on_host = getCommProperties("mgr.ssh.rootDirOnHost")
+
+    if visual_deploy:
+        sign_ip = getCommProperties("sign.ip")
+        ssh_user = getCommProperties("mgr.ssh.user")
+        ssh_port = int(getCommProperties("mgr.ssh.port"))
+        root_dir_on_host = getCommProperties("mgr.ssh.rootDirOnHost")
 
     # init file
     server_dir = currentDir + "/webase-node-mgr"
@@ -291,10 +293,12 @@ def changeManagerConfig(visual_deploy=False):
     doCmd('sed -i "s/webasenodemanager/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
     doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, conf_dir))
     doCmd('sed -i "s%deployType:.*$%deployType: {}%g" {}/application.yml'.format(deploy_type, conf_dir))
-    doCmd('sed -i "s%webaseSignAddress:.*$%webaseSignAddress: {}:{}%g" {}/application.yml'.format(sign_ip, sign_port, conf_dir))
-    doCmd('sed -i "s%sshDefaultUser:.*$%sshDefaultUser: {}%g" {}/application.yml'.format(ssh_user, conf_dir))
-    doCmd('sed -i "s%sshDefaultPort:.*$%sshDefaultPort: {}%g" {}/application.yml'.format(ssh_port, conf_dir))
-    doCmd('sed -i "s%rootDirOnHost:.*$%rootDirOnHost: {}%g" {}/application.yml'.format(root_dir_on_host,  conf_dir))
+
+    if visual_deploy:
+        doCmd('sed -i "s%webaseSignAddress:.*$%webaseSignAddress: {}:{}%g" {}/application.yml'.format(sign_ip, sign_port, conf_dir))
+        doCmd('sed -i "s%sshDefaultUser:.*$%sshDefaultUser: {}%g" {}/application.yml'.format(ssh_user, conf_dir))
+        doCmd('sed -i "s%sshDefaultPort:.*$%sshDefaultPort: {}%g" {}/application.yml'.format(ssh_port, conf_dir))
+        doCmd('sed -i "s%rootDirOnHost:.*$%rootDirOnHost: {}%g" {}/application.yml'.format(root_dir_on_host,  conf_dir))
 
     return
 
