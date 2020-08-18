@@ -96,7 +96,7 @@ def checkDocker():
     require = "docker"
     hasInstall = hasInstallServer(require)
     if not hasInstall:
-        doCmd("bash <(curl -s -L get.docker.com)")
+        doCmd("curl -s -L get.docker.com | bash")
     print ("check finished sucessfully.")
 
 def checkJava():
