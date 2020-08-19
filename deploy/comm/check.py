@@ -97,6 +97,8 @@ def checkDocker():
     hasInstall = hasInstallServer(require)
     if not hasInstall:
         doCmd("curl -s -L get.docker.com | bash")
+
+    doCmd("sudo systemctl restart docker")
     print ("check finished sucessfully.")
 
 def checkJava():
