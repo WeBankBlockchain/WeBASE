@@ -4,12 +4,15 @@
 import sys
 import comm.check as commCheck
 import comm.build as commBuild
+import comm.global_var as gl
+
 def do():
     if len(sys.argv)==1:
         help()
         return
     param = sys.argv[1]
     if "installAll" == param:
+        gl.set_install_all()
         commCheck.do()
         commBuild.do()
     elif "startAll" == param:
@@ -17,6 +20,15 @@ def do():
         commBuild.start()
     elif "stopAll" == param:
         commBuild.end()
+    elif "installWeBASE" == param:
+        gl.set_visual_deploy()
+        commCheck.visual_do()
+        commBuild.visual_do()
+    elif "startWeBASE" == param:
+        commCheck.visualCheckPort()
+        commBuild.visualStart()
+    elif "stopWeBASE" == param:
+        commBuild.visualEnd()
     elif "startNode" == param:
         commBuild.startNode()
     elif "stopNode" == param:
@@ -50,20 +62,23 @@ def help():
 Usage: python deploy [Parameter]
 
 Parameter:
-    check:        check the environment
-    installAll:   check the environment, deploy all server
-    startAll:     check server port, start all server
-    stopAll:      stop all server
-    startNode:    start FISCO-BCOS nodes
-    stopNode:     stop FISCO-BCOS nodes
-    startWeb:     start WeBASE-Web server
-    stopWeb:      stop WeBASE-Web server
-    startManager: start WeBASE-Node-Manager server
-    stopManager:  stop WeBASE-Node-Manager server
-    startFront:   start WeBASE-Front server
-    stopFront:    stop WeBASE-Front server
-    startSign:    start WeBASE-Sign server
-    stopSign:     stop WeBASE-Sign server
+    check:          check the environment
+    installAll:     check the environment, deploy all server
+    startAll:       check server port, start all server
+    stopAll:        stop all server
+    installWeBASE:  check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front server.
+    startWeBASE:    check server port, start all server deploy under visual deploy model
+    stopWeBASE:     stop all server deploy under visual deploy model
+    startNode:      start FISCO-BCOS nodes
+    stopNode:       stop FISCO-BCOS nodes
+    startWeb:       start WeBASE-Web server
+    stopWeb:        stop WeBASE-Web server
+    startManager:   start WeBASE-Node-Manager server
+    stopManager:    stop WeBASE-Node-Manager server
+    startFront:     start WeBASE-Front server
+    stopFront:      stop WeBASE-Front server
+    startSign:      start WeBASE-Sign server
+    stopSign:       stop WeBASE-Sign server
 
 Attention:
     1. Need to install python, jdk, mysql, MySQL-python or PyMySQL first

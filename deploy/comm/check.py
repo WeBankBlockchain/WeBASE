@@ -2,11 +2,12 @@
 # encoding: utf-8
 
 from . import log as deployLog
+import os
 import sys
 from .utils import *
 
 log = deployLog.getLocalLogger()
-checkDependent = ["git","openssl","curl"]
+checkDependent = ["git","openssl","curl","wget"]
 
 def do():
     print ("================================================================"),
@@ -33,28 +34,72 @@ def do():
     checkMgrDbConnect()
     print ("===================== envrionment ready... =====================")
     print ("================================================================")
-    
+
+def visual_do():
+    print ("================================================================"),
+    webaseMsg = '''
+              _    _     ______  ___  _____ _____ 
+             | |  | |    | ___ \/ _ \/  ___|  ___|
+             | |  | | ___| |_/ / /_\ \ `--.| |__  
+             | |/\| |/ _ | ___ |  _  |`--. |  __| 
+             \  /\  |  __| |_/ | | | /\__/ | |___ 
+              \/  \/ \___\____/\_| |_\____/\____/  
+    '''
+    print (webaseMsg)
+    print ("================================================================")
+    print ("===================== envrionment check... =====================")
+    installRequirements()
+    checkDocker()
+    checkNginx()
+    checkJava()
+    checkWebPort()
+    checkMgrPort()
+    checkSignIp()
+    checkSignPort()
+    checkSignDbConnect()
+    checkMgrDbConnect()
+    print ("===================== envrionment ready... =====================")
+    print ("================================================================")
+
 def checkPort():
     checkWebPort()
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
-    
+
+def visualCheckPort():
+    checkWebPort()
+    checkMgrPort()
+    checkSignPort()
+    checkFrontPort()
+
 def installRequirements():
-    for require in checkDependent:
-        print ("check {}...".format(require))
-        hasInstall = hasInstallServer(require)
-        if not hasInstall:
-            installByYum(require)
-        print ("check finished sucessfully.")
-    return
-    
+   print ("================================================================")
+   print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
+   for require in checkDependent:
+      print ("check {}...".format(require))
+      hasInstall = hasInstallServer(require)
+      if not hasInstall:
+        installByYum(require)
+      print ("check finished sucessfully.")
+
 def checkNginx():
     print ("check nginx...")
     require = "nginx"
     hasInstall = hasInstallServer(require)
     if not hasInstall:
         installByYum(require)
+    print ("check finished sucessfully.")
+
+def checkDocker():
+    print ("check Docker...")
+    require = "docker"
+    hasInstall = hasInstallServer(require)
+    if not hasInstall:
+        doCmd("curl -s -L get.docker.com | bash")
+
+    print("Try to start Docker...")
+    doCmd("sudo systemctl start docker")
     print ("check finished sucessfully.")
 
 def checkJava():
@@ -147,6 +192,11 @@ def checkFrontPort():
     print ("check WeBASE-Front port...")
     deploy_ip = "127.0.0.1"
     front_port = getCommProperties("front.port")
+
+    if front_port is None:
+        print ("======= WeBASE-Front is not deploy. return! =======")
+        return
+
     res_front = net_if_used(deploy_ip,front_port)
     if res_front:
         sys.exit(0)
@@ -162,7 +212,19 @@ def checkSignPort():
         sys.exit(0)
     print ("check finished sucessfully.")
     return
-    
+
+def checkSignIp():
+    print ("check WeBASE-Sign IP for visual deploy...")
+    sign_ip = getCommProperties("sign.ip")
+    if isBlank(sign_ip) or sign_ip == "127.0.0.1":
+        print ("When using visual deploy, sign IP should be the external IP of this host, not 127.0.0.1.")
+        sys.exit(0)
+    print ("check finished sucessfully.")
+    return
+
+def isBlank (str):
+    return not (str and str.strip())
+
 def checkMgrDbConnect():
     print ("check database connection...")
     mysql_ip = getCommProperties("mysql.ip")
@@ -205,7 +267,18 @@ def installByYum(server):
     elif isUbuntu():
         os.system("sudo apt-get install -y {}".format(server))
     else:
-        raise Exception("error,not support this platform,only support centos,suse,ubuntu.")
+        print ("=========================================================================")
+        print ('current system platform is not in target list(centos/redhat, ubuntu, suse')
+        print ('======== please install dependency of [{}] on your own ========'.format(server))
+        info = "n"
+        if sys.version_info.major == 2:
+            info = raw_input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+        else:
+            info = input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+        if info == "y" or info == "Y":
+            return
+        else:
+            raise Exception("error, not support this platform, only support centos/redhat, suse, ubuntu.")
     return
 
 if __name__ == '__main__':
