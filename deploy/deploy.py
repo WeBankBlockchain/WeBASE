@@ -2,15 +2,17 @@
 # encoding: utf-8
 
 import sys
+# check python version first
+# check before import in case of avoiding error of mysql lib not found in comm.check package
+if not sys.version_info.major == 3 and sys.version_info.minor >= 5:
+    print("This script requires Python 3.5 or higher!")
+    print("You are using Python {}.{}.".format(sys.version_info.major, sys.version_info.minor))
+    sys.exit(1)
+
+
 import comm.check as commCheck
 import comm.build as commBuild
 import comm.global_var as gl
-
-def check_python_version():
-    if not sys.version_info.major == 3 and sys.version_info.minor >= 5:
-        print("This script requires Python 3.5 or higher!")
-        print("You are using Python {}.{}.".format(sys.version_info.major, sys.version_info.minor))
-        sys.exit(1)
 
 def do():
     if len(sys.argv)==1:
@@ -101,6 +103,5 @@ def paramError():
     return
 
 if __name__ == '__main__':
-    check_python_version()
     do()
     pass
