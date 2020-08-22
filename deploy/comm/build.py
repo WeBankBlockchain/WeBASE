@@ -48,6 +48,15 @@ def visual_do():
     print ("================================================================")
     return
 
+
+def start():
+    startNode()
+    startWeb()
+    startManager()
+    startSign()
+    startFront()
+    return
+
 def end():
     stopNode()
     stopWeb()
