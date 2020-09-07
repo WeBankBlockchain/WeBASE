@@ -58,6 +58,7 @@ contract.name: HelloWorld
 contract.address: "0xca597170829f4ad5054b618425a56e0be23cbc55"
 contract.funcName: set
 contract.funcParam: "[\"abc\"]"
+contract.contractAbi: "[{\"constant\":false,\"inputs\":[{\"name\":\"n\",\"type\":\"string\"}],\"name\":\"set\",\"outputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"function\"},{\"constant\":true,\"inputs\":[],\"name\":\"get\",\"outputs\":[{\"name\":\"\",\"type\":\"string\"}],\"payable\":false,\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"payable\":false,\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"}]"
 ```
 * TransactionService.java
 ```
@@ -83,6 +84,8 @@ public class TransactionService {
     private String funcName;
     @Value("${contract.funcParam}")
     private String funcParam;
+    @Value("${contract.contractAbi}")
+    private String contractAbi;
 
     public void sendTransaction() {
 
@@ -95,6 +98,7 @@ public class TransactionService {
             transParam.setContractName(contractName);
             transParam.setFuncName(funcName);
             transParam.setFuncParam(JSONArray.parseArray(funcParam));
+            transParam.setContractAbi(JSONArray.parseArray(contractAbi));
 
             log.info("transaction param:{}", JSON.toJSONString(transParam));
             Object rsp = rest.postForObject(url, transParam, Object.class);
