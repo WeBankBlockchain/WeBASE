@@ -101,9 +101,23 @@ def installNode():
         doCmdIgnoreException("dos2unix nodeconf")
 
         gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
-        if not os.path.exists("{}/nodes".format(currentDir)):
+        if os.path.exists("{}/build_chain.sh".format(currentDir)):
+            info = "n"      
+            if sys.version_info.major == 2:
+                info =  raw_input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
+            else:
+                info = input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
+            if info == "y" or info == "Y":
+                doCmd("rm -f build_chain.sh")
+                # download build_chain script
+                print (gitComm)
+                os.system(gitComm)
+        else
+            # download build_chain script
             print (gitComm)
             os.system(gitComm)
+        # if no nodes directory, run build_chain script
+        if not os.path.exists("{}/nodes".format(currentDir)):
             if encrypt_type == 1:
                 os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
             else:
