@@ -3,11 +3,13 @@
 
 import sys
 import os
+import time
 from .utils import *
 from .mysql import *
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
+initDbEnable = False
 
 def do():
     print ("=====================    deploy   start... =====================")
@@ -16,6 +18,7 @@ def do():
     installManager()
     installSign()
     installFront()
+    initFrontForMgr()
     print ("=====================    deploy   end...   =====================")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
@@ -112,7 +115,7 @@ def installNode():
                 # download build_chain script
                 print (gitComm)
                 os.system(gitComm)
-        else
+        else:
             # download build_chain script
             print (gitComm)
             os.system(gitComm)
@@ -362,6 +365,9 @@ def installManager(visual_deploy=False):
                 if_success = 'success' in dbResult["output"]
                 if if_success:
                     print ("======= script init success! =======")
+                    global initDbEnable
+                    initDbEnable = True
+                    log.info(" installManager initDbEnable {}".format(initDbEnable))
                 else:
                     print ("======= script init  fail!   =======")
                     print (dbResult["output"])
@@ -644,3 +650,23 @@ def stopSign():
     else:
         print ("======= WeBASE-Sign stop fail. Please view log file (default path:./log/).    =======")
     return
+
+def initFrontForMgr():
+    os.chdir(currentDir)
+    global initDbEnable
+    log.info(" initFrontForMgr initDbEnable: {}".format(initDbEnable))
+    if initDbEnable:
+        addFrontToDb()
+        managerPort = getCommProperties("mgr.port")
+        frontPort = getCommProperties("front.port")
+        url = "http://127.0.0.1:{}/WeBASE-Node-Manager/front/refresh".format(managerPort)
+        timeTemp = 0
+        while timeTemp < 120 :
+            log.info(" initFrontForMgr timeTemp: {}".format(timeTemp))
+            time.sleep(10)
+            timeTemp = timeTemp + 10
+            frontEnable = do_telnet("127.0.0.1",frontPort)
+            log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
+            if frontEnable:
+                rest_get(url)
+                return
