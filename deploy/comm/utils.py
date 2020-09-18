@@ -23,6 +23,8 @@ import struct
 import telnetlib
 import platform
 import shutil
+import json
+import requests
 from distutils.dir_util import copy_tree
 
 log = deployLog.getLocalLogger()
@@ -242,6 +244,14 @@ def checkFileName(dir,fileName):
 def get_str_btw(s, f, b):
     par = s.partition(f)
     return (par[2].partition(b))[0][:]
+    
+def rest_get(url):
+    log.info("rest_get url: {}".format(url))
+    ret = requests.get(url)
+    if ret.status_code == 200:
+        text = json.loads(ret.text)
+        log.info("rest_get result: {}".format(text))
+        return text
 
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
