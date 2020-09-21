@@ -25,6 +25,7 @@ import platform
 import shutil
 import json
 import requests
+from threading import Thread
 from distutils.dir_util import copy_tree
 
 log = deployLog.getLocalLogger()
@@ -253,6 +254,12 @@ def rest_get(url):
         log.info("rest_get result: {}".format(text))
         return text
 
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+    
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
     pass
