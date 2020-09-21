@@ -651,22 +651,23 @@ def stopSign():
         print ("======= WeBASE-Sign stop fail. Please view log file (default path:./log/).    =======")
     return
 
+@async
 def initFrontForMgr():
     os.chdir(currentDir)
     global initDbEnable
     log.info(" initFrontForMgr initDbEnable: {}".format(initDbEnable))
     if initDbEnable:
-        addFrontToDb()
         managerPort = getCommProperties("mgr.port")
         frontPort = getCommProperties("front.port")
         url = "http://127.0.0.1:{}/WeBASE-Node-Manager/front/refresh".format(managerPort)
         timeTemp = 0
         while timeTemp < 120 :
-            log.info(" initFrontForMgr timeTemp: {}".format(timeTemp))
             time.sleep(10)
             timeTemp = timeTemp + 10
+            log.info(" initFrontForMgr timeTemp: {}".format(timeTemp))
             frontEnable = do_telnet("127.0.0.1",frontPort)
             log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
             if frontEnable:
+                addFrontToDb()
                 rest_get(url)
                 return
