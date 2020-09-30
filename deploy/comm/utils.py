@@ -24,7 +24,7 @@ import telnetlib
 import platform
 import shutil
 import json
-import requests
+from urllib import request
 from threading import Thread
 from distutils.dir_util import copy_tree
 
@@ -248,11 +248,8 @@ def get_str_btw(s, f, b):
     
 def rest_get(url):
     log.info("rest_get url: {}".format(url))
-    ret = requests.get(url)
-    if ret.status_code == 200:
-        text = json.loads(ret.text)
-        log.info("rest_get result: {}".format(text))
-        return text
+    res = request.urlopen(url)
+    log.info(res.read())
 
 def async(f):
     def wrapper(*args, **kwargs):
