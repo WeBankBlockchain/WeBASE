@@ -134,8 +134,6 @@ def installNode():
             if info == "y" or info == "Y":
                 doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
                 doCmd("rm -rf nodes")
-                print (gitComm)
-                os.system(gitComm)
                 if encrypt_type == 1:
                     os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
                 else:
