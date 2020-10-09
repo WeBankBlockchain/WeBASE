@@ -26,10 +26,10 @@ def do():
     sign_version = getCommProperties("webase.sign.version")
     front_version = getCommProperties("webase.front.version")
 
-    print ("=====================    webase-web version  {}   =====================".format(web_version))
-    print ("=====================    webase-node-mgr version  {}   =====================".format(mgr_version))
-    print ("=====================    webase-sign version  {}   =====================".format(sign_version))
-    print ("=====================    webase-front version  {}   =====================".format(front_version))
+    print ("=====================    webase-web version  {}        ==================".format(web_version))
+    print ("=====================    webase-node-mgr version  {}   ==================".format(mgr_version))
+    print ("=====================    webase-sign version  {}       ==================".format(sign_version))
+    print ("=====================    webase-front version  {}      ==================".format(front_version))
     print ("================================================================")
     return
 
@@ -45,9 +45,9 @@ def visual_do():
     mgr_version = getCommProperties("webase.mgr.version")
     sign_version = getCommProperties("webase.sign.version")
 
-    print ("=====================    webase-web version  {}   =====================".format(web_version))
-    print ("=====================    webase-node-mgr version  {}   =====================".format(mgr_version))
-    print ("=====================    webase-sign version  {}   =====================".format(sign_version))
+    print ("=====================    webase-web version  {}        ==================".format(web_version))
+    print ("=====================    webase-node-mgr version  {}   ==================".format(mgr_version))
+    print ("=====================    webase-sign version  {}       ==================".format(sign_version))
     print ("================================================================")
     return
 
@@ -642,15 +642,16 @@ def stopSign():
     if result["status"] == 0:
         if_success = 'Success' in result["output"]
         if if_success:
-            print ("======= WeBASE-Sign stop success!  =======")
+            print ("=======     WeBASE-Sign     stop  success!  =======")
         else:
-            print ("======= WeBASE-Sign is not running! =======")
+            print ("=======     WeBASE-Sign     is not running! =======")
     else:
         print ("======= WeBASE-Sign stop fail. Please view log file (default path:./log/).    =======")
     return
 
-@async
+# @async
 def initFrontForMgr():
+    print ("==============  Init Front for Mgr start...   ==============")
     os.chdir(currentDir)
     global initDbEnable
     log.info(" initFrontForMgr initDbEnable: {}".format(initDbEnable))
@@ -659,13 +660,21 @@ def initFrontForMgr():
         frontPort = getCommProperties("front.port")
         url = "http://127.0.0.1:{}/WeBASE-Node-Manager/front/refresh".format(managerPort)
         timeTemp = 0
-        while timeTemp < 120 :
-            time.sleep(10)
-            timeTemp = timeTemp + 10
-            log.info(" initFrontForMgr timeTemp: {}".format(timeTemp))
+        waitTime = 120
+        frontEnable = False
+        while timeTemp < waitTime :
+            print("=", end='')
+            sys.stdout.flush()
+            time.sleep(1)
+            timeTemp = timeTemp + 1
             frontEnable = do_telnet("127.0.0.1",frontPort)
-            log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
             if frontEnable:
+                log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
                 addFrontToDb()
                 rest_get(url)
+                print("= 100%")
+                print ("==============  Init Front for Mgr end...     ==============")
                 return
+        if not frontEnable:
+            print ("==============  Init Front for Mgr fail.      ==============")
+            return
