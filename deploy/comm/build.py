@@ -592,10 +592,12 @@ def installDockerImage():
     print ("============== Download docker image from CDN... ==============")
     os.chdir(currentDir)
     image_version = getCommProperties("fisco.webase.docker.cdn.version")
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
+    # gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
+    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/download/docker/image/{}/docker-fisco-webase.tar".format(image_version)
     pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
 
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
+    # gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
+    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/download/docker/image/{}/docker-fisco-webase-gm.tar".format(image_version)
     pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase")
 
     return
