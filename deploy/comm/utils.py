@@ -23,6 +23,9 @@ import struct
 import telnetlib
 import platform
 import shutil
+import json
+from urllib import request
+from threading import Thread
 from distutils.dir_util import copy_tree
 
 log = deployLog.getLocalLogger()
@@ -242,7 +245,18 @@ def checkFileName(dir,fileName):
 def get_str_btw(s, f, b):
     par = s.partition(f)
     return (par[2].partition(b))[0][:]
+    
+def rest_get(url):
+    log.info("rest_get url: {}".format(url))
+    res = request.urlopen(url)
+    log.info(res.read())
 
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
+    
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
     pass

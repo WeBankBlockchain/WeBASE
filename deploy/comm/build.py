@@ -3,11 +3,13 @@
 
 import sys
 import os
+import time
 from .utils import *
 from .mysql import *
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
+initDbEnable = False
 
 def do():
     print ("=====================    deploy   start... =====================")
@@ -16,6 +18,7 @@ def do():
     installManager()
     installSign()
     installFront()
+    initFrontForMgr()
     print ("=====================    deploy   end...   =====================")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
@@ -23,10 +26,10 @@ def do():
     sign_version = getCommProperties("webase.sign.version")
     front_version = getCommProperties("webase.front.version")
 
-    print ("=====================    webase-web version  {}   =====================".format(web_version))
-    print ("=====================    webase-node-mgr version  {}   =====================".format(mgr_version))
-    print ("=====================    webase-sign version  {}   =====================".format(sign_version))
-    print ("=====================    webase-front version  {}   =====================".format(front_version))
+    print ("=====================    webase-web version  {}        ==================".format(web_version))
+    print ("=====================    webase-node-mgr version  {}   ==================".format(mgr_version))
+    print ("=====================    webase-sign version  {}       ==================".format(sign_version))
+    print ("=====================    webase-front version  {}      ==================".format(front_version))
     print ("================================================================")
     return
 
@@ -42,9 +45,9 @@ def visual_do():
     mgr_version = getCommProperties("webase.mgr.version")
     sign_version = getCommProperties("webase.sign.version")
 
-    print ("=====================    webase-web version  {}   =====================".format(web_version))
-    print ("=====================    webase-node-mgr version  {}   =====================".format(mgr_version))
-    print ("=====================    webase-sign version  {}   =====================".format(sign_version))
+    print ("=====================    webase-web version  {}        ==================".format(web_version))
+    print ("=====================    webase-node-mgr version  {}   ==================".format(mgr_version))
+    print ("=====================    webase-sign version  {}       ==================".format(sign_version))
     print ("================================================================")
     return
 
@@ -101,9 +104,23 @@ def installNode():
         doCmdIgnoreException("dos2unix nodeconf")
 
         gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
-        if not os.path.exists("{}/nodes".format(currentDir)):
+        if os.path.exists("{}/build_chain.sh".format(currentDir)):
+            info = "n"      
+            if sys.version_info.major == 2:
+                info =  raw_input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
+            else:
+                info = input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
+            if info == "y" or info == "Y":
+                doCmd("rm -f build_chain.sh")
+                # download build_chain script
+                print (gitComm)
+                os.system(gitComm)
+        else:
+            # download build_chain script
             print (gitComm)
             os.system(gitComm)
+        # if no nodes directory, run build_chain script
+        if not os.path.exists("{}/nodes".format(currentDir)):
             if encrypt_type == 1:
                 os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
             else:
@@ -117,8 +134,6 @@ def installNode():
             if info == "y" or info == "Y":
                 doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
                 doCmd("rm -rf nodes")
-                print (gitComm)
-                os.system(gitComm)
                 if encrypt_type == 1:
                     os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
                 else:
@@ -348,6 +363,9 @@ def installManager(visual_deploy=False):
                 if_success = 'success' in dbResult["output"]
                 if if_success:
                     print ("======= script init success! =======")
+                    global initDbEnable
+                    initDbEnable = True
+                    log.info(" installManager initDbEnable {}".format(initDbEnable))
                 else:
                     print ("======= script init  fail!   =======")
                     print (dbResult["output"])
@@ -624,9 +642,39 @@ def stopSign():
     if result["status"] == 0:
         if_success = 'Success' in result["output"]
         if if_success:
-            print ("======= WeBASE-Sign stop success!  =======")
+            print ("=======     WeBASE-Sign     stop  success!  =======")
         else:
-            print ("======= WeBASE-Sign is not running! =======")
+            print ("=======     WeBASE-Sign     is not running! =======")
     else:
         print ("======= WeBASE-Sign stop fail. Please view log file (default path:./log/).    =======")
     return
+
+# @async
+def initFrontForMgr():
+    print ("==============  Init Front for Mgr start...   ==============")
+    os.chdir(currentDir)
+    global initDbEnable
+    log.info(" initFrontForMgr initDbEnable: {}".format(initDbEnable))
+    if initDbEnable:
+        managerPort = getCommProperties("mgr.port")
+        frontPort = getCommProperties("front.port")
+        url = "http://127.0.0.1:{}/WeBASE-Node-Manager/front/refresh".format(managerPort)
+        timeTemp = 0
+        waitTime = 120
+        frontEnable = False
+        while timeTemp < waitTime :
+            print("=", end='')
+            sys.stdout.flush()
+            time.sleep(1)
+            timeTemp = timeTemp + 1
+            frontEnable = do_telnet("127.0.0.1",frontPort)
+            if frontEnable:
+                log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
+                addFrontToDb()
+                rest_get(url)
+                print("= 100%")
+                print ("==============  Init Front for Mgr end...     ==============")
+                return
+        if not frontEnable:
+            print ("==============  Init Front for Mgr fail.      ==============")
+            return

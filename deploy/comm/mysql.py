@@ -8,6 +8,38 @@ from .utils import *
 
 log = deployLog.getLocalLogger()
 
+def addFrontToDb():
+    # get properties
+    mysql_ip = getCommProperties("mysql.ip")
+    mysql_port = int(getCommProperties("mysql.port"))
+    mysql_user = getCommProperties("mysql.user")
+    mysql_password = getCommProperties("mysql.password")
+    mysql_database = getCommProperties("mysql.database")
+    front_org = getCommProperties("front.org")
+    front_port = getCommProperties("front.port")
+    fisco_version = getCommProperties("fisco.version")
+
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, database=mysql_database, charset='utf8')
+        conn.autocommit(1)
+        cursor = conn.cursor()
+        
+        # add db
+        add_db = "INSERT INTO tb_front (node_id,front_ip,front_port,agency,client_version, create_time, modify_time) \
+                  VALUES ('init','127.0.0.1',%s,\'%s\',\'%s\', NOW(),NOW())" % \
+                  (front_port, front_org, fisco_version)
+        log.info(add_db)
+        cursor.execute(add_db)
+        conn.commit()
+        cursor.close()
+        conn.close()
+    except:
+        import traceback
+        log.info(" mysql except {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+
 def dbConnect():
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
