@@ -649,13 +649,12 @@ def stopSign():
         print ("======= WeBASE-Sign stop fail. Please view log file (default path:./log/).    =======")
     return
 
-# @async
 def initFrontForMgr():
-    print ("==============  Init Front for Mgr start...   ==============")
     os.chdir(currentDir)
     global initDbEnable
     log.info(" initFrontForMgr initDbEnable: {}".format(initDbEnable))
     if initDbEnable:
+        print ("==============  Init Front for Mgr start...   ==============")
         managerPort = getCommProperties("mgr.port")
         frontPort = getCommProperties("front.port")
         url = "http://127.0.0.1:{}/WeBASE-Node-Manager/front/refresh".format(managerPort)
