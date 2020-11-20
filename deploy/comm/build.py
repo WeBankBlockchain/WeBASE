@@ -87,6 +87,7 @@ def installNode():
     fisco_version = getCommProperties("fisco.version")
     node_counts = getCommProperties("node.counts")
     encrypt_type = int(getCommProperties("encrypt.type"))
+    encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
 
     if if_exist_fisco == "no":
         print ("================================================================")
@@ -121,8 +122,14 @@ def installNode():
             os.system(gitComm)
         # if no nodes directory, run build_chain script
         if not os.path.exists("{}/nodes".format(currentDir)):
+            # guomi 
             if encrypt_type == 1:
-                os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                # guomi ssl
+                if encrypt_ssl_type == 1:
+                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                # standard ssl
+                else:
+                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
             else:
                 os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
         else:
@@ -486,6 +493,8 @@ def installFront():
     # copy node crt
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
+    encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
+
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
     sdk_dir = fisco_dir + "/sdk"
@@ -493,7 +502,10 @@ def installFront():
         print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
         sys.exit(0)
     os.chdir(server_dir)
-    copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    if encrypt_ssl_type == 1:
+        copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
+    else:
+        copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
 
     startFront()
     return
