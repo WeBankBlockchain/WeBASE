@@ -7,7 +7,7 @@ import sys
 from .utils import *
 
 log = deployLog.getLocalLogger()
-checkDependent = ["git","openssl","curl","wget"]
+checkDependent = ["git","openssl","curl","wget","dos2unix"]
 
 def do():
     print ("================================================================"),
@@ -62,20 +62,22 @@ def visual_do():
     print ("================================================================")
 
 def checkPort():
+    print ("==============      port    check   start...  ==============")
     checkWebPort()
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
+    print ("==============      port    check   end...    ==============")
 
 def visualCheckPort():
+    print ("==============      port    check   start...  ==============")
     checkWebPort()
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
+    print ("==============      port    check   end...    ==============")
 
 def installRequirements():
-   print ("================================================================")
-   print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
    for require in checkDependent:
       print ("check {}...".format(require))
       hasInstall = hasInstallServer(require)
