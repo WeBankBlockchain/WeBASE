@@ -1,5 +1,7 @@
 中文|[English](README-en.md)
 
+[![Code Lines](https://tokei.rs/b1/github/WeBankFinTech/WeBASE?category=code)](https://github.com/WeBankFinTech/WeBASE)
+
 ![image](https://webasedoc.readthedocs.io/zh_CN/latest/_images/logo.jpg)
 
 # 什么是WeBASE
