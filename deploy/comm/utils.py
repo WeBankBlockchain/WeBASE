@@ -248,8 +248,13 @@ def get_str_btw(s, f, b):
     
 def rest_get(url):
     log.info("rest_get url: {}".format(url))
-    res = request.urlopen(url)
-    log.info(res.read())
+    try:
+        res = request.urlopen(url)
+        log.info("rest_get success: {}".format(res.read()))
+        return res
+    except:
+        log.error("rest_get fail: {}".format(sys.exc_info()))
+        return ''
     
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
