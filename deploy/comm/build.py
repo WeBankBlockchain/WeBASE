@@ -689,9 +689,12 @@ def initFrontForMgr():
             if frontEnable:
                 log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
                 addFrontToDb()
-                rest_get(url)
-                print("= 100%")
-                print ("==============  Init Front for Mgr end...     ==============")
+                restResult = rest_get(url)
+                if restResult == '':
+                    print ("======= Init Front for Mgr fail. Please view log file (default path:./log/).    =======")
+                else:
+                    print("= 100%")
+                    print ("==============  Init Front for Mgr end...     ==============")
                 return
         if not frontEnable:
             print ("==============  Init Front for Mgr fail.      ==============")
