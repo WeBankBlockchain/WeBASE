@@ -198,6 +198,7 @@ def changeWebConfig():
     deploy_ip = "127.0.0.1"
     web_port = getCommProperties("web.port")
     mgr_port = getCommProperties("mgr.port")
+    pid_file = currentDir + "/nginx-webase-web.pid"
 
     # init configure file
     web_conf_dir = currentDir + "/comm"
@@ -214,6 +215,7 @@ def changeWebConfig():
     doCmd('sed -i "s/5000/{}/g" {}/comm/nginx.conf'.format(web_port, currentDir))
     doCmd('sed -i "s/server 127.0.0.1:5001/server {}:{}/g" {}/comm/nginx.conf'.format(deploy_ip, mgr_port, currentDir))
     doCmd('sed -i "s:log_path:{}:g" {}/comm/nginx.conf'.format(web_log_dir, currentDir))
+    doCmd('sed -i "s:pid_file:{}:g" {}/comm/nginx.conf'.format(pid_file, currentDir))
     # set web_page_url(root & static) globally
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
 
@@ -231,18 +233,19 @@ def installWeb():
 
 def startWeb():
     print ("==============      WeBASE-Web      start...  ==============")
-    if os.path.exists("/run/nginx-webase-web.pid"):
+    pid_file = currentDir + "/nginx-webase-web.pid"
+    if os.path.exists(pid_file):
         info = "n"
         if sys.version_info.major == 2:
             info = raw_input("WeBASE-Web Process already exists. Kill process to force restart？[y/n]:")
         else:
             info = input("WeBASE-Web Process already exists. Kill process to force restart？[y/n]:")
         if info == "y" or info == "Y":
-            fin = open('/run/nginx-webase-web.pid', 'r')
+            fin = open(pid_file, 'r')
             pid = fin.read()
             cmd = "sudo kill -QUIT {}".format(pid)
             os.system(cmd)
-            doCmdIgnoreException("sudo rm -rf /run/nginx-webase-web.pid")
+            doCmdIgnoreException("sudo rm -rf " + pid_file)
         else:
             sys.exit(0)
     web_log_dir = currentDir + "/webase-web/log"
@@ -263,12 +266,13 @@ def startWeb():
     return
 
 def stopWeb():
-    if os.path.exists("/run/nginx-webase-web.pid"):
-        fin = open('/run/nginx-webase-web.pid', 'r')
+    pid_file = currentDir + "/nginx-webase-web.pid"
+    if os.path.exists(pid_file):
+        fin = open(pid_file, 'r')
         pid = fin.read()
         cmd = "sudo kill -QUIT {}".format(pid)
         os.system(cmd)
-        doCmdIgnoreException("sudo rm -rf /run/nginx-webase-web.pid")
+        doCmdIgnoreException("sudo rm -rf " + pid_file)
         print ("=======      WeBASE-Web     stop  success!  =======")
     else:
         print ("=======      WeBASE-Web     is not running! =======")
