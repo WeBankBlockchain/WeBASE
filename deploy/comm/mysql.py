@@ -120,5 +120,51 @@ def signDbConnect():
         traceback.print_exc()
         sys.exit(0)
     
+
+def checkMgrDbAuthorized():
+    print ("check mgr database user/password...")
+    # get properties
+    mysql_ip = getCommProperties("mysql.ip")
+    mysql_port = int(getCommProperties("mysql.port"))
+    mysql_user = getCommProperties("mysql.user")
+    mysql_password = getCommProperties("mysql.password")
+
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
+        # conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, database=mysql_database, charset='utf8')
+        conn.close()
+        print("check mgr db user/password correct!")        
+        log.info("check mgr db user/password correct!")
+    except:
+        import traceback
+        print("======mgr mysql user/password error!======")
+        log.info("mgr mysql user/password error {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+
+
+def checkSignDbAuthorized():
+    print ("check sign database user/password...")
+    # get properties
+    mysql_ip = getCommProperties("sign.mysql.ip")
+    mysql_port = int(getCommProperties("sign.mysql.port"))
+    mysql_user = getCommProperties("sign.mysql.user")
+    mysql_password = getCommProperties("sign.mysql.password")
+
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
+        conn.close()
+        print("check sign db user/password correct!")        
+        log.info("check sign db user/password correct!")
+    except:
+        import traceback
+        print("======sign mysql user/password error!======")
+        log.info("sign mysql user/password error {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+
+
 if __name__ == '__main__':
     pass

@@ -5,9 +5,10 @@ from . import log as deployLog
 import os
 import sys
 from .utils import *
+from .mysql import *
 
 log = deployLog.getLocalLogger()
-checkDependent = ["git","openssl","curl","wget"]
+checkDependent = ["git","openssl","curl","wget","nginx"]
 
 def do():
     print ("================================================================"),
@@ -30,8 +31,10 @@ def do():
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
-    checkSignDbConnect()
     checkMgrDbConnect()
+    checkSignDbConnect()
+    checkMgrDbAuthorized()
+    checkSignDbAuthorized()
     print ("===================== envrionment ready... =====================")
     print ("================================================================")
 
@@ -75,7 +78,7 @@ def visualCheckPort():
 
 def installRequirements():
    print ("================================================================")
-   print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
+   print ('===== check/install dependency of [git,openssl,curl,wget,nginx] =====')
    for require in checkDependent:
       print ("check {}...".format(require))
       hasInstall = hasInstallServer(require)
