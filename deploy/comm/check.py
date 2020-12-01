@@ -5,6 +5,7 @@ from . import log as deployLog
 import os
 import sys
 from .utils import *
+from .mysql import *
 
 log = deployLog.getLocalLogger()
 checkDependent = ["git","openssl","curl","wget","dos2unix"]
@@ -30,8 +31,10 @@ def do():
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
-    checkSignDbConnect()
     checkMgrDbConnect()
+    checkSignDbConnect()
+    checkMgrDbAuthorized()
+    checkSignDbAuthorized()
     print ("===================== envrionment ready... =====================")
     print ("================================================================")
 
