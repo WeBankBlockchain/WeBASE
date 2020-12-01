@@ -30,6 +30,7 @@ from distutils.dir_util import copy_tree
 log = deployLog.getLocalLogger()
 platformStr = platform.platform()
 unameStr = platform.uname()[1]
+versionStr = platform.uname()[3]
 
 def getIpAddress(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -68,14 +69,14 @@ def net_if_used_no_msg(ip,port):
         s.close()
 
 def isUbuntu():
-    return platformStr.lower().find("ubuntu") > -1 or unameStr.lower().find("ubuntu") > -1
+    return platformStr.lower().find("ubuntu") > -1 or unameStr.lower().find("ubuntu") > -1 or versionStr.lower().find("ubuntu") > -1
 
 def isCentos():
     # support redhat
-    return platformStr.lower().find("centos") > -1 or unameStr.lower().find("centos") > -1 or unameStr.lower().find("redhat") > -1
+    return platformStr.lower().find("centos") > -1 or unameStr.lower().find("centos") > -1 or unameStr.lower().find("redhat") > -1 or versionStr.lower().find("centos") > -1
 
 def isSuse():
-    return platformStr.lower().find("suse") > -1  or unameStr.lower().find("suse") > -1
+    return platformStr.lower().find("suse") > -1  or unameStr.lower().find("suse") > -1 or versionStr.lower().find("suse") > -1
 
 def getBaseDir():
     cwd = os.getcwd()
@@ -247,8 +248,13 @@ def get_str_btw(s, f, b):
     
 def rest_get(url):
     log.info("rest_get url: {}".format(url))
-    res = request.urlopen(url)
-    log.info(res.read())
+    try:
+        res = request.urlopen(url)
+        log.info("rest_get success: {}".format(res.read()))
+        return res
+    except:
+        log.error("rest_get fail: {}".format(sys.exc_info()))
+        return ''
     
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
