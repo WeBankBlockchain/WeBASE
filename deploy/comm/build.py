@@ -10,14 +10,15 @@ from .mysql import *
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
 initDbEnable = False
+serverWaitTime = 5
 
 def do():
     print ("=====================    deploy   start... =====================")
     installNode()
     installWeb()
+    installFront()
     installManager()
     installSign()
-    installFront()
     initFrontForMgr()
     print ("=====================    deploy   end...   =====================")
     os.chdir(currentDir)
@@ -55,9 +56,9 @@ def visual_do():
 def start():
     startNode()
     startWeb()
+    startFront()
     startManager()
     startSign()
-    startFront()
     return
 
 def end():
@@ -255,12 +256,12 @@ def startWeb():
     if res["status"] == 0:
         res2 = doCmd("sudo " + res["output"] + " -c " + nginx_config_dir)
         if res2["status"] == 0:
-            print ("=======      WeBASE-Web     start success!  =======")
+            print ("==============    WeBASE-Web start success!   ==============")
         else:
-            print ("=======      WeBASE-Web     start  fail. Please view log file (default path:./webase-web/log/).    =======")
+            print ("==============    WeBASE-Web start fail. Please view log file (default path:./webase-web/log/). ==============")
             sys.exit(0)
     else:
-        print ("=======      WeBASE-Web     start  fail. Please view log file (default path:./log/).    =======")
+        print ("==============    WeBASE-Web start fail. Please view log file (default path:./webase-web/log/). ==============")
         sys.exit(0)
     print ("==============      WeBASE-Web      end...    ==============")
     return
@@ -380,16 +381,16 @@ def installManager(visual_deploy=False):
             if dbResult["status"] == 0:
                 if_success = 'success' in dbResult["output"]
                 if if_success:
-                    print ("======= script init success! =======")
+                    print ("==============     script  init  success!     ==============")
                     global initDbEnable
                     initDbEnable = True
                     log.info(" installManager initDbEnable {}".format(initDbEnable))
                 else:
-                    print ("======= script init  fail!   =======")
+                    print ("==============     script  init  fail!        ==============")
                     print (dbResult["output"])
                     sys.exit(0)
             else:
-                print ("======= script init  fail. Please view log file (default path:./log/).   =======")
+                print ("============== script init  fail. Please view log file (default path:./log/). ==============")
                 sys.exit(0)
     startManager()
     return
@@ -412,12 +413,18 @@ def startManager():
             sys.exit(0)
         if_success = 'Starting' in result["output"]
         if if_success:
-            print ("======= WeBASE-Node-Manager  starting . Please check through the log file (default path:./webase-node-mgr/log/). =======")
+            timeTemp = 0
+            while timeTemp < serverWaitTime :
+                print("=", end='')
+                sys.stdout.flush()
+                time.sleep(1)
+                timeTemp = timeTemp + 1
+            print ("========= WeBASE-Node-Manager starting. Please check through the log file (default path:./webase-node-mgr/log/). ==============")
         else:
-            print ("======= WeBASE-Node-Manager start fail. Please check through the log file (default path:./webase-node-mgr/log/). =======")
+            print ("============== WeBASE-Node-Manager start fail. Please check through the log file (default path:./webase-node-mgr/log/). ==============")
             sys.exit(0)
     else:
-        print ("======= WeBASE-Node-Manager start  fail. Please view log file (default path:./log/).    =======")
+        print ("============== WeBASE-Node-Manager start fail. Please check through the log file (default path:./webase-node-mgr/log/). ==============")
         sys.exit(0)
     print ("============== WeBASE-Node-Manager  end...    ==============")
     return
@@ -494,9 +501,9 @@ def installFront():
     if res_file:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("WeBASE-Front database {} already exists, delete rebuild or not？[y/n]:".format(frontDb))
+            info = raw_input("WeBASE-Front database {} already exists, rebuild or not？[y/n]:".format(frontDb))
         else:
-            info = input("WeBASE-Front database {} already exists, delete rebuild or not？[y/n]:".format(frontDb))
+            info = input("WeBASE-Front database {} already exists, rebuild or not？[y/n]:".format(frontDb))
         if info == "y" or info == "Y":
             doCmdIgnoreException("rm -rf {}/{}.*".format(db_dir,frontDb))
 
@@ -542,15 +549,20 @@ def startFront():
             sys.exit(0)
         if_success = 'Starting' in result["output"]
         if if_success:
-            print ("=======     WeBASE-Front    starting .  Please check through the log file (default path:./{}/log/).    =======".format(frontPackage))
+            timeTemp = 0
+            while timeTemp < serverWaitTime :
+                print("=", end='')
+                sys.stdout.flush()
+                time.sleep(1)
+                timeTemp = timeTemp + 1
+            print ("========= WeBASE-Front starting. Please check through the log file (default path:./{}/log/). ==============".format(frontPackage))
         else:
-            print ("=======     WeBASE-Front    start fail. Please check through the log file (default path:./{}/log/).    =======".format(frontPackage))
+            print ("============== WeBASE-Front start fail. Please check through the log file (default path:./{}/log/). ==============".format(frontPackage))
             sys.exit(0)
     else:
-        print ("=======     WeBASE-Front    start  fail. Please view log file (default path:./log/).    =======")
+        print ("============== WeBASE-Front start fail. Please check through the log file (default path:./{}/log/). ==============")
         sys.exit(0)
     print ("==============     WeBASE-Front     end...    ==============")
-    print ("================================================================")
     return
 
 def stopFront():
@@ -604,7 +616,7 @@ def changeSignConfig():
 
 def installSign():
     print ("================================================================")
-    print ("============== WeBASE-Sign install... ==============")
+    print ("==============     WeBASE-Sign  install...    ==============")
     os.chdir(currentDir)
     sign_version = getCommProperties("webase.sign.version")
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip ".format(sign_version)
@@ -628,7 +640,7 @@ def installDockerImage():
     return
 
 def startSign():
-    print ("============== WeBASE-Sign  start...  ==============")
+    print ("==============     WeBASE-Sign    start...    ==============")
     os.chdir(currentDir)
     signPort = getCommProperties("sign.port")
     server_dir = currentDir + "/webase-sign"
@@ -645,14 +657,20 @@ def startSign():
             sys.exit(0)
         if_success = 'Starting' in result["output"]
         if if_success:
-            print ("======= WeBASE-Sign starting. Please check through the log file (default path:./webase-sign/log/). =======")
+            timeTemp = 0
+            while timeTemp < serverWaitTime :
+                print("=", end='')
+                sys.stdout.flush()
+                time.sleep(1)
+                timeTemp = timeTemp + 1
+            print ("========= WeBASE-Sign starting. Please check through the log file (default path:./webase-sign/log/). ==============")
         else:
-            print ("======= WeBASE-Sign start fail. Please check through the log file (default path:./webase-sign/log/). =======")
+            print ("============== WeBASE-Sign start fail. Please check through the log file (default path:./webase-sign/log/). ==============")
             sys.exit(0)
     else:
-        print ("======= WeBASE-Sign start fail. Please view log file (default path:./log/).    =======")
+        print ("============== WeBASE-Sign start fail. Please check through the log file (default path:./webase-sign/log/). ==============")
         sys.exit(0)
-    print ("============== WeBASE-Sign  end...    ==============")
+    print ("==============     WeBASE-Sign    end...      ==============")
     return
 
 def stopSign():
@@ -695,7 +713,7 @@ def initFrontForMgr():
                 addFrontToDb()
                 restResult = rest_get(url)
                 if restResult == '':
-                    print ("======= Init Front for Mgr fail. Please view log file (default path:./log/).    =======")
+                    print ("============== Init Front for Mgr fail. Please view log file (default path:./log/). ==============")
                 else:
                     print("= 100%")
                     print ("==============  Init Front for Mgr end...     ==============")
