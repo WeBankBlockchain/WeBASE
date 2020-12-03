@@ -15,10 +15,10 @@ serverWaitTime = 5
 def do():
     print ("=====================    deploy   start... =====================")
     installNode()
-    installWeb()
+    installSign()
     installFront()
     installManager()
-    installSign()
+    installWeb()
     initFrontForMgr()
     print ("=====================    deploy   end...   =====================")
     os.chdir(currentDir)
@@ -36,10 +36,10 @@ def do():
 
 def visual_do():
     print ("=====================    deploy   start... =====================")
-    installWeb()
-    installManager(True)
-    installSign()
     installDockerImage()
+    installSign()
+    installManager(True)
+    installWeb()
     print ("=====================    deploy   end...   =====================")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
@@ -55,24 +55,24 @@ def visual_do():
 
 def start():
     startNode()
-    startWeb()
+    startSign()
     startFront()
     startManager()
-    startSign()
+    startWeb()
     return
 
 def end():
-    stopNode()
     stopWeb()
     stopManager()
-    stopSign()
     stopFront()
+    stopSign()
+    stopNode()
     return
 
 def visualStart():
-    startWeb()
-    startManager()
     startSign()
+    startManager()
+    startWeb()
     return
 def visualEnd():
     stopWeb()
@@ -176,9 +176,10 @@ def startNode():
     return
 
 def stopNode():
+    os.chdir(currentDir)
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco is None:
-        print ("======= FISCO-BCOS is not deploy. return! =======")
+        print ("=======   FISCO-BCOS is not deploy. return! =======")
         return
 
     fisco_dir = getCommProperties("fisco.dir")
