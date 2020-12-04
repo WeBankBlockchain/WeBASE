@@ -134,7 +134,7 @@ def checkMgrDbAuthorized():
         conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
         # conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, database=mysql_database, charset='utf8')
         conn.close()
-        print("check mgr db user/password correct!")        
+        print("check finished sucessfully.")        
         log.info("check mgr db user/password correct!")
     except:
         import traceback
@@ -156,7 +156,7 @@ def checkSignDbAuthorized():
         # connect
         conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
         conn.close()
-        print("check sign db user/password correct!")        
+        print("check finished sucessfully.")        
         log.info("check sign db user/password correct!")
     except:
         import traceback
