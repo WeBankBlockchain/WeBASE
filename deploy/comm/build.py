@@ -260,9 +260,7 @@ def startWeb():
     res = doCmd("which nginx")
     if res["status"] == 0:
         res2 = doCmd("sudo " + res["output"] + " -c " + nginx_config_dir)
-        if res2["status"] == 0:
-            print ("==============    WeBASE-Web start success!   ==============")
-        else:
+        if res2["status"] != 0:
             print ("==============    WeBASE-Web start fail. Please view log file (default path:./webase-web/log/). ==============")
             sys.exit(0)
     else:
@@ -405,7 +403,10 @@ def startManager():
     os.chdir(currentDir)
     managerPort = getCommProperties("mgr.port")
     server_dir = currentDir + "/webase-node-mgr"
+    if not checkPathExists(server_dir):
+        sys.exit(0)
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -436,7 +437,10 @@ def startManager():
 
 def stopManager():
     server_dir = currentDir + "/webase-node-mgr"
+    if not checkPathExists(server_dir):
+        return
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -540,8 +544,11 @@ def startFront():
         print ("======= WeBASE-Front is not deploy. return! =======")
         return
 
-    frontPackage = "webase-front"
-    os.chdir(currentDir + "/" + frontPackage)
+    server_dir = currentDir + "/webase-front"
+    if not checkPathExists(server_dir):
+        sys.exit(0)
+    os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -560,9 +567,9 @@ def startFront():
                 sys.stdout.flush()
                 time.sleep(1)
                 timeTemp = timeTemp + 1
-            print ("========= WeBASE-Front starting. Please check through the log file (default path:./{}/log/). ==============".format(frontPackage))
+            print ("========= WeBASE-Front starting. Please check through the log file (default path:./webase-front/log/). ==============")
         else:
-            print ("============== WeBASE-Front start fail. Please check through the log file (default path:./{}/log/). ==============".format(frontPackage))
+            print ("============== WeBASE-Front start fail. Please check through the log file (default path:./webase-front/log/). ==============")
             sys.exit(0)
     else:
         print ("============== WeBASE-Front start fail. Please check through the log file (default path:./{}/log/). ==============")
@@ -573,11 +580,10 @@ def startFront():
 def stopFront():
     os.chdir(currentDir)
     server_dir = currentDir + "/webase-front"
-    if not os.path.exists(server_dir):
-        print ("======= WeBASE-Front is not deploy. return! =======")
+    if not checkPathExists(server_dir):
         return
-
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -649,7 +655,10 @@ def startSign():
     os.chdir(currentDir)
     signPort = getCommProperties("sign.port")
     server_dir = currentDir + "/webase-sign"
+    if not checkPathExists(server_dir):
+        sys.exit(0)
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -680,6 +689,8 @@ def startSign():
 
 def stopSign():
     server_dir = currentDir + "/webase-sign"
+    if not checkPathExists(server_dir):
+        return
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")

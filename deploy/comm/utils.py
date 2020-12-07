@@ -242,6 +242,13 @@ def checkFileName(dir,fileName):
     else:
         return False
 
+def checkPathExists(pathName):
+    if os.path.exists(pathName):
+        return True
+    else:
+        print ("======={} is not exists.=======".format(pathName))
+        return False
+
 def get_str_btw(s, f, b):
     par = s.partition(f)
     return (par[2].partition(b))[0][:]
