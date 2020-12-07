@@ -13,43 +13,47 @@ initDbEnable = False
 serverWaitTime = 5
 
 def do():
-    print ("=====================    deploy   start... =====================")
+    print ("==============        starting  deploy        ==============")
     installNode()
     installSign()
     installFront()
     installManager()
     installWeb()
     initFrontForMgr()
-    print ("=====================    deploy   end...   =====================")
+    print ("============================================================")
+    print ("==============      deploy  has completed     ==============")
+    print ("============================================================")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
     mgr_version = getCommProperties("webase.mgr.version")
     sign_version = getCommProperties("webase.sign.version")
     front_version = getCommProperties("webase.front.version")
 
-    print ("=====================    webase-web version  {}        ==================".format(web_version))
-    print ("=====================    webase-node-mgr version  {}   ==================".format(mgr_version))
-    print ("=====================    webase-sign version  {}       ==================".format(sign_version))
-    print ("=====================    webase-front version  {}      ==================".format(front_version))
-    print ("================================================================")
+    print ("==============    webase-web version  {}        ========".format(web_version))
+    print ("==============    webase-node-mgr version  {}   ========".format(mgr_version))
+    print ("==============    webase-sign version  {}       ========".format(sign_version))
+    print ("==============    webase-front version  {}      ========".format(front_version))
+    print ("============================================================")
     return
 
 def visual_do():
-    print ("=====================    deploy   start... =====================")
+    print ("==============        starting  deploy        ==============")
     installDockerImage()
     installSign()
     installManager(True)
     installWeb()
-    print ("=====================    deploy   end...   =====================")
+    print ("============================================================")
+    print ("==============      deploy  has completed     ==============")
+    print ("============================================================")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
     mgr_version = getCommProperties("webase.mgr.version")
     sign_version = getCommProperties("webase.sign.version")
 
-    print ("=====================    webase-web version  {}        ==================".format(web_version))
-    print ("=====================    webase-node-mgr version  {}   ==================".format(mgr_version))
-    print ("=====================    webase-sign version  {}       ==================".format(sign_version))
-    print ("================================================================")
+    print ("==============    webase-web version  {}        ========".format(web_version))
+    print ("==============    webase-node-mgr version  {}   ========".format(mgr_version))
+    print ("==============    webase-sign version  {}       ========".format(sign_version))
+    print ("============================================================")
     return
 
 
@@ -91,8 +95,8 @@ def installNode():
     encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
 
     if if_exist_fisco == "no":
-        print ("================================================================")
-        print ("==============      FISCO-BCOS     install... ==============")
+        print ("============================================================")
+        print ("==============      Installing FISCO-BCOS     ==============")
         # init configure file
         if not os.path.exists(currentDir + "/nodetemp"):
             doCmd('cp -f nodeconf nodetemp')
@@ -136,9 +140,9 @@ def installNode():
         else:
             info = "n"
             if sys.version_info.major == 2:
-                info = raw_input("FISCO-BCOS node directory “nodes” already exists. Reinstall or not？[y/n]:")
+                info = raw_input("FISCO-BCOS node directory “nodes” already exists. Reinstall or not?[y/n]:")
             else:
-                info = input("FISCO-BCOS node directory “nodes” already exists. Reinstall or not？[y/n]:")
+                info = input("FISCO-BCOS node directory “nodes” already exists. Reinstall or not?[y/n]:")
             if info == "y" or info == "Y":
                 doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
                 doCmd("rm -rf nodes")
@@ -155,7 +159,7 @@ def installNode():
     startNode()
 
 def startNode():
-    print ("==============      FISCO-BCOS      start...  ==============")
+    print ("==============      Starting FISCO-BCOS       ==============")
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco is None:
         print ("======= FISCO-BCOS is not deploy. return! =======")
@@ -172,7 +176,7 @@ def startNode():
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
     os.system("bash start_all.sh")
-    print ("==============      FISCO-BCOS      end...    ==============")
+    print ("==============      FISCO-BCOS  Started       ==============")
     return
 
 def stopNode():
@@ -224,8 +228,8 @@ def changeWebConfig():
     return
 
 def installWeb():
-    print ("================================================================")
-    print ("==============      WeBASE-Web     install... ==============")
+    print ("============================================================")
+    print ("==============      Installing WeBASE-Web     ==============")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web.zip ".format(web_version)
@@ -234,14 +238,14 @@ def installWeb():
     startWeb()
 
 def startWeb():
-    print ("==============      WeBASE-Web      start...  ==============")
+    print ("==============      Starting WeBASE-Web       ==============")
     pid_file = currentDir + "/nginx-webase-web.pid"
     if os.path.exists(pid_file):
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("WeBASE-Web Process already exists. Kill process to force restart？[y/n]:")
+            info = raw_input("WeBASE-Web Process already exists. Kill process to force restart?[y/n]:")
         else:
-            info = input("WeBASE-Web Process already exists. Kill process to force restart？[y/n]:")
+            info = input("WeBASE-Web Process already exists. Kill process to force restart?[y/n]:")
         if info == "y" or info == "Y":
             fin = open(pid_file, 'r')
             pid = fin.read()
@@ -256,15 +260,13 @@ def startWeb():
     res = doCmd("which nginx")
     if res["status"] == 0:
         res2 = doCmd("sudo " + res["output"] + " -c " + nginx_config_dir)
-        if res2["status"] == 0:
-            print ("==============    WeBASE-Web start success!   ==============")
-        else:
+        if res2["status"] != 0:
             print ("==============    WeBASE-Web start fail. Please view log file (default path:./webase-web/log/). ==============")
             sys.exit(0)
     else:
         print ("==============    WeBASE-Web start fail. Please view log file (default path:./webase-web/log/). ==============")
         sys.exit(0)
-    print ("==============      WeBASE-Web      end...    ==============")
+    print ("==============      WeBASE-Web Started        ==============")
     return
 
 def stopWeb():
@@ -347,8 +349,8 @@ def changeManagerConfig(visual_deploy=False):
     return
 
 def installManager(visual_deploy=False):
-    print ("================================================================")
-    print ("============== WeBASE-Node-Manager install... ==============")
+    print ("============================================================")
+    print ("============== Installing WeBASE-Node-Manager ==============")
     os.chdir(currentDir)
     mgr_version = getCommProperties("webase.mgr.version")
     encrypt_type = int(getCommProperties("encrypt.type"))
@@ -371,9 +373,9 @@ def installManager(visual_deploy=False):
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)？[y/n]:")
+            info = raw_input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)?[y/n]:")
         else:
-            info = input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)？[y/n]:")
+            info = input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)?[y/n]:")
         if info == "y" or info == "Y":
             os.chdir(script_dir)
             doCmdIgnoreException("chmod u+x *.sh")
@@ -397,11 +399,14 @@ def installManager(visual_deploy=False):
     return
 
 def startManager():
-    print ("============== WeBASE-Node-Manager  start...  ==============")
+    print ("==============  Starting WeBASE-Node-Manager  ==============")
     os.chdir(currentDir)
     managerPort = getCommProperties("mgr.port")
     server_dir = currentDir + "/webase-node-mgr"
+    if not checkPathExists(server_dir):
+        sys.exit(0)
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -427,12 +432,15 @@ def startManager():
     else:
         print ("============== WeBASE-Node-Manager start fail. Please check through the log file (default path:./webase-node-mgr/log/). ==============")
         sys.exit(0)
-    print ("============== WeBASE-Node-Manager  end...    ==============")
+    print ("==============  WeBASE-Node-Manager  Started  ==============")
     return
 
 def stopManager():
     server_dir = currentDir + "/webase-node-mgr"
+    if not checkPathExists(server_dir):
+        return
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -484,8 +492,8 @@ def changeFrontConfig():
     return
 
 def installFront():
-    print ("================================================================")
-    print ("==============     WeBASE-Front    install... ==============")
+    print ("============================================================")
+    print ("==============     Installing WeBASE-Front    ==============")
     os.chdir(currentDir)
     front_version = getCommProperties("webase.front.version")
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-front.zip ".format(front_version)
@@ -502,9 +510,9 @@ def installFront():
     if res_file:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("WeBASE-Front database {} already exists, rebuild or not？[y/n]:".format(frontDb))
+            info = raw_input("WeBASE-Front database {} already exists, rebuild or not?[y/n]:".format(frontDb))
         else:
-            info = input("WeBASE-Front database {} already exists, rebuild or not？[y/n]:".format(frontDb))
+            info = input("WeBASE-Front database {} already exists, rebuild or not?[y/n]:".format(frontDb))
         if info == "y" or info == "Y":
             doCmdIgnoreException("rm -rf {}/{}.*".format(db_dir,frontDb))
 
@@ -529,15 +537,18 @@ def installFront():
     return
 
 def startFront():
-    print ("==============     WeBASE-Front     start...  ==============")
+    print ("==============     Starting WeBASE-Front      ==============")
     os.chdir(currentDir)
     frontPort = getCommProperties("front.port")
     if frontPort is None:
         print ("======= WeBASE-Front is not deploy. return! =======")
         return
 
-    frontPackage = "webase-front"
-    os.chdir(currentDir + "/" + frontPackage)
+    server_dir = currentDir + "/webase-front"
+    if not checkPathExists(server_dir):
+        sys.exit(0)
+    os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -556,24 +567,23 @@ def startFront():
                 sys.stdout.flush()
                 time.sleep(1)
                 timeTemp = timeTemp + 1
-            print ("========= WeBASE-Front starting. Please check through the log file (default path:./{}/log/). ==============".format(frontPackage))
+            print ("========= WeBASE-Front starting. Please check through the log file (default path:./webase-front/log/). ==============")
         else:
-            print ("============== WeBASE-Front start fail. Please check through the log file (default path:./{}/log/). ==============".format(frontPackage))
+            print ("============== WeBASE-Front start fail. Please check through the log file (default path:./webase-front/log/). ==============")
             sys.exit(0)
     else:
         print ("============== WeBASE-Front start fail. Please check through the log file (default path:./{}/log/). ==============")
         sys.exit(0)
-    print ("==============     WeBASE-Front     end...    ==============")
+    print ("==============     WeBASE-Front  Started.     ==============")
     return
 
 def stopFront():
     os.chdir(currentDir)
     server_dir = currentDir + "/webase-front"
-    if not os.path.exists(server_dir):
-        print ("======= WeBASE-Front is not deploy. return! =======")
+    if not checkPathExists(server_dir):
         return
-
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -616,8 +626,8 @@ def changeSignConfig():
     return
 
 def installSign():
-    print ("================================================================")
-    print ("==============     WeBASE-Sign  install...    ==============")
+    print ("============================================================")
+    print ("==============     Installing WeBASE-Sign     ==============")
     os.chdir(currentDir)
     sign_version = getCommProperties("webase.sign.version")
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip ".format(sign_version)
@@ -628,8 +638,8 @@ def installSign():
     return
 
 def installDockerImage():
-    print ("================================================================")
-    print ("============== Download docker image from CDN... ==============")
+    print ("============================================================")
+    print ("============ Download docker image from CDN... =============")
     os.chdir(currentDir)
     image_version = getCommProperties("fisco.webase.docker.cdn.version")
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
@@ -641,11 +651,14 @@ def installDockerImage():
     return
 
 def startSign():
-    print ("==============     WeBASE-Sign    start...    ==============")
+    print ("==============      Starting WeBASE-Sign      ==============")
     os.chdir(currentDir)
     signPort = getCommProperties("sign.port")
     server_dir = currentDir + "/webase-sign"
+    if not checkPathExists(server_dir):
+        sys.exit(0)
     os.chdir(server_dir)
+    
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
@@ -671,11 +684,13 @@ def startSign():
     else:
         print ("============== WeBASE-Sign start fail. Please check through the log file (default path:./webase-sign/log/). ==============")
         sys.exit(0)
-    print ("==============     WeBASE-Sign    end...      ==============")
+    print ("==============      WeBASE-Sign  Started      ==============")
     return
 
 def stopSign():
     server_dir = currentDir + "/webase-sign"
+    if not checkPathExists(server_dir):
+        return
     os.chdir(server_dir)
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")

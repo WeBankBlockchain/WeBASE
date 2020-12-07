@@ -183,9 +183,9 @@ def pullDockerImage(gitComm,fileName,repo_name):
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("{} already exists. Download again or not？[y/n]:".format(fileName))
+            info = raw_input("{} already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
         else:
-            info = input("{} already exists. Download again or not？[y/n]:".format(fileName))
+            info = input("{} already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
         if info == "y" or info == "Y":
             doCmd("rm -rf {}".format(fileName))
             print (gitComm)
@@ -206,9 +206,9 @@ def pullSourceExtract(gitComm,fileName):
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
+            info = raw_input("{}.zip already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
         else:
-            info = input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
+            info = input("{}.zip already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
         if info == "y" or info == "Y":
             doCmd("rm -rf {}.zip".format(fileName))
             doCmd("rm -rf {}".format(fileName))
@@ -222,9 +222,9 @@ def pullSourceExtract(gitComm,fileName):
     else:
         info1 = "n"
         if sys.version_info.major == 2:
-            info1 = raw_input("{}.zip has been unzipped. Whether to re-unzip？[y/n]:".format(fileName))
+            info1 = raw_input("directory '{}' is not empty. Do you want delete and re-unzip {}.zip?[y/n]:".format(fileName,fileName))
         else:
-            info1 = input("{}.zip has been unzipped. Whether to re-unzip？[y/n]:".format(fileName))
+            info1 = input("directory '{}' is not empty. Do you want delete and re-unzip {}.zip?[y/n]:".format(fileName,fileName))
         if info1 == "y" or info1 == "Y":
             doCmd("rm -rf {}".format(fileName))
             doCmd("unzip -o {}.zip".format(fileName))
@@ -240,6 +240,13 @@ def checkFileName(dir,fileName):
     if fileName in Files:
         return True
     else:
+        return False
+
+def checkPathExists(pathName):
+    if os.path.exists(pathName):
+        return True
+    else:
+        print ("======={} is not exists.=======".format(pathName))
         return False
 
 def get_str_btw(s, f, b):

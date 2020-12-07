@@ -11,7 +11,7 @@ log = deployLog.getLocalLogger()
 checkDependent = ["git","openssl","curl","wget","dos2unix"]
 
 def do():
-    print ("================================================================"),
+    print ("============================================================"),
     webaseMsg = '''
               _    _     ______  ___  _____ _____ 
              | |  | |    | ___ \/ _ \/  ___|  ___|
@@ -21,8 +21,8 @@ def do():
               \/  \/ \___\____/\_| |_\____/\____/  
     '''
     print (webaseMsg)
-    print ("================================================================")
-    print ("===================== envrionment check... =====================")
+    print ("============================================================")
+    print ("==============      checking envrionment      ==============")
     installRequirements()
     checkNginx()
     checkJava()
@@ -35,11 +35,11 @@ def do():
     checkSignDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
-    print ("===================== envrionment ready... =====================")
-    print ("================================================================")
+    print ("==============      envrionment available     ==============")
+    print ("============================================================")
 
 def visual_do():
-    print ("================================================================"),
+    print ("============================================================"),
     webaseMsg = '''
               _    _     ______  ___  _____ _____ 
              | |  | |    | ___ \/ _ \/  ___|  ___|
@@ -49,8 +49,8 @@ def visual_do():
               \/  \/ \___\____/\_| |_\____/\____/  
     '''
     print (webaseMsg)
-    print ("================================================================")
-    print ("===================== envrionment check... =====================")
+    print ("============================================================")
+    print ("==============      checking envrionment      ==============")
     installRequirements()
     checkDocker()
     checkNginx()
@@ -61,24 +61,24 @@ def visual_do():
     checkSignPort()
     checkSignDbConnect()
     checkMgrDbConnect()
-    print ("===================== envrionment ready... =====================")
-    print ("================================================================")
+    print ("==============      envrionment available     ==============")
+    print ("============================================================")
 
 def checkPort():
-    print ("==============      port    check   start...  ==============")
+    print ("==============      checking    port          ==============")
     checkWebPort()
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
-    print ("==============      port    check   end...    ==============")
+    print ("==============        port    available       ==============")
 
 def visualCheckPort():
-    print ("==============      port    check   start...  ==============")
+    print ("==============      checking    port          ==============")
     checkWebPort()
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
-    print ("==============      port    check   end...    ==============")
+    print ("==============        port    available       ==============")
 
 def installRequirements():
    for require in checkDependent:
@@ -272,9 +272,9 @@ def installByYum(server):
     elif isUbuntu():
         os.system("sudo apt-get install -y {}".format(server))
     else:
-        print ("=========================================================================")
+        print ("============================================================")
         print ('current system platform is not in target list(centos/redhat, ubuntu, suse')
-        print ('======== please install dependency of [{}] on your own ========'.format(server))
+        print ('===== please install dependency of [{}] on your own ====='.format(server))
         info = "n"
         if sys.version_info.major == 2:
             info = raw_input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
