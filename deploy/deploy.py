@@ -89,9 +89,9 @@ Parameter:
     stopSign:       stop WeBASE-Sign server
 
 Attention:
-    1. Need to install python3, jdk, mysql, PyMySQL first
+    1. Need to install python, jdk, mysql, MySQL-python or PyMySQL first
     2. Need to ensure a smooth network
-    3. You need to install git,openssl,curl,wget,nginx,dos2unix; if it is not installed, the installation script will automatically install these components, but this may fail.
+    3. You need to install git, wget, nginx; if it is not installed, the installation script will automatically install these components, but this may fail.
     '''
     print (helpMsg)
     return
