@@ -5,12 +5,13 @@ from . import log as deployLog
 import os
 import sys
 from .utils import *
+from .mysql import *
 
 log = deployLog.getLocalLogger()
-checkDependent = ["git","openssl","curl","wget"]
+checkDependent = ["git","openssl","curl","wget","dos2unix"]
 
 def do():
-    print ("================================================================"),
+    print ("============================================================"),
     webaseMsg = '''
               _    _     ______  ___  _____ _____ 
              | |  | |    | ___ \/ _ \/  ___|  ___|
@@ -20,8 +21,8 @@ def do():
               \/  \/ \___\____/\_| |_\____/\____/  
     '''
     print (webaseMsg)
-    print ("================================================================")
-    print ("===================== envrionment check... =====================")
+    print ("============================================================")
+    print ("==============      checking envrionment      ==============")
     installRequirements()
     checkNginx()
     checkJava()
@@ -30,13 +31,15 @@ def do():
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
-    checkSignDbConnect()
     checkMgrDbConnect()
-    print ("===================== envrionment ready... =====================")
-    print ("================================================================")
+    checkSignDbConnect()
+    checkMgrDbAuthorized()
+    checkSignDbAuthorized()
+    print ("==============      envrionment available     ==============")
+    print ("============================================================")
 
 def visual_do():
-    print ("================================================================"),
+    print ("============================================================"),
     webaseMsg = '''
               _    _     ______  ___  _____ _____ 
              | |  | |    | ___ \/ _ \/  ___|  ___|
@@ -46,8 +49,8 @@ def visual_do():
               \/  \/ \___\____/\_| |_\____/\____/  
     '''
     print (webaseMsg)
-    print ("================================================================")
-    print ("===================== envrionment check... =====================")
+    print ("============================================================")
+    print ("==============      checking envrionment      ==============")
     installRequirements()
     checkDocker()
     checkNginx()
@@ -58,24 +61,26 @@ def visual_do():
     checkSignPort()
     checkSignDbConnect()
     checkMgrDbConnect()
-    print ("===================== envrionment ready... =====================")
-    print ("================================================================")
+    print ("==============      envrionment available     ==============")
+    print ("============================================================")
 
 def checkPort():
+    print ("==============      checking    port          ==============")
     checkWebPort()
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
+    print ("==============        port    available       ==============")
 
 def visualCheckPort():
+    print ("==============      checking    port          ==============")
     checkWebPort()
     checkMgrPort()
     checkSignPort()
     checkFrontPort()
+    print ("==============        port    available       ==============")
 
 def installRequirements():
-   print ("================================================================")
-   print ('===== check/install dependency of [git,openssl,curl,nginx] =====')
    for require in checkDependent:
       print ("check {}...".format(require))
       hasInstall = hasInstallServer(require)
@@ -267,14 +272,14 @@ def installByYum(server):
     elif isUbuntu():
         os.system("sudo apt-get install -y {}".format(server))
     else:
-        print ("=========================================================================")
+        print ("============================================================")
         print ('current system platform is not in target list(centos/redhat, ubuntu, suse')
-        print ('======== please install dependency of [{}] on your own ========'.format(server))
+        print ('===== please install dependency of [{}] on your own ====='.format(server))
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+            info = raw_input("Please check whether dependency of [{}] already installed, yes or not?[y/n]:".format(server))
         else:
-            info = input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+            info = input("Please check whether dependency of [{}] already installed, yes or not?[y/n]:".format(server))
         if info == "y" or info == "Y":
             return
         else:
