@@ -277,9 +277,9 @@ def installByYum(server):
         print ('===== please install dependency of [{}] on your own ====='.format(server))
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+            info = raw_input("Please check whether dependency of [{}] already installed, yes or not?[y/n]:".format(server))
         else:
-            info = input("Please check whether dependency of [{}] already installed, yes or not？[y/n]:".format(server))
+            info = input("Please check whether dependency of [{}] already installed, yes or not?[y/n]:".format(server))
         if info == "y" or info == "Y":
             return
         else:

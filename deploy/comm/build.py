@@ -373,9 +373,9 @@ def installManager(visual_deploy=False):
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)?[y/n]:")
+            info = raw_input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         else:
-            info = input("Whether to initialize the data (the first deployment or rebuilding of the library needs to be performed)?[y/n]:")
+            info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         if info == "y" or info == "Y":
             os.chdir(script_dir)
             doCmdIgnoreException("chmod u+x *.sh")
