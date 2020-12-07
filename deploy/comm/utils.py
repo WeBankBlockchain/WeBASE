@@ -25,12 +25,12 @@ import platform
 import shutil
 import json
 from urllib import request
+from threading import Thread
 from distutils.dir_util import copy_tree
 
 log = deployLog.getLocalLogger()
 platformStr = platform.platform()
 unameStr = platform.uname()[1]
-versionStr = platform.uname()[3]
 
 def getIpAddress(ifname):
     s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -69,14 +69,14 @@ def net_if_used_no_msg(ip,port):
         s.close()
 
 def isUbuntu():
-    return platformStr.lower().find("ubuntu") > -1 or unameStr.lower().find("ubuntu") > -1 or versionStr.lower().find("ubuntu") > -1
+    return platformStr.lower().find("ubuntu") > -1 or unameStr.lower().find("ubuntu") > -1
 
 def isCentos():
     # support redhat
-    return platformStr.lower().find("centos") > -1 or unameStr.lower().find("centos") > -1 or unameStr.lower().find("redhat") > -1 or versionStr.lower().find("centos") > -1
+    return platformStr.lower().find("centos") > -1 or unameStr.lower().find("centos") > -1 or unameStr.lower().find("redhat") > -1
 
 def isSuse():
-    return platformStr.lower().find("suse") > -1  or unameStr.lower().find("suse") > -1 or versionStr.lower().find("suse") > -1
+    return platformStr.lower().find("suse") > -1  or unameStr.lower().find("suse") > -1
 
 def getBaseDir():
     cwd = os.getcwd()
@@ -183,9 +183,9 @@ def pullDockerImage(gitComm,fileName,repo_name):
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("{} already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
+            info = raw_input("{} already exists. Download again or not？[y/n]:".format(fileName))
         else:
-            info = input("{} already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
+            info = input("{} already exists. Download again or not？[y/n]:".format(fileName))
         if info == "y" or info == "Y":
             doCmd("rm -rf {}".format(fileName))
             print (gitComm)
@@ -206,9 +206,9 @@ def pullSourceExtract(gitComm,fileName):
     else:
         info = "n"
         if sys.version_info.major == 2:
-            info = raw_input("{}.zip already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
+            info = raw_input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
         else:
-            info = input("{}.zip already exists. Do you want to re-download and overwrite it?[y/n]:".format(fileName))
+            info = input("{}.zip already exists. Download again or not？[y/n]:".format(fileName))
         if info == "y" or info == "Y":
             doCmd("rm -rf {}.zip".format(fileName))
             doCmd("rm -rf {}".format(fileName))
@@ -222,9 +222,9 @@ def pullSourceExtract(gitComm,fileName):
     else:
         info1 = "n"
         if sys.version_info.major == 2:
-            info1 = raw_input("directory '{}' is not empty. Do you want delete and re-unzip {}.zip?[y/n]:".format(fileName,fileName))
+            info1 = raw_input("{}.zip has been unzipped. Whether to re-unzip？[y/n]:".format(fileName))
         else:
-            info1 = input("directory '{}' is not empty. Do you want delete and re-unzip {}.zip?[y/n]:".format(fileName,fileName))
+            info1 = input("{}.zip has been unzipped. Whether to re-unzip？[y/n]:".format(fileName))
         if info1 == "y" or info1 == "Y":
             doCmd("rm -rf {}".format(fileName))
             doCmd("unzip -o {}.zip".format(fileName))
@@ -242,26 +242,20 @@ def checkFileName(dir,fileName):
     else:
         return False
 
-def checkPathExists(pathName):
-    if os.path.exists(pathName):
-        return True
-    else:
-        print ("======={} is not exists.=======".format(pathName))
-        return False
-
 def get_str_btw(s, f, b):
     par = s.partition(f)
     return (par[2].partition(b))[0][:]
     
 def rest_get(url):
     log.info("rest_get url: {}".format(url))
-    try:
-        res = request.urlopen(url)
-        log.info("rest_get success: {}".format(res.read()))
-        return res
-    except:
-        log.error("rest_get fail: {}".format(sys.exc_info()))
-        return ''
+    res = request.urlopen(url)
+    log.info(res.read())
+
+def async(f):
+    def wrapper(*args, **kwargs):
+        thr = Thread(target=f, args=args, kwargs=kwargs)
+        thr.start()
+    return wrapper
     
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
