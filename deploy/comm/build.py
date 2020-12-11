@@ -375,7 +375,7 @@ def installManager(visual_deploy=False):
             info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         if info == "y" or info == "Y":
             initNodeMgrTable(script_dir,True)
-        else 
+        else:
             initNodeMgrTable(script_dir,False)  
                   
         global initDbEnable
