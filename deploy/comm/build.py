@@ -358,7 +358,9 @@ def installManager(visual_deploy=False):
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-node-mgr.zip ".format(mgr_version)
     pullSourceExtract(gitComm,"webase-node-mgr")
     changeManagerConfig(visual_deploy)
-    dbConnect()
+    # connect mgr's db and create database
+    # if no re-create db, no need to init tables in db
+    whether_init = dbConnect()
 
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = getCommProperties("mysql.port")
@@ -374,13 +376,14 @@ def installManager(visual_deploy=False):
         else:
             info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         if info == "y" or info == "Y":
-            initNodeMgrTable(script_dir,True)
+            initNodeMgrTable(script_dir,whether_init)
+            global initDbEnable
+            initDbEnable = True
+            log.info(" installManager initDbEnable {}".format(initDbEnable))
         else:
-            initNodeMgrTable(script_dir,False)  
+            initNodeMgrTable(script_dir,whether_init)  
                   
-        global initDbEnable
-        initDbEnable = True
-        log.info(" installManager initDbEnable {}".format(initDbEnable))
+       
     # script_dir = server_dir + "/script"
     # script_cmd = 'bash webase.sh {} {}'.format(mysql_ip, mysql_port)
     # if encrypt_type == 1:

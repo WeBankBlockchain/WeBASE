@@ -41,6 +41,8 @@ def addFrontToDb():
         sys.exit(0)
 
 def dbConnect():
+    # return whether to init tables
+    whether_init = True
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = int(getCommProperties("mysql.port"))
@@ -69,11 +71,15 @@ def dbConnect():
                 cursor.execute(drop_db)
                 log.info(create_db)
                 cursor.execute(create_db)
+            # if not rebuild database, no need to re-init tables of database
+            else:
+                whether_init = False
         else:
             log.info(create_db)
             cursor.execute(create_db)
         cursor.close()
         conn.close()
+        return whether_init
     except:
         import traceback
         log.info(" mysql except {}".format(traceback.format_exc()))
@@ -166,7 +172,7 @@ def checkSignDbAuthorized():
         sys.exit(0)
 
 # init table and table's default data of nodemgr
-def initNodeMgrTable(script_dir,both=True):
+def initNodeMgrTable(script_dir,init_both=True):
     print ("init mgr database tables...")
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
@@ -201,7 +207,7 @@ def initNodeMgrTable(script_dir,both=True):
             cursor.execute(sql_item)
 
         # if both create table and init table data
-        if both:
+        if init_both:
             log.info("start init default data of tables...")
             for sql_item in init_sql_list:
                 log.info(sql_item)
