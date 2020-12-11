@@ -369,19 +369,19 @@ def installManager(visual_deploy=False):
     script_dir = server_dir + "/script"    
     if len(sys.argv) == 3 and sys.argv[2] == "travis":
         print ("Travis CI do not initialize database")
-    else:
+    elif whether_init == True:
         info = "n"
         if sys.version_info.major == 2:
             info = raw_input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         else:
             info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         if info == "y" or info == "Y":
-            initNodeMgrTable(script_dir,whether_init)
+            initNodeMgrTable(script_dir,True)
             global initDbEnable
             initDbEnable = True
             log.info(" installManager initDbEnable {}".format(initDbEnable))
         else:
-            initNodeMgrTable(script_dir,whether_init)  
+            initNodeMgrTable(script_dir,False)  
                   
        
     # script_dir = server_dir + "/script"

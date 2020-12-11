@@ -128,7 +128,7 @@ def signDbConnect():
     
 
 def checkMgrDbAuthorized():
-    print ("check mgr database user/password...")
+    log.info("check mgr database user/password...")
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = int(getCommProperties("mysql.port"))
