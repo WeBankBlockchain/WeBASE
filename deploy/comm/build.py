@@ -362,12 +362,8 @@ def installManager(visual_deploy=False):
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = getCommProperties("mysql.port")
     server_dir = currentDir + "/webase-node-mgr"
-    script_dir = server_dir + "/script"
-    script_cmd = 'bash webase.sh {} {}'.format(mysql_ip, mysql_port)
-    if encrypt_type == 1:
-        script_dir = script_dir + "/gm"
-        script_cmd = 'bash webase-gm.sh {} {}'.format(mysql_ip, mysql_port)
-
+    # v1.4.2 use py to init, instead of .sh to call mysql client
+    script_dir = server_dir + "/script"    
     if len(sys.argv) == 3 and sys.argv[2] == "travis":
         print ("Travis CI do not initialize database")
     else:
@@ -377,24 +373,41 @@ def installManager(visual_deploy=False):
         else:
             info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         if info == "y" or info == "Y":
-            os.chdir(script_dir)
-            doCmdIgnoreException("chmod u+x *.sh")
-            doCmdIgnoreException("dos2unix *.sh")
-            dbResult = doCmd(script_cmd)
-            if dbResult["status"] == 0:
-                if_success = 'success' in dbResult["output"]
-                if if_success:
-                    print ("==============     script  init  success!     ==============")
-                    global initDbEnable
-                    initDbEnable = True
-                    log.info(" installManager initDbEnable {}".format(initDbEnable))
-                else:
-                    print ("==============     script  init  fail!        ==============")
-                    print (dbResult["output"])
-                    sys.exit(0)
-            else:
-                print ("============== script init  fail. Please view log file (default path:./log/). ==============")
-                sys.exit(0)
+            initNodeMgrTable(script_dir)
+
+    # script_dir = server_dir + "/script"
+    # script_cmd = 'bash webase.sh {} {}'.format(mysql_ip, mysql_port)
+    # if encrypt_type == 1:
+    # script_dir = script_dir + "/gm"
+    # script_cmd = 'bash webase-gm.sh {} {}'.format(mysql_ip, mysql_port)
+
+    # if len(sys.argv) == 3 and sys.argv[2] == "travis":
+    #     print ("Travis CI do not initialize database")
+    # else:
+    #     info = "n"
+    #     if sys.version_info.major == 2:
+    #         info = raw_input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
+    #     else:
+    #         info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
+    #     if info == "y" or info == "Y":
+    #         os.chdir(script_dir)
+    #         doCmdIgnoreException("chmod u+x *.sh")
+    #         doCmdIgnoreException("dos2unix *.sh")
+    #         dbResult = doCmd(script_cmd)
+    #         if dbResult["status"] == 0:
+    #             if_success = 'success' in dbResult["output"]
+    #             if if_success:
+    #                 print ("==============     script  init  success!     ==============")
+    #                 global initDbEnable
+    #                 initDbEnable = True
+    #                 log.info(" installManager initDbEnable {}".format(initDbEnable))
+    #             else:
+    #                 print ("==============     script  init  fail!        ==============")
+    #                 print (dbResult["output"])
+    #                 sys.exit(0)
+    #         else:
+    #             print ("============== script init  fail. Please view log file (default path:./log/). ==============")
+    #             sys.exit(0)
     startManager()
     return
 

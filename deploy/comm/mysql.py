@@ -165,6 +165,73 @@ def checkSignDbAuthorized():
         traceback.print_exc()
         sys.exit(0)
 
+# init table and table's default data of nodemgr
+def initNodeMgrTable(script_dir):
+    print ("init mgr database tables...")
+    # get properties
+    mysql_ip = getCommProperties("mysql.ip")
+    mysql_port = int(getCommProperties("mysql.port"))
+    mysql_user = getCommProperties("mysql.user")
+    mysql_password = getCommProperties("mysql.password")
+      # 0:ecdsa, 1:gm 
+    encrypt_type = int(getCommProperties("encrypt.type"))
+    
+    # read .sql content
+    create_sql_path = script_dir + "/webase-ddl.sql"
+    if encrypt_type == 1:
+        init_sql_path = script_dir + "/gm/webase-dml-gm.sql"
+    else:
+        init_sql_path = script_dir + "/webase-dml.sql"
+    # create table
+    create_sql_list=readSqlContent(create_sql_path)
+    # init table data
+    init_sql_list=readSqlContent(init_sql_path)
+
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
+        conn.autocommit(1)
+        cursor = conn.cursor()
+
+        log.info("start create tables...")
+        for sql_item in create_sql_list:
+            log.info(sql_item)
+            cursor.execute(sql_item)
+
+        log.info("start init default data of tables...")
+        for sql_item in init_sql_list:
+            log.info(sql_item)
+            cursor.execute(sql_item)
+        
+        print ("==============     script  init  success!     ==============")
+        log.info("init mgr tables success!")
+        cursor.close()
+        conn.close()
+    except:
+        import traceback
+        print ("==============     script  init  fail!        ==============")
+        log.info("init mgr database tables error {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+
+def readSqlContent(sql_path):
+    log.info("reading node manager table sql file {}".format(sql_path))        
+    # read .sql file in webase-node-mgr/script(/gm)
+    with open(sql_path,encoding="utf-8",mode="r") as f:  
+        data = f.read()
+        lines = data.splitlines()
+        sql_data = ''
+	    # remove -- comment
+        for line in lines:
+            if len(line) == 0:
+                continue
+            elif line.startswith("--"):
+                continue
+            else:
+                sql_data += line
+        sql_list = sql_data.split(';')[:-1]
+        sql_list = [x.replace('\n', ' ') if '\n' in x else x for x in sql_list]
+        return sql_list
 
 if __name__ == '__main__':
     pass
