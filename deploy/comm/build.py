@@ -358,31 +358,23 @@ def installManager(visual_deploy=False):
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-node-mgr.zip ".format(mgr_version)
     pullSourceExtract(gitComm,"webase-node-mgr")
     changeManagerConfig(visual_deploy)
+    
+    # v1.4.2 use py to init, instead of .sh to call mysql client
     # connect mgr's db and create database
     # if no re-create db, no need to init tables in db
-    whether_init = dbConnect()
-
-    mysql_ip = getCommProperties("mysql.ip")
-    mysql_port = getCommProperties("mysql.port")
+    whether_init = mgrDbInit()
     server_dir = currentDir + "/webase-node-mgr"
-    # v1.4.2 use py to init, instead of .sh to call mysql client
     script_dir = server_dir + "/script"    
     if len(sys.argv) == 3 and sys.argv[2] == "travis":
         print ("Travis CI do not initialize database")
     elif whether_init == True:
-        info = "n"
-        if sys.version_info.major == 2:
-            info = raw_input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
-        else:
-            info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
-        if info == "y" or info == "Y":
-            initNodeMgrTable(script_dir,True)
-            global initDbEnable
-            initDbEnable = True
-            log.info(" installManager initDbEnable {}".format(initDbEnable))
-        else:
-            initNodeMgrTable(script_dir,False)  
-                  
+        initNodeMgrTable(script_dir)
+        global initDbEnable
+        initDbEnable = True
+        log.info(" installManager initDbEnable {}".format(initDbEnable))
+        
+    startManager()
+    return        
        
     # script_dir = server_dir + "/script"
     # script_cmd = 'bash webase.sh {} {}'.format(mysql_ip, mysql_port)
@@ -417,8 +409,6 @@ def installManager(visual_deploy=False):
     #         else:
     #             print ("============== script init  fail. Please view log file (default path:./log/). ==============")
     #             sys.exit(0)
-    startManager()
-    return
 
 def startManager():
     print ("==============  Starting WeBASE-Node-Manager  ==============")

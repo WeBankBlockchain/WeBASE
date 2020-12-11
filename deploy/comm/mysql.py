@@ -40,7 +40,7 @@ def addFrontToDb():
         traceback.print_exc()
         sys.exit(0)
 
-def dbConnect():
+def mgrDbInit():
     # return whether to init tables
     whether_init = True
     # get properties
@@ -63,9 +63,9 @@ def dbConnect():
         if result == 1:
             info = "n"
             if sys.version_info.major == 2:
-                info = raw_input("WeBASE-Node-Manager database {} already exists. Do you want drop and recreate it?[y/n]:".format(mysql_database))
+                info = raw_input("WeBASE-Node-Manager database {} already exists. Do you want drop and re-initialize it?[y/n]:".format(mysql_database))
             else:
-                info = input("WeBASE-Node-Manager database {} already exists. Do you want drop and recreate it?[y/n]:".format(mysql_database))
+                info = input("WeBASE-Node-Manager database {} already exists. Do you want drop and re-initialize it?[y/n]:".format(mysql_database))
             if info == "y" or info == "Y":
                 log.info(drop_db)
                 cursor.execute(drop_db)
@@ -172,7 +172,7 @@ def checkSignDbAuthorized():
         sys.exit(0)
 
 # init table and table's default data of nodemgr
-def initNodeMgrTable(script_dir,init_both=True):
+def initNodeMgrTable(script_dir):
     print ("init mgr database tables...")
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
@@ -206,20 +206,18 @@ def initNodeMgrTable(script_dir,init_both=True):
             log.info(sql_item)
             cursor.execute(sql_item)
 
-        # if both create table and init table data
-        if init_both:
-            log.info("start init default data of tables...")
-            for sql_item in init_sql_list:
-                log.info(sql_item)
-                cursor.execute(sql_item)
+        log.info("start init default data of tables...")
+        for sql_item in init_sql_list:
+            log.info(sql_item)
+            cursor.execute(sql_item)
         
-        print ("==============     script  init  success!     ==============")
+        print ("==============  mgr db script  init  success!  ==============")
         log.info("init mgr tables success!")
         cursor.close()
         conn.close()
     except:
         import traceback
-        print ("============== script init  fail. Please view log file (default path:./log/). ==============")
+        print ("============== script init  fail! Please view log file (default path:./log/). ==============")
         log.info("init mgr database tables error {}".format(traceback.format_exc()))
         traceback.print_exc()
         sys.exit(0)
