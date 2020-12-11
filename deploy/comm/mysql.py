@@ -173,6 +173,8 @@ def initNodeMgrTable(script_dir):
     mysql_port = int(getCommProperties("mysql.port"))
     mysql_user = getCommProperties("mysql.user")
     mysql_password = getCommProperties("mysql.password")
+    mysql_database = getCommProperties("mysql.database")
+    
       # 0:ecdsa, 1:gm 
     encrypt_type = int(getCommProperties("encrypt.type"))
     
@@ -189,7 +191,7 @@ def initNodeMgrTable(script_dir):
 
     try:
         # connect
-        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, database=mysql_database, charset='utf8')
         conn.autocommit(1)
         cursor = conn.cursor()
 
@@ -209,7 +211,7 @@ def initNodeMgrTable(script_dir):
         conn.close()
     except:
         import traceback
-        print ("==============     script  init  fail!        ==============")
+        print ("============== script init  fail. Please view log file (default path:./log/). ==============")
         log.info("init mgr database tables error {}".format(traceback.format_exc()))
         traceback.print_exc()
         sys.exit(0)

@@ -374,7 +374,10 @@ def installManager(visual_deploy=False):
             info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         if info == "y" or info == "Y":
             initNodeMgrTable(script_dir)
-
+            global initDbEnable
+            initDbEnable = True
+            log.info(" installManager initDbEnable {}".format(initDbEnable))
+    
     # script_dir = server_dir + "/script"
     # script_cmd = 'bash webase.sh {} {}'.format(mysql_ip, mysql_port)
     # if encrypt_type == 1:
