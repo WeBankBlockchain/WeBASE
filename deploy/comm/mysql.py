@@ -166,7 +166,7 @@ def checkSignDbAuthorized():
         sys.exit(0)
 
 # init table and table's default data of nodemgr
-def initNodeMgrTable(script_dir):
+def initNodeMgrTable(script_dir,both=True):
     print ("init mgr database tables...")
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
@@ -200,10 +200,12 @@ def initNodeMgrTable(script_dir):
             log.info(sql_item)
             cursor.execute(sql_item)
 
-        log.info("start init default data of tables...")
-        for sql_item in init_sql_list:
-            log.info(sql_item)
-            cursor.execute(sql_item)
+        # if both create table and init table data
+        if both:
+            log.info("start init default data of tables...")
+            for sql_item in init_sql_list:
+                log.info(sql_item)
+                cursor.execute(sql_item)
         
         print ("==============     script  init  success!     ==============")
         log.info("init mgr tables success!")

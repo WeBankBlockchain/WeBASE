@@ -9,6 +9,7 @@ from .mysql import *
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
+# check init node mgr's tb_front 
 initDbEnable = False
 serverWaitTime = 5
 
@@ -373,11 +374,13 @@ def installManager(visual_deploy=False):
         else:
             info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
         if info == "y" or info == "Y":
-            initNodeMgrTable(script_dir)
-            global initDbEnable
-            initDbEnable = True
-            log.info(" installManager initDbEnable {}".format(initDbEnable))
-    
+            initNodeMgrTable(script_dir,True)
+        else 
+            initNodeMgrTable(script_dir,False)  
+                  
+        global initDbEnable
+        initDbEnable = True
+        log.info(" installManager initDbEnable {}".format(initDbEnable))
     # script_dir = server_dir + "/script"
     # script_cmd = 'bash webase.sh {} {}'.format(mysql_ip, mysql_port)
     # if encrypt_type == 1:
