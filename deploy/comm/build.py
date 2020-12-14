@@ -531,6 +531,7 @@ def installFront():
     # copy node crt
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
+    encrypt_type = int(getCommProperties("encrypt.type"))
     encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
 
     if if_exist_fisco == "no":
@@ -541,6 +542,9 @@ def installFront():
         sys.exit(0)
     os.chdir(server_dir)
     if encrypt_ssl_type == 1:
+        if encrypt_type == 0:
+            print ("======= only guomi type support guomi ssl. please check! =======".format(sdk_dir))
+            sys.exit(0)
         copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
     else:
         copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
