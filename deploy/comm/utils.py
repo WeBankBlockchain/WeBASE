@@ -193,7 +193,7 @@ def pullDockerImage(gitComm,fileName,repo_name):
 
     doCmd("sudo docker load -i {}".format(fileName))
 
-    result = doCmd("docker image ls {} | wc -l".format(repo_name))
+    result = doCmd("sudo docker image ls {} | wc -l".format(repo_name))
     print ("Uzip image result {} ".format(result))
     if int(result["output"]) <= 1 :
         print ("Unzip docker image from file {} failed!".format(fileName))
