@@ -422,6 +422,7 @@ def startManager():
     doCmdIgnoreException("source /etc/profile")
     doCmdIgnoreException("chmod u+x *.sh")
     doCmdIgnoreException("dos2unix *.sh")
+    doCmdIgnoreException("find ./script -name '*.sh'|xargs dos2unix")
     result = doCmd("bash start.sh")
     if result["status"] == 0:
         if_started = 'is running' in result["output"]
