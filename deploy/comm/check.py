@@ -328,7 +328,8 @@ def checkMemAndCpu():
     cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
     if (int(memFree.get("status")) != 0 or int(cpuCore.get("status")) != 0):
         raise Exception('Get memory or cpu core fail memFree:{} cpuCore:{}'.format(memFree, cpuCore))
-    memFreeInt=int(memFree.get("output"))
+    memFreeStr=memFree.get("output").split(".", 1)[0]
+    memFreeInt=int(memFreeStr)
     cpuCoreInt=int(cpuCore.get("output"))
 
     fisco_count_str = getCommProperties("node.counts")
