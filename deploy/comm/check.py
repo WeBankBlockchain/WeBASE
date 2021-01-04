@@ -296,12 +296,13 @@ def installByYum(server):
 # update every version
 # check fisco version and webase-front version
 def checkVersion():
-    fisco_ver_str = getCommProperties("fisco.version")
-    fisco_version_int = int(re.findall("\d+",fisco_ver_str)[0])
-    # webase-front version greater or equal with other webase version
-    webase_front_ver_str = getCommProperties("webase.front.version")
-    webase_front_version_int = int(re.findall("\d+",webase_front_ver_str)[0])
     print ("check webase and fisco version...")
+    fisco_ver_str = getCommProperties("fisco.version")
+    webase_front_ver_str = getCommProperties("webase.front.version")
+    print ("check webase {} and fisco version {}...".format(fisco_ver_str,webase_front_ver_str))
+    fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0])
+    # webase-front version greater or equal with other webase version
+    webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0])
     flag=False
     # require if webase <= 1.3.2, fisco < 2.5.0
     if ( webase_front_version_int <= 132 and fisco_version_int >= 250 ):
