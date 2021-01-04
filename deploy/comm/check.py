@@ -296,10 +296,9 @@ def installByYum(server):
 # update every version
 # check fisco version and webase-front version
 def checkVersion():
-    print ("check webase and fisco version...")
     fisco_ver_str = getCommProperties("fisco.version")
     webase_front_ver_str = getCommProperties("webase.front.version")
-    print ("check webase {} and fisco version {}...".format(fisco_ver_str,webase_front_ver_str))
+    print ("check webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
     fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0])
     # webase-front version greater or equal with other webase version
     webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0])
@@ -330,7 +329,7 @@ def checkMemAndCpu():
     fisco_count_str = getCommProperties("node.counts")
     fisco_count = 2
     if (fisco_ver_str != 'nodeCounts'):
-        fisco_count = int(fisco_ver_str)
+        fisco_count = int(fisco_count_str)
     # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
     flag=False
     if (fisco_count <= 2):
