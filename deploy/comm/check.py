@@ -6,6 +6,7 @@ import os
 import sys
 from .utils import *
 from .mysql import *
+import re
 #import psutil
 
 log = deployLog.getLocalLogger()
@@ -296,12 +297,10 @@ def installByYum(server):
 # check fisco version and webase-front version
 def checkVersion():
     fisco_ver_str = getCommProperties("fisco.version")
-    fisco_version = filter(str.isdigit, fisco_ver_str)
-    fisco_version_int = int(fisco_version)
+    fisco_version_int = int(re.findall("\d+",fisco_ver_str)[0])
     # webase-front version greater or equal with other webase version
     webase_front_ver_str = getCommProperties("webase.front.version")
-    webase_front_version = filter(str.isdigit, webase_front_ver_str)
-    webase_front_version_int = int(webase_front_version)
+    webase_front_version_int = int(re.findall("\d+",webase_front_ver_str)[0])
     print ("check webase and fisco version...")
     flag=False
     # require if webase <= 1.3.2, fisco < 2.5.0
