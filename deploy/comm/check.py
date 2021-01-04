@@ -313,8 +313,7 @@ def checkVersion():
 
     # if version conflicts, exit
     if (flag):
-        print ('WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
-        sys.exit(0)        
+        raise Exception('WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
     else:
         print ('WeBASE version and FISCO version check success. ')
         return
@@ -326,8 +325,9 @@ def checkMemAndCpu():
     # memFree = mem.free/1024
     memFree=doCmd("awk '($1 == \"MemFree:\"){print $2/1024}' /proc/meminfo 2>&1")
     cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
+    print ("check host free memory :{} and cpu core:{}.", memFree, cpuCore)
 
-    memFreeInt=int(memFree)
+    memFreeInt=int(memFree.get("MemFree"))
     cpuCoreInt=int(cpuCore)
     # cpu
     fisco_count_str = getCommProperties("node.counts")
@@ -343,8 +343,7 @@ def checkMemAndCpu():
         if (memFree <= 4095 or cpuCore < 4):
             flag=True
     if (flag):
-        print ('Free memory :{}, cpu core :{} is not enough for node count :{}'.format(memFree, cpuCore, fisco_count))
-        sys.exit(0)          
+        raise Exception('Free memory :{}, cpu core :{} is not enough for node count :{}'.format(memFree, cpuCore, fisco_count))
     else:
         print ('Free memroy and cpu core check success. ')
         return
