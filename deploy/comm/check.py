@@ -329,7 +329,7 @@ def checkMemAndCpu():
     # cpu
     fisco_count_str = getCommProperties("node.counts")
     fisco_count = 2
-    if (fisco_ver_str != 'nodeCounts'):
+    if (fisco_count_str != 'nodeCounts'):
         fisco_count = int(fisco_count_str)
     # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
     flag=False
