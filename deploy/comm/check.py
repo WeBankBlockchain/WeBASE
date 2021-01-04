@@ -324,12 +324,12 @@ def checkMemAndCpu():
     # get free memory(M)
     memFree=doCmd("awk '($1 == \"MemFree:\"){print $2/1024}' /proc/meminfo 2>&1")
     # get cpu core num
-    cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
-    if (int(memFree.get("status")) != 0 or int(cpuCore.get("status")) != 0):
-        raise Exception('Get memory or cpu core fail memFree:{} cpuCore:{}'.format(memFree, cpuCore))
+    # cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
+    if (int(memFree.get("status")) != 0):
+        raise Exception('Get memory or cpu core fail memFree:{}'.format(memFree))
     memFreeStr=memFree.get("output").split(".", 1)[0]
     memFreeInt=int(memFreeStr)
-    cpuCoreInt=int(cpuCore.get("output"))
+    # cpuCoreInt=int(cpuCore.get("output"))
 
     fisco_count_str = getCommProperties("node.counts")
     fisco_count = 2
@@ -338,13 +338,13 @@ def checkMemAndCpu():
     # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
     flag=False
     if (fisco_count <= 2):
-        if (memFreeInt <= 2047 or cpuCoreInt < 2):
+        if (memFreeInt <= 2047):
             flag=True
     if (fisco_count >= 4):
-        if (memFreeInt <= 4095 or cpuCoreInt < 4):
+        if (memFreeInt <= 4095):
             flag=True
     if (flag):
-        print ('[WARN]Free memory {}(M), cpu core {} is NOT ENOUGH for node count {} and webase, please check doc for more detail'.format(memFreeInt, cpuCoreInt, fisco_count))
+        print ('[WARN]Free memory {}(M) is NOT ENOUGH for node count {} and webase, please check doc for more detail'.format(memFreeInt, fisco_count))
     else:
         print ('check finished sucessfully.')
         return
