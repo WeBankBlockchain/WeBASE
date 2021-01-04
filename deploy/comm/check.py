@@ -321,15 +321,16 @@ def checkVersion():
 
 def checkMemAndCpu():
     print ("check host free memory and cpu core...")
+    # result format: {'status': 0, 'output': '151.895'}
     # get free memory(M)
-    # memFree = mem.free/1024
     memFree=doCmd("awk '($1 == \"MemFree:\"){print $2/1024}' /proc/meminfo 2>&1")
+    # get cpu core num
     cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
-    print ("check host free memory :{} and cpu core:{}.", memFree, cpuCore)
+    if (int(memFree.get("status")) != 0 or int(cpuCore.get("status")) != 0):
+        raise Exception('Get memory or cpu core fail memFree:{} cpuCore:{}'.format(memFree, cpuCore))
+    memFreeInt=int(memFree.get("output"))
+    cpuCoreInt=int(cpuCore.get("output"))
 
-    memFreeInt=int(memFree.get("MemFree"))
-    cpuCoreInt=int(cpuCore)
-    # cpu
     fisco_count_str = getCommProperties("node.counts")
     fisco_count = 2
     if (fisco_count_str != 'nodeCounts'):
@@ -343,7 +344,7 @@ def checkMemAndCpu():
         if (memFree <= 4095 or cpuCore < 4):
             flag=True
     if (flag):
-        raise Exception('Free memory :{}, cpu core :{} is not enough for node count :{}'.format(memFree, cpuCore, fisco_count))
+        raise Exception('Free memory :{}(M), cpu core :{} is not enough for node count :{}'.format(memFreeInt, cpuCoreInt, fisco_count))
     else:
         print ('Free memroy and cpu core check success. ')
         return
