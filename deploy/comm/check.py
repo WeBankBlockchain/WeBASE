@@ -345,7 +345,7 @@ def checkMemAndCpu():
         if (memFreeInt <= 4095 or cpuCoreInt < 4):
             flag=True
     if (flag):
-        raise Exception('Free memory :{}(M), cpu core :{} is not enough for node count :{}, please check doc for more detail'.format(memFreeInt, cpuCoreInt, fisco_count))
+        raise Exception('Free memory {}(M), cpu core {} is NOT ENOUGH for node count {} and webase, please check doc for more detail'.format(memFreeInt, cpuCoreInt, fisco_count))
     else:
         print ('Free memroy and cpu core check success. ')
         return
