@@ -299,9 +299,9 @@ def checkVersion():
     fisco_ver_str = getCommProperties("fisco.version")
     webase_front_ver_str = getCommProperties("webase.front.version")
     print ("check webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
-    fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0])
+    fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
     # webase-front version greater or equal with other webase version
-    webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0])
+    webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
     print ("check webase {} and fisco version {}...".format(webase_front_version_int, fisco_version_int))
     flag=False
     # require if webase <= 1.3.2, fisco < 2.5.0
@@ -326,6 +326,9 @@ def checkMemAndCpu():
     # memFree = mem.free/1024
     memFree=doCmd("awk '($1 == \"MemFree:\"){print $2/1024}' /proc/meminfo 2>&1")
     cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
+
+    memFreeInt=int(memFree)
+    cpuCoreInt=int(cpuCore)
     # cpu
     fisco_count_str = getCommProperties("node.counts")
     fisco_count = 2
