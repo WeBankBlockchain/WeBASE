@@ -322,7 +322,7 @@ def checkMemAndCpu():
     print ("check host free memory and cpu core...")
     # get free memory(M)
     # memFree = mem.free/1024
-    memFree=doCmd("awk '($1 == "MemFree:"){print $2/1024}' /proc/meminfo 2>&1")
+    memFree=doCmd("awk '($1 == \"MemFree:\"){print $2/1024}' /proc/meminfo 2>&1")
     cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
     # cpu
     fisco_count_str = getCommProperties("node.counts")
