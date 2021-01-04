@@ -6,9 +6,13 @@ import os
 import sys
 from .utils import *
 from .mysql import *
+import psutil
 
 log = deployLog.getLocalLogger()
 checkDependent = ["git","openssl","curl","wget","dos2unix"]
+# memery(B) and cpu(core counts logical)
+mem=psutil.virtual_memory()
+cpuCore=psutil.cpu_count()
 
 def do():
     print ("============================================================"),
@@ -24,6 +28,8 @@ def do():
     print ("============================================================")
     print ("==============      checking envrionment      ==============")
     installRequirements()
+    checkVersion()
+    checkMemAndCpu()
     checkNginx()
     checkJava()
     checkNodePort()
@@ -285,6 +291,57 @@ def installByYum(server):
         else:
             raise Exception("error, not support this platform, only support centos/redhat, suse, ubuntu.")
     return
+
+# update every version
+# check fisco version and webase-front version
+def checkVersion():
+    fisco_ver_str = getCommProperties("fisco.version")
+    fisco_version = int(filter(str.isdigit, fisco_ver_str))
+    # webase-front version greater or equal with other webase version
+    webase_front_ver_str = getCommProperties("webase.front.version")
+    webase_front_version = int(filter(str.isdigit, webase_front_ver_str))
+    print ("check webase and fisco version...")
+    flag=False
+    # require if webase <= 1.3.2, fisco < 2.5.0
+    if ( webase_front_version <= 132 and fisco_version >= 250 ):
+        flag=True
+    # require if webase >= 1.3.1(dynamic group), fisco >= 2.4.1
+    if ( webase_front_version >= 131 and fisco_version < 241 ):
+        flag=True
+
+    # if version conflicts, exit
+    if (flag):
+        print ('WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
+        sys.exit(0)        
+    else:
+        print ('WeBASE version and FISCO version check success. ')
+        return
+
+
+def checkMemAndCpu():
+    print ("check host free memory and cpu core...")
+    # get free memory(M)
+    memFree = mem.free/1024/1024
+    # cpu
+    fisco_count_str = getCommProperties("node.counts")
+    fisco_count = 2
+    if (fisco_ver_str != 'nodeCounts'):
+        fisco_count = int(fisco_ver_str)
+    # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
+    flag=False
+    if (fisco_count <= 2):
+        if (memFree <= 2047 or cpuCore < 2):
+            flag=True
+    if (fisco_count >= 4):
+        if (memFree <= 4095 or cpuCore < 4):
+            flag=True
+    if (flag):
+        print ('Free memory :{}, cpu core :{} is not enough for node count :{}'.format(memFree, cpuCore, fisco_count))
+        sys.exit(0)          
+    else:
+        print ('Free memroy and cpu core check success. ')
+        return
+
 
 if __name__ == '__main__':
     pass
