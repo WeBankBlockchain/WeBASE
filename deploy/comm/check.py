@@ -6,13 +6,13 @@ import os
 import sys
 from .utils import *
 from .mysql import *
-import psutil
+#import psutil
 
 log = deployLog.getLocalLogger()
 checkDependent = ["git","openssl","curl","wget","dos2unix"]
 # memery(B) and cpu(core counts logical)
-mem=psutil.virtual_memory()
-cpuCore=psutil.cpu_count()
+# mem=psutil.virtual_memory()
+# cpuCore=psutil.cpu_count()
 
 def do():
     print ("============================================================"),
@@ -321,7 +321,9 @@ def checkVersion():
 def checkMemAndCpu():
     print ("check host free memory and cpu core...")
     # get free memory(M)
-    memFree = mem.free/1024/1024
+    # memFree = mem.free/1024
+    memFree=doCmd("awk '($1 == "MemFree:"){print $2/1024}' /proc/meminfo 2>&1")
+    cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
     # cpu
     fisco_count_str = getCommProperties("node.counts")
     fisco_count = 2
