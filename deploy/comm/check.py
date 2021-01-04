@@ -339,13 +339,13 @@ def checkMemAndCpu():
     # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
     flag=False
     if (fisco_count <= 2):
-        if (memFree <= 2047 or cpuCore < 2):
+        if (memFreeInt <= 3071 or cpuCoreInt < 2):
             flag=True
     if (fisco_count >= 4):
-        if (memFree <= 4095 or cpuCore < 4):
+        if (memFreeInt <= 4095 or cpuCoreInt < 4):
             flag=True
     if (flag):
-        raise Exception('Free memory :{}(M), cpu core :{} is not enough for node count :{}'.format(memFreeInt, cpuCoreInt, fisco_count))
+        raise Exception('Free memory :{}(M), cpu core :{} is not enough for node count :{}, please check doc for more detail'.format(memFreeInt, cpuCoreInt, fisco_count))
     else:
         print ('Free memroy and cpu core check success. ')
         return
