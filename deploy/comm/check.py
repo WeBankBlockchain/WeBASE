@@ -302,7 +302,6 @@ def checkVersion():
     fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
     # webase-front version greater or equal with other webase version
     webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
-    print ("check webase {} and fisco version {}...".format(webase_front_version_int, fisco_version_int))
     flag=False
     # require if webase <= 1.3.2, fisco < 2.5.0
     if ( webase_front_version_int <= 132 and fisco_version_int >= 250 ):
@@ -313,9 +312,9 @@ def checkVersion():
 
     # if version conflicts, exit
     if (flag):
-        raise Exception('WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
+        raise Exception ('[ERROR]WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
     else:
-        print ('WeBASE version and FISCO version check success. ')
+        print ('WeBASE version and FISCO version check successfully. ')
         return
 
 
@@ -339,15 +338,15 @@ def checkMemAndCpu():
     # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
     flag=False
     if (fisco_count <= 2):
-        if (memFreeInt <= 3071 or cpuCoreInt < 2):
+        if (memFreeInt <= 2047 or cpuCoreInt < 2):
             flag=True
     if (fisco_count >= 4):
         if (memFreeInt <= 4095 or cpuCoreInt < 4):
             flag=True
     if (flag):
-        raise Exception('Free memory {}(M), cpu core {} is NOT ENOUGH for node count {} and webase, please check doc for more detail'.format(memFreeInt, cpuCoreInt, fisco_count))
+        print ('[WARN]Free memory {}(M), cpu core {} is NOT ENOUGH for node count {} and webase, please check doc for more detail'.format(memFreeInt, cpuCoreInt, fisco_count))
     else:
-        print ('Free memroy and cpu core check success. ')
+        print ('Free memroy and cpu core check successfully. ')
         return
 
 
