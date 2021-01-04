@@ -314,7 +314,7 @@ def checkVersion():
     if (flag):
         raise Exception ('[ERROR]WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
     else:
-        print ('WeBASE version and FISCO version check successfully. ')
+        print ('check finished sucessfully.')
         return
 
 
@@ -346,7 +346,7 @@ def checkMemAndCpu():
     if (flag):
         print ('[WARN]Free memory {}(M), cpu core {} is NOT ENOUGH for node count {} and webase, please check doc for more detail'.format(memFreeInt, cpuCoreInt, fisco_count))
     else:
-        print ('Free memroy and cpu core check successfully. ')
+        print ('check finished sucessfully.')
         return
 
 
