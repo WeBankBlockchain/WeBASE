@@ -299,7 +299,6 @@ def changeManagerConfig(visual_deploy=False):
         sign_ip = getCommProperties("sign.ip")
         ssh_user = getCommProperties("mgr.ssh.user")
         ssh_port = int(getCommProperties("mgr.ssh.port"))
-        root_dir_on_host = getCommProperties("mgr.ssh.rootDirOnHost")
 
     # init file
     server_dir = currentDir + "/webase-node-mgr"
@@ -345,7 +344,6 @@ def changeManagerConfig(visual_deploy=False):
         doCmd('sed -i "s%webaseSignAddress:.*$%webaseSignAddress: {}:{}%g" {}/application.yml'.format(sign_ip, sign_port, conf_dir))
         doCmd('sed -i "s%sshDefaultUser:.*$%sshDefaultUser: {}%g" {}/application.yml'.format(ssh_user, conf_dir))
         doCmd('sed -i "s%sshDefaultPort:.*$%sshDefaultPort: {}%g" {}/application.yml'.format(ssh_port, conf_dir))
-        doCmd('sed -i "s%rootDirOnHost:.*$%rootDirOnHost: {}%g" {}/application.yml'.format(root_dir_on_host,  conf_dir))
 
     return
 
