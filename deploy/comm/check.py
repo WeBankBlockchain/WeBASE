@@ -345,6 +345,7 @@ def checkMemAndCpu():
             flag=True
     if (flag):
         print ('[WARN]Free memory {}(M) may be NOT ENOUGH for node count [{}] and webase'.format(memFreeInt, fisco_count))
+        print ("[WARN]Recommend webase with 2G memory at least, and one node equipped with one core of CPU and 1G memory(linear increase with node count). ")
     else:
         print ('check finished sucessfully.')
         return
