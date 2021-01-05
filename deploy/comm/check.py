@@ -6,9 +6,14 @@ import os
 import sys
 from .utils import *
 from .mysql import *
+import re
+#import psutil
 
 log = deployLog.getLocalLogger()
 checkDependent = ["git","openssl","curl","wget","dos2unix"]
+# memery(B) and cpu(core counts logical)
+# mem=psutil.virtual_memory()
+# cpuCore=psutil.cpu_count()
 
 def do():
     print ("============================================================"),
@@ -24,6 +29,8 @@ def do():
     print ("============================================================")
     print ("==============      checking envrionment      ==============")
     installRequirements()
+    checkVersion()
+    checkMemAndCpu()
     checkNginx()
     checkJava()
     checkNodePort()
@@ -285,6 +292,63 @@ def installByYum(server):
         else:
             raise Exception("error, not support this platform, only support centos/redhat, suse, ubuntu.")
     return
+
+# update every version
+# check fisco version and webase-front version
+def checkVersion():
+    fisco_ver_str = getCommProperties("fisco.version")
+    webase_front_ver_str = getCommProperties("webase.front.version")
+    print ("check webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
+    fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
+    # webase-front version greater or equal with other webase version
+    webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
+    flag=False
+    # require if webase <= 1.3.2, fisco < 2.5.0
+    if ( webase_front_version_int <= 132 and fisco_version_int >= 250 ):
+        flag=True
+    # require if webase >= 1.3.1(dynamic group), fisco >= 2.4.1
+    if ( webase_front_version_int >= 131 and fisco_version_int < 241 ):
+        flag=True
+
+    # if version conflicts, exit
+    if (flag):
+        raise Exception ('[ERROR]WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
+    else:
+        print ('check finished sucessfully.')
+        return
+
+
+def checkMemAndCpu():
+    print ("check host free memory and cpu core...")
+    # result format: {'status': 0, 'output': '151.895'}
+    # get free memory(M)
+    memFree=doCmd("awk '($1 == \"MemFree:\"){print $2/1024}' /proc/meminfo 2>&1")
+    # get cpu core num
+    # cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
+    if (int(memFree.get("status")) != 0):
+        raise Exception('Get memory or cpu core fail memFree:{}'.format(memFree))
+    memFreeStr=memFree.get("output").split(".", 1)[0]
+    memFreeInt=int(memFreeStr)
+    # cpuCoreInt=int(cpuCore.get("output"))
+
+    fisco_count_str = getCommProperties("node.counts")
+    fisco_count = 2
+    if (fisco_count_str != 'nodeCounts'):
+        fisco_count = int(fisco_count_str)
+    # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
+    flag=False
+    if (fisco_count <= 2):
+        if (memFreeInt <= 2047):
+            flag=True
+    if (fisco_count >= 4):
+        if (memFreeInt <= 4095):
+            flag=True
+    if (flag):
+        print ('[WARN]Free memory {}(M) is NOT ENOUGH for node count {} and webase, please check doc for more detail'.format(memFreeInt, fisco_count))
+    else:
+        print ('check finished sucessfully.')
+        return
+
 
 if __name__ == '__main__':
     pass
