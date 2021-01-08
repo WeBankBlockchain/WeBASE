@@ -696,7 +696,8 @@ def initFrontForMgr():
             time.sleep(1)
             timeTemp = timeTemp + 1
             frontEnable = do_telnet("127.0.0.1",frontPort)
-            if frontEnable:
+            nodemgrEnable = do_telnet("127.0.0.1",managerPort)
+            if frontEnable and nodemgrEnable:
                 log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
                 addFrontToDb()
                 restResult = rest_get(url)
