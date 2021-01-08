@@ -297,9 +297,6 @@ def changeManagerConfig(visual_deploy=False):
 
     if visual_deploy:
         sign_ip = getCommProperties("sign.ip")
-        ssh_user = getCommProperties("mgr.ssh.user")
-        ssh_port = int(getCommProperties("mgr.ssh.port"))
-        root_dir_on_host = getCommProperties("mgr.ssh.rootDirOnHost")
 
     # init file
     server_dir = currentDir + "/webase-node-mgr"
@@ -343,9 +340,6 @@ def changeManagerConfig(visual_deploy=False):
 
     if visual_deploy:
         doCmd('sed -i "s%webaseSignAddress:.*$%webaseSignAddress: {}:{}%g" {}/application.yml'.format(sign_ip, sign_port, conf_dir))
-        doCmd('sed -i "s%sshDefaultUser:.*$%sshDefaultUser: {}%g" {}/application.yml'.format(ssh_user, conf_dir))
-        doCmd('sed -i "s%sshDefaultPort:.*$%sshDefaultPort: {}%g" {}/application.yml'.format(ssh_port, conf_dir))
-        doCmd('sed -i "s%rootDirOnHost:.*$%rootDirOnHost: {}%g" {}/application.yml'.format(root_dir_on_host,  conf_dir))
 
     return
 
@@ -375,40 +369,6 @@ def installManager(visual_deploy=False):
         
     startManager()
     return        
-       
-    # script_dir = server_dir + "/script"
-    # script_cmd = 'bash webase.sh {} {}'.format(mysql_ip, mysql_port)
-    # if encrypt_type == 1:
-    # script_dir = script_dir + "/gm"
-    # script_cmd = 'bash webase-gm.sh {} {}'.format(mysql_ip, mysql_port)
-
-    # if len(sys.argv) == 3 and sys.argv[2] == "travis":
-    #     print ("Travis CI do not initialize database")
-    # else:
-    #     info = "n"
-    #     if sys.version_info.major == 2:
-    #         info = raw_input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
-    #     else:
-    #         info = input("Do you want to initialize the WeBASE-Node-Manager database(It is required for new created database)?[y/n]:")
-    #     if info == "y" or info == "Y":
-    #         os.chdir(script_dir)
-    #         doCmdIgnoreException("chmod u+x *.sh")
-    #         doCmdIgnoreException("dos2unix *.sh")
-    #         dbResult = doCmd(script_cmd)
-    #         if dbResult["status"] == 0:
-    #             if_success = 'success' in dbResult["output"]
-    #             if if_success:
-    #                 print ("==============     script  init  success!     ==============")
-    #                 global initDbEnable
-    #                 initDbEnable = True
-    #                 log.info(" installManager initDbEnable {}".format(initDbEnable))
-    #             else:
-    #                 print ("==============     script  init  fail!        ==============")
-    #                 print (dbResult["output"])
-    #                 sys.exit(0)
-    #         else:
-    #             print ("============== script init  fail. Please view log file (default path:./log/). ==============")
-    #             sys.exit(0)
 
 def startManager():
     print ("==============  Starting WeBASE-Node-Manager  ==============")
@@ -736,7 +696,8 @@ def initFrontForMgr():
             time.sleep(1)
             timeTemp = timeTemp + 1
             frontEnable = do_telnet("127.0.0.1",frontPort)
-            if frontEnable:
+            nodemgrEnable = do_telnet("127.0.0.1",managerPort)
+            if frontEnable and nodemgrEnable:
                 log.info(" initFrontForMgr frontEnable {}".format(frontEnable))
                 addFrontToDb()
                 restResult = rest_get(url)
