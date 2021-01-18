@@ -263,6 +263,20 @@ def rest_get(url):
         log.error("rest_get fail: {}".format(sys.exc_info()))
         return ''
     
+def rest_post(url,data):
+    log.info("rest_post url: {}, data:{}".format(url, data))
+    raw_params = json.dumps(data)
+    params = bytes(raw_params, 'utf8')
+    headers = {'Accept-Charset': 'utf-8', 'Content-Type': 'application/json'}
+    try:
+        req = request.Request(url=url, data=params, headers=headers, method='POST')
+        res = request.urlopen(req).read()
+        log.info("rest_post success: {}".format(res))
+        return res
+    except:
+        log.error("rest_post fail: {}".format(sys.exc_info()))
+        return ''
+
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
     pass
