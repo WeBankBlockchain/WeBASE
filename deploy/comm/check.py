@@ -353,6 +353,17 @@ def checkMemAndCpu():
         print ('check finished sucessfully.')
         return
 
+def checkExistChainConnect():
+    print ("check exist chain connection...")
+    listenIp = getCommProperties("node.listenIp")
+    rpcPort = getCommProperties("node.rpcPort")
+    ifLink = do_telnet(listenIp,rpcPort)
+    if not ifLink:
+        print ('Exist chain listen ip:{} port:{} is disconnected, please confirm.'.format(listenIp, rpcPort))
+        sys.exit(0)
+    print ("check finished sucessfully.")
+    return
+
 def checkEncryptTypeByRpc():
     print ("check encrypt type same with exited chain...")
     existChain = getCommProperties("if.exist.fisco")
@@ -363,6 +374,9 @@ def checkEncryptTypeByRpc():
     encryptType = getCommProperties("encrypt.type")
     # request for chain encrypt type
     if (existChain == 'yes'):
+        # check chain existed
+        checkExistChainConnect()
+        # request chain
         data={"jsonrpc":"2.0","method":"getClientVersion","params":[],"id":1}
         result=rest_post(chainRpcUrl, data)
         # handle result
