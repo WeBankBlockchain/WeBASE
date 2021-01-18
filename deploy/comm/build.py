@@ -226,6 +226,27 @@ def changeWebConfig():
     # set web_page_url(root & static) globally
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
 
+    # change the path of mime.types, which is in the path of nginx configuration by default.
+    res = doCmd("which nginx")
+    if res["status"] == 0:
+        res2 = doCmd("sudo " + res["output"] + " -t ")
+        if res2["status"] == 0:
+           oneLineOutput = res2["output"].split('\n')[0]; 
+           print("onelineOutput: %s" %(oneLineOutput));
+           startIndex = oneLineOutput.index("/");
+           endIndex = oneLineOutput.rindex("/");
+
+           nginxConfPath = oneLineOutput[startIndex:endIndex];
+           print("Defualt nginx config path: %s" %(nginxConfPath)); 
+           doCmd('sed -i "s/include .*\/mime.types/include {}\/mime.types/g" {}/comm/nginx.conf'.format(nginxConfPath.replace("/", "\/"), currentDir))
+
+        else:
+            print ("==============   WebBASE-web start fail when checking the path of nginx configuration fail. Please view log file (default path:./webase-web/log/). ==============")
+            sys.exit(0)
+    else:
+        print ("==============    WeBASE-Web start fail when getting nginx. Please view log file (default path:./webase-web/log/). ==============")
+        sys.exit(0)
+
     return
 
 def installWeb():
