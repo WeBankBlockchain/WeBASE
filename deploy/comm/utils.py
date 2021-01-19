@@ -176,6 +176,7 @@ def do_telnet(host,port):
         return False
     return True
 
+# deprecated in 1.4.3
 def pullDockerImage(gitComm,fileName,repo_name):
     if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
         print (gitComm)
