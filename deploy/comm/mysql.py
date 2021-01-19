@@ -5,6 +5,7 @@ from . import log as deployLog
 import sys
 import MySQLdb as mdb
 from .utils import *
+from urllib import parse
 
 log = deployLog.getLocalLogger()
 
@@ -13,7 +14,8 @@ def addFrontToDb():
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = int(getCommProperties("mysql.port"))
     mysql_user = getCommProperties("mysql.user")
-    mysql_password = getCommProperties("mysql.password")
+    mysql_password_raw = getCommProperties("mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)
     mysql_database = getCommProperties("mysql.database")
     front_org = getCommProperties("front.org")
     front_port = getCommProperties("front.port")
@@ -47,7 +49,8 @@ def mgrDbInit():
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = int(getCommProperties("mysql.port"))
     mysql_user = getCommProperties("mysql.user")
-    mysql_password = getCommProperties("mysql.password")
+    mysql_password_raw = getCommProperties("mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)      
     mysql_database = getCommProperties("mysql.database")
 
     try:
@@ -86,14 +89,14 @@ def mgrDbInit():
         traceback.print_exc()
         sys.exit(0)
 
-def signDbConnect():
+def signDbInit():
     # get properties
     mysql_ip = getCommProperties("sign.mysql.ip")
     mysql_port = int(getCommProperties("sign.mysql.port"))
     mysql_user = getCommProperties("sign.mysql.user")
-    mysql_password = getCommProperties("sign.mysql.password")
+    mysql_password_raw = getCommProperties("sign.mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)  
     mysql_database = getCommProperties("sign.mysql.database")
-
     try:
         # connect
         conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, charset='utf8')
@@ -127,14 +130,16 @@ def signDbConnect():
         sys.exit(0)
     
 
+### to check by mysql.py
+
 def checkMgrDbAuthorized():
-    log.info("check mgr database user/password...")
+    print ("check mgr database user/password...")
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = int(getCommProperties("mysql.port"))
     mysql_user = getCommProperties("mysql.user")
-    mysql_password = getCommProperties("mysql.password")
-
+    mysql_password_raw = getCommProperties("mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)
     try:
         # connect
         conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
@@ -156,8 +161,8 @@ def checkSignDbAuthorized():
     mysql_ip = getCommProperties("sign.mysql.ip")
     mysql_port = int(getCommProperties("sign.mysql.port"))
     mysql_user = getCommProperties("sign.mysql.user")
-    mysql_password = getCommProperties("sign.mysql.password")
-
+    mysql_password_raw = getCommProperties("sign.mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)
     try:
         # connect
         conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
@@ -171,6 +176,7 @@ def checkSignDbAuthorized():
         traceback.print_exc()
         sys.exit(0)
 
+# tool function:
 # init table and table's default data of nodemgr
 def initNodeMgrTable(script_dir):
     print ("init mgr database tables...")
@@ -178,7 +184,8 @@ def initNodeMgrTable(script_dir):
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = int(getCommProperties("mysql.port"))
     mysql_user = getCommProperties("mysql.user")
-    mysql_password = getCommProperties("mysql.password")
+    mysql_password_raw = getCommProperties("mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)    
     mysql_database = getCommProperties("mysql.database")
     
       # 0:ecdsa, 1:gm 
@@ -222,6 +229,7 @@ def initNodeMgrTable(script_dir):
         traceback.print_exc()
         sys.exit(0)
 
+# tool function:
 def readSqlContent(sql_path):
     log.info("reading node manager table sql file {}".format(sql_path))        
     # read .sql file in webase-node-mgr/script(/gm)

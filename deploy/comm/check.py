@@ -42,6 +42,7 @@ def do():
     checkSignDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
+    checkEncryptTypeByRpc()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -68,6 +69,8 @@ def visual_do():
     checkSignPort()
     checkSignDbConnect()
     checkMgrDbConnect()
+    checkMgrDbAuthorized()
+    checkSignDbAuthorized()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -347,6 +350,47 @@ def checkMemAndCpu():
         print ('[WARN]Free memory {}(M) may be NOT ENOUGH for node count [{}] and webase'.format(memFreeInt, fisco_count))
         print ("[WARN]Recommend webase with 2G memory at least, and one node equipped with one core of CPU and 1G memory(linear increase with node count). ")
     else:
+        print ('check finished sucessfully.')
+        return
+
+def checkExistChainConnect():
+    print ("check exist chain connection...")
+    listenIp = getCommProperties("node.listenIp")
+    rpcPort = getCommProperties("node.rpcPort")
+    ifLink = do_telnet(listenIp,rpcPort)
+    if not ifLink:
+        print ('Exist chain listen ip:{} port:{} is disconnected, please confirm.'.format(listenIp, rpcPort))
+        sys.exit(0)
+    print ("check finished sucessfully.")
+    return
+
+def checkEncryptTypeByRpc():
+    print ("check encrypt type same with exited chain...")
+    existChain = getCommProperties("if.exist.fisco")
+    listenIp = getCommProperties("node.listenIp")
+    rpcPort = getCommProperties("node.rpcPort")
+    chainRpcUrl = "http://{}:{}".format(listenIp,rpcPort)
+
+    encryptType = getCommProperties("encrypt.type")
+    # request for chain encrypt type
+    if (existChain == 'yes'):
+        # check chain existed
+        checkExistChainConnect()
+        # request chain
+        data={"jsonrpc":"2.0","method":"getClientVersion","params":[],"id":1}
+        result=rest_post(chainRpcUrl, data)
+        # handle result
+        log.info("request result:{}".format(result))
+        resultStr=str(result, encoding="utf-8")
+        isGuomi="gm" in resultStr
+        if (isGuomi and encryptType != 1):
+            raise Exception("config's encryptType CONFLICTS with existed [guomi] chain")
+        elif (!isGuomi and encryptType == 1):
+            raise Exception("config's encryptType CONFLICTS with existed [ecdsa] chain")
+        else:
+            print ('check finished sucessfully.')
+            return
+     else:
         print ('check finished sucessfully.')
         return
 

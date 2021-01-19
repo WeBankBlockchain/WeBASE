@@ -39,7 +39,7 @@ def do():
 
 def visual_do():
     print ("==============        starting  deploy        ==============")
-    installDockerImage()
+    # installDockerImage()
     installSign()
     installManager(True)
     installWeb()
@@ -339,6 +339,8 @@ def changeManagerConfig(visual_deploy=False):
     doCmd('sed -i "s%deployType:.*$%deployType: {}%g" {}/application.yml'.format(deploy_type, conf_dir))
 
     if visual_deploy:
+        if (sign_ip == '127.0.0.1' or sign_ip == 'localhost'):
+            print ("ERROR! If using visual deploy, webaseSignAddress cannot be 127.0.0.1 or localhost!")
         doCmd('sed -i "s%webaseSignAddress:.*$%webaseSignAddress: {}:{}%g" {}/application.yml'.format(sign_ip, sign_port, conf_dir))
 
     return
@@ -605,10 +607,12 @@ def installSign():
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip ".format(sign_version)
     pullSourceExtract(gitComm,"webase-sign")
     changeSignConfig()
-    signDbConnect()
+    signDbInit()
     startSign()
     return
 
+# download by visual deploy
+# deprecated in 1.4.3
 def installDockerImage():
     print ("============================================================")
     print ("============ Download docker image from CDN... =============")
