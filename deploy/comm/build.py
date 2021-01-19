@@ -39,7 +39,7 @@ def do():
 
 def visual_do():
     print ("==============        starting  deploy        ==============")
-    installDockerImage()
+    # installDockerImage()
     installSign()
     installManager(True)
     installWeb()
@@ -605,10 +605,11 @@ def installSign():
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip ".format(sign_version)
     pullSourceExtract(gitComm,"webase-sign")
     changeSignConfig()
-    signDbConnect()
+    signDbInit()
     startSign()
     return
 
+# download by visual deploy
 def installDockerImage():
     print ("============================================================")
     print ("============ Download docker image from CDN... =============")
