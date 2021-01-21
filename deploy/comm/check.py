@@ -385,12 +385,12 @@ def checkEncryptTypeByRpc():
         isGuomi="gm" in resultStr
         if (isGuomi and encryptType != 1):
             raise Exception("config's encryptType CONFLICTS with existed [guomi] chain")
-        elif (!isGuomi and encryptType == 1):
+        elif ((isGuomi != True) and encryptType == 1):
             raise Exception("config's encryptType CONFLICTS with existed [ecdsa] chain")
         else:
             print ('check finished sucessfully.')
             return
-     else:
+    else:
         print ('check finished sucessfully.')
         return
 
