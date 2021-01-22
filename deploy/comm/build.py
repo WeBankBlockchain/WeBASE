@@ -39,7 +39,7 @@ def do():
 
 def visual_do():
     print ("==============        starting  deploy        ==============")
-    # installDockerImage()
+    installDockerImage()
     installSign()
     installManager(True)
     installWeb()
@@ -614,16 +614,19 @@ def installSign():
 # download by visual deploy
 # deprecated in 1.4.3
 def installDockerImage():
-    print ("============================================================")
-    print ("============ Download docker image from CDN... =============")
-    os.chdir(currentDir)
-    image_version = getCommProperties("fisco.webase.docker.cdn.version")
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
-    pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
+    ifLoad = getCommProperties("if.load.image")
+    if (ifLoad == "yes"):
+        print ("============================================================")
+        print ("============ Download docker image from CDN... =============")
+        os.chdir(currentDir)
+        image_version = getCommProperties("fisco.webase.docker.cdn.version")
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
+        pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
 
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
-    pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase")
-
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
+        pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase")
+    else: 
+        print ("============ Skip download docker image from CDN... =============")
     return
 
 def startSign():

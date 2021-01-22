@@ -176,7 +176,7 @@ def do_telnet(host,port):
         return False
     return True
 
-# deprecated in 1.4.3
+# required docker command not need sudo
 def pullDockerImage(gitComm,fileName,repo_name):
     if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
         print (gitComm)
@@ -192,7 +192,7 @@ def pullDockerImage(gitComm,fileName,repo_name):
             print (gitComm)
             os.system(gitComm)
 
-    doCmd("sudo docker load -i {}".format(fileName))
+    doCmd("docker load -i {}".format(fileName))
 
     result = doCmd("docker image ls {} | wc -l".format(repo_name))
     print ("Uzip image result {} ".format(result))

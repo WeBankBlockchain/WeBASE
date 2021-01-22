@@ -332,8 +332,17 @@ def checkMemAndCpu():
         raise Exception('Get memory or cpu core fail memFree:{}'.format(memFree))
     memFreeStr=memFree.get("output").split(".", 1)[0]
     memFreeInt=int(memFreeStr)
-    # cpuCoreInt=int(cpuCore.get("output"))
 
+    existed_chain = getCommProperties("if.exist.fisco")
+    # if existed chain, only need memory for webase
+    if (existed_chain == 'yes'):
+        if (memFreeInt <= 2047):
+            print ('[WARN]Free memory {}(M) may be NOT ENOUGH for webase'.format(memFreeInt))
+            print ("[WARN]Recommend webase with 2G memory at least. ")
+        else:
+            print ('check finished sucessfully.')
+            return        
+    # else not existed chain
     fisco_count_str = getCommProperties("node.counts")
     fisco_count = 2
     if (fisco_count_str != 'nodeCounts'):
@@ -383,9 +392,9 @@ def checkEncryptTypeByRpc():
         log.info("request result:{}".format(result))
         resultStr=str(result, encoding="utf-8")
         isGuomi="gm" in resultStr
-        if (isGuomi and encryptType != 1):
+        if (isGuomi and encryptType != '1'):
             raise Exception("config's encryptType CONFLICTS with existed [guomi] chain")
-        elif ((isGuomi != True) and encryptType == 1):
+        elif ((isGuomi == False) and encryptType == '1'):
             raise Exception("config's encryptType CONFLICTS with existed [ecdsa] chain")
         else:
             print ('check finished sucessfully.')
