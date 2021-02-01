@@ -623,8 +623,8 @@ def installDockerImage():
         gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
         pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
 
-        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
-        pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase")
+        #gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
+        #pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase")
     else: 
         print ("============ Skip download docker image from CDN... =============")
     return
