@@ -6,9 +6,14 @@ import os
 import sys
 from .utils import *
 from .mysql import *
+import re
+#import psutil
 
 log = deployLog.getLocalLogger()
 checkDependent = ["git","openssl","curl","wget","dos2unix"]
+# memery(B) and cpu(core counts logical)
+# mem=psutil.virtual_memory()
+# cpuCore=psutil.cpu_count()
 
 def do():
     print ("============================================================"),
@@ -24,6 +29,8 @@ def do():
     print ("============================================================")
     print ("==============      checking envrionment      ==============")
     installRequirements()
+    checkVersion()
+    checkMemAndCpu()
     checkNginx()
     checkJava()
     checkNodePort()
@@ -35,6 +42,7 @@ def do():
     checkSignDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
+    checkEncryptTypeByRpc()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -61,6 +69,8 @@ def visual_do():
     checkSignPort()
     checkSignDbConnect()
     checkMgrDbConnect()
+    checkMgrDbAuthorized()
+    checkSignDbAuthorized()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -285,6 +295,114 @@ def installByYum(server):
         else:
             raise Exception("error, not support this platform, only support centos/redhat, suse, ubuntu.")
     return
+
+# update every version
+# check fisco version and webase-front version
+def checkVersion():
+    fisco_ver_str = getCommProperties("fisco.version")
+    webase_front_ver_str = getCommProperties("webase.front.version")
+    print ("check webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
+    fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
+    # webase-front version greater or equal with other webase version
+    webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
+    flag=False
+    # require if webase <= 1.3.2, fisco < 2.5.0
+    if ( webase_front_version_int <= 132 and fisco_version_int >= 250 ):
+        flag=True
+    # require if webase >= 1.3.1(dynamic group), fisco >= 2.4.1
+    if ( webase_front_version_int >= 131 and fisco_version_int < 241 ):
+        flag=True
+
+    # if version conflicts, exit
+    if (flag):
+        raise Exception ('[ERROR]WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
+    else:
+        print ('check finished sucessfully.')
+        return
+
+
+def checkMemAndCpu():
+    print ("check host free memory and cpu core...")
+    # result format: {'status': 0, 'output': '151.895'}
+    # get free memory(M)
+    memFree=doCmd("awk '($1 == \"MemFree:\"){print $2/1024}' /proc/meminfo 2>&1")
+    # get cpu core num
+    # cpuCore=doCmd("cat /proc/cpuinfo | grep processor | wc -l 2>&1")
+    if (int(memFree.get("status")) != 0):
+        raise Exception('Get memory or cpu core fail memFree:{}'.format(memFree))
+    memFreeStr=memFree.get("output").split(".", 1)[0]
+    memFreeInt=int(memFreeStr)
+
+    existed_chain = getCommProperties("if.exist.fisco")
+    # if existed chain, only need memory for webase
+    if (existed_chain == 'yes'):
+        if (memFreeInt <= 2047):
+            print ('[WARN]Free memory {}(M) may be NOT ENOUGH for webase'.format(memFreeInt))
+            print ("[WARN]Recommend webase with 2G memory at least. ")
+        else:
+            print ('check finished sucessfully.')
+            return        
+    # else not existed chain
+    fisco_count_str = getCommProperties("node.counts")
+    fisco_count = 2
+    if (fisco_count_str != 'nodeCounts'):
+        fisco_count = int(fisco_count_str)
+    # check 2 nodes, 4 nodes, more nodes memory free rate/cpu require
+    flag=False
+    if (fisco_count <= 2):
+        if (memFreeInt <= 2047):
+            flag=True
+    if (fisco_count >= 4):
+        if (memFreeInt <= 4095):
+            flag=True
+    if (flag):
+        print ('[WARN]Free memory {}(M) may be NOT ENOUGH for node count [{}] and webase'.format(memFreeInt, fisco_count))
+        print ("[WARN]Recommend webase with 2G memory at least, and one node equipped with one core of CPU and 1G memory(linear increase with node count). ")
+    else:
+        print ('check finished sucessfully.')
+        return
+
+def checkExistChainConnect():
+    print ("check exist chain connection...")
+    listenIp = getCommProperties("node.listenIp")
+    rpcPort = getCommProperties("node.rpcPort")
+    ifLink = do_telnet(listenIp,rpcPort)
+    if not ifLink:
+        print ('Exist chain listen ip:{} port:{} is disconnected, please confirm.'.format(listenIp, rpcPort))
+        sys.exit(0)
+    print ("check finished sucessfully.")
+    return
+
+def checkEncryptTypeByRpc():
+    print ("check encrypt type same with exited chain...")
+    existChain = getCommProperties("if.exist.fisco")
+    listenIp = getCommProperties("node.listenIp")
+    rpcPort = getCommProperties("node.rpcPort")
+    chainRpcUrl = "http://{}:{}".format(listenIp,rpcPort)
+
+    encryptType = getCommProperties("encrypt.type")
+    # request for chain encrypt type
+    if (existChain == 'yes'):
+        # check chain existed
+        checkExistChainConnect()
+        # request chain
+        data={"jsonrpc":"2.0","method":"getClientVersion","params":[],"id":1}
+        result=rest_post(chainRpcUrl, data)
+        # handle result
+        log.info("request result:{}".format(result))
+        resultStr=str(result, encoding="utf-8")
+        isGuomi="gm" in resultStr
+        if (isGuomi and encryptType != '1'):
+            raise Exception("config's encryptType CONFLICTS with existed [guomi] chain")
+        elif ((isGuomi == False) and encryptType == '1'):
+            raise Exception("config's encryptType CONFLICTS with existed [ecdsa] chain")
+        else:
+            print ('check finished sucessfully.')
+            return
+    else:
+        print ('check finished sucessfully.')
+        return
+
 
 if __name__ == '__main__':
     pass

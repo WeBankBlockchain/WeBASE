@@ -5,8 +5,8 @@ import sys
 
 # check python version first
 # check before import in case of avoiding error of mysql lib not found in comm.check package
-if not sys.version_info.major == 3 and sys.version_info.minor >= 5:
-    print("This script requires Python 3.5 or higher!")
+if not sys.version_info.major == 3 and sys.version_info.minor >= 6:
+    print("This script requires Python 3.6 or higher!")
     print("You are using Python {}.{}.".format(sys.version_info.major, sys.version_info.minor))
     sys.exit(1)
 
@@ -89,7 +89,7 @@ Parameter:
     stopSign:       stop WeBASE-Sign server
 
 Attention:
-    1. Need to install python3, jdk, mysql, PyMySQL first
+    1. Need to install python3.6, jdk, mysql, PyMySQL first
     2. Need to ensure a smooth network
     3. You need to install git,openssl,curl,wget,nginx,dos2unix; if it is not installed, the installation script will automatically install these components, but this may fail.
     '''

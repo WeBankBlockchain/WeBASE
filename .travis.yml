@@ -4,16 +4,6 @@ services:
   - mysql
 matrix:
   include:
-    - name: "Python 2.7 on Xenial Linux"
-      python: 2.7
-      dist: xenial
-      before_install:
-        - pip install MySQL-python
-    - name: "Python 3.4 on Xenial Linux"
-      python: 3.4
-      dist: xenial
-      before_install:
-        - pip install PyMySQL
     - name: "Python 3.5 on Xenial Linux"
       python: 3.5
       dist: xenial
@@ -36,12 +26,14 @@ addons:
     - openssl
     - curl
     - nginx
+    - dos2unix
   homebrew:
     packages:
     - git
     - openssl
     - curl
     - nginx
+    - dos2unix
 install:
   - pip install -r requirements.txt
 script:
