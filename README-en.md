@@ -27,13 +27,12 @@ Receive transaction request, cache transaction to database and asynchronously ch
 
 * **Private key Hosting and cloud signature service [WeBASE-Sign](https://github.com/WeBankFinTech/WeBASE-Sign)**
 Hosting user private key, providing cloud signature.
-<!--
+
 * **Data export code generation tool [WeBASE-Codegen-Monkey](https://github.com/WeBankFinTech/WeBASE-Codegen-Monkey)**
 The code generation tool can generate the core code of data export through configuration.
 
 * **Data export service [WeBASE-Collect-Bee](https://github.com/WeBankFinTech/WeBASE-Collect-Bee)**
 Export the basic data on the blockchain, such as the current block height, total transaction volume, etc. export the business data of the contract on the blockchain, including the event, constructor, contract address, execution function information, etc. through the configuration of the smart contract.
- -->
 
 * **Chain manage service [WeBASE-Chain-Manager](https://github.com/WeBankFinTech/WeBASE-Chain-Manager)** 
 Manage multiple chains, support national secret chain, non-national secret chain. Provide group add, delete, check and change interface, so that users can easily establish their own application groups.
