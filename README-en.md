@@ -27,12 +27,25 @@ Receive transaction request, cache transaction to database and asynchronously ch
 
 * **Private key Hosting and cloud signature service [WeBASE-Sign](https://github.com/WeBankFinTech/WeBASE-Sign)**
 Hosting user private key, providing cloud signature.
-
+<!--
 * **Data export code generation tool [WeBASE-Codegen-Monkey](https://github.com/WeBankFinTech/WeBASE-Codegen-Monkey)**
 The code generation tool can generate the core code of data export through configuration.
 
 * **Data export service [WeBASE-Collect-Bee](https://github.com/WeBankFinTech/WeBASE-Collect-Bee)**
 Export the basic data on the blockchain, such as the current block height, total transaction volume, etc. export the business data of the contract on the blockchain, including the event, constructor, contract address, execution function information, etc. through the configuration of the smart contract.
+ -->
+
+* **Chain manage service [WeBASE-Chain-Manager](https://github.com/WeBankFinTech/WeBASE-Chain-Manager)** 
+Manage multiple chains, support national secret chain, non-national secret chain. Provide group add, delete, check and change interface, so that users can easily establish their own application groups.
+
+* **Contract security check service [WeBASE-Solidity-Security](https://github.com/WeBankFinTech/WeBASE-Solidity-Security)** 
+Inherit contract detection tool Slither, provide external detection interface.
+
+* **Data statistics service [WeBASE-Stat](https://github.com/WeBankFinTech/WeBASE-Stat)** 
+Rely on WeBASE-Front,drag data on CPU, memory, IO, group size, group GAS, group network traffic and store into database.
+
+* **Data monitoring service [WeBASE-Data](https://github.com/WeBankFinTech/WeBASE-Data)** 
+Rely on WeBASE-Front,export and parse blockchain data to provide a visual view of governance. You can check which chain, which user and which contract the transaction belongs to, and ensure that the data on the chain can be checked and managed.
 
 ## Contribution
 Please read our [contribution document](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/CONTRIBUTING.html) to learn how to contribute your code and submit your contribution.
