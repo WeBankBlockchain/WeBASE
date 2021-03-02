@@ -45,6 +45,9 @@
 * **数据统计服务 [WeBASE-Stat](https://github.com/WeBankFinTech/WeBASE-Stat)** 
 统计数据服务以前置为基础，拉取CPU、内存、IO、群组大小、群组gas、群组网络流量的数据，记录数据库。
 
+* **数据监管服务 [WeBASE-Data](https://github.com/WeBankFinTech/WeBASE-Data)** 
+数据监管服务以前置为基础，导出区块链数据并解析，提供一个可视化的监管视图。可以查询交易属于哪条链，哪个用户，哪个合约，保证链上数据可查可管。
+
 
 ## 贡献说明
 请阅读我们的[贡献文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/CONTRIBUTING.html)，了解如何贡献代码，并提交你的贡献。
