@@ -502,10 +502,12 @@ def installFront():
         print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
         sys.exit(0)
     os.chdir(server_dir)
-    if encrypt_ssl_type == 1:
-        copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
-    else:
-        copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # copy the whole sdk(sdk.key and gm dir) to conf/
+    copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # if encrypt_ssl_type == 1:
+    #     copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
+    # else:
+    #     copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
 
     startFront()
     return
