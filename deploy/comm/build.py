@@ -228,7 +228,7 @@ def changeWebConfig():
     # set web_page_url(root & static) globally
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
     # set mobile phone phone_page_url globally
-    doCmd('sed -i "s:phone_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
+    doCmd('sed -i "s:phone_page_url:{}:g" {}/comm/nginx.conf'.format(h5_web_dir, currentDir))
 
     return
 
