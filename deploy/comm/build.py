@@ -216,6 +216,8 @@ def changeWebConfig():
 
     # change web config
     web_dir = currentDir + "/webase-web"
+    # mobile phone h5 dir
+    h5_web_dir = currentDir + "/webase-web-h5"    
     web_log_dir = web_dir + "/log"
     doCmd('mkdir -p {}'.format(web_log_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
@@ -225,6 +227,8 @@ def changeWebConfig():
     doCmd('sed -i "s:pid_file:{}:g" {}/comm/nginx.conf'.format(pid_file, currentDir))
     # set web_page_url(root & static) globally
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
+    # set mobile phone phone_page_url globally
+    doCmd('sed -i "s:phone_page_url:{}:g" {}/comm/nginx.conf'.format(h5_web_dir, currentDir))
 
     return
 
@@ -502,10 +506,12 @@ def installFront():
         print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
         sys.exit(0)
     os.chdir(server_dir)
-    if encrypt_ssl_type == 1:
-        copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
-    else:
-        copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # copy the whole sdk(sdk.key and gm dir) to conf/
+    copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # if encrypt_ssl_type == 1:
+    #     copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
+    # else:
+    #     copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
 
     startFront()
     return
