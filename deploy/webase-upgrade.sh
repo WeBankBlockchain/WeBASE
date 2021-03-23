@@ -13,10 +13,22 @@ zip_list=("webase-sign" "webase-front" "webase-node-mgr" "webase-web" "webase-we
 
 # download url prefix
 cdn_url_pre="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/"
-
+logfile=${PWD}/upgrade.log
 
 ## re-download zip
 force_download_zip="true"
+
+LOG_WARN()
+{
+    local content=${1}
+    echo -e "\033[31m[WARN] ${content}\033[0m"
+}
+
+LOG_INFO()
+{
+    local content=${1}
+    echo -e "\033[32m[INFO] ${content}\033[0m"
+}
 
 ####### 参数解析 #######
 cmdname=$(basename "$0")
@@ -87,58 +99,52 @@ done
 
 
 function main() {
-    echo "start pull zip of new webase..."
+    LOG_INFO "start pull zip of new webase..."
     # pull
-    for webase_name in $zip_list
+    for webase_name in ${zip_list[@]};
     do
-        pull_zip "$webase_name"
+        pull_zip "$webase_name" || (LOG_WARN "pull_zip $webase_name failed!" && exit 1)
     done
     # stop
-    stop_all
+    LOG_INFO "==========now webase stop all=========="
+    python3 deploy.py stopAll  || (LOG_WARN "==========stopAll failed!==========" && exit 1)
     # change new webase's config file, backup old webase and data
-    for webase_name in $zip_list
+    for webase_name in ${zip_list[@]};
     do
-        copy_webase "$webase_name"
+        copy_webase "$webase_name" || (LOG_WARN "copy_webase $webase_name failed!" && exit 1)
     done
     # restart
-    start_all
+    LOG_INFO "==========now webase start all=========="
+    python3 deploy.py startAll  || (LOG_WARN "==========startAll failed!==========" && exit 1)
 }
 
 
-function stop_all() {
-    echo "now stop webase all"
-    python3 deploy.py stopAll  || (echo "stopAll failed!" && exit)
-}
+# function stop_all() {
+#     LOG_INFO "==========now webase stop all=========="
+#     python3 deploy.py stopAll  
+# }
 
-function start_all() {
-    echo "now start webase all"
-    python3 deploy.py startAll || (echo "startAll failed!" && exit)
-}
+# function start_all() {
+#     LOG_INFO "==========now webase start all=========="
+#     python3 deploy.py startAll
+# }
 
 
 function pull_zip() {
     local webase_name="$1"
     local zip="${webase_name}.zip"
     if [[ "${force_download_zip}" == "true" ]];then
-        echo "now force re-download zip of webase"
+        # echo "now force re-download zip of webase"
         # delete old zip
         if [[ -f "$zip" ]];then
             rm -f "$zip"
         fi
     fi
-    echo "pull zip of $zip"
-    wget "${cdn_url_pre}${new_version}/${zip}" 
+    LOG_INFO "pull zip of $zip"
+    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
     # webase-web.zip => webase-web-v1.5.0
     local temp_package_name="${webase_name}-${new_version}"
-    unzip_package "$zip" "$temp_package_name"
-}
-
-## unzip
-function unzip_package() {
-    local zip="$1"
-    local target_dir="$2"
-    echo "unzip zip of $webase_name to unzip ${target_dir}"
-    unzip -o "${zip}" -d "$target_dir"
+    unzip -o "$zip" -d "$temp_package_name"
 }
 
 ## copy config and cert to new unzip dir
@@ -178,33 +184,33 @@ function copy_webase() {
 # }
 
 function copy_front() {
-    echo "copy front config files"
+    LOG_INFO "copy webase-front config files"
     if [[ -d "webase-front" ]]; then
         copy "webase-front/conf/*.yml" "webase-front-${new_version}/conf/" 
         copy "webase-front/conf/*.crt" "webase-front-${new_version}/conf/" 
         copy "webase-front/conf/*.key" "webase-front-${new_version}/conf/" 
         copy "webase-front/conf/*.so" "webase-front-${new_version}/conf/" 
     else
-        echo "copy directory of webase-front not exist!"
+        LOG_WARN "copy directory of webase-front not exist!"
     fi
 }
 
 function copy_node_mgr() {
-    echo "copy front config files"
+    LOG_INFO "copy webase-node-mgr config files"
     if [[ -d "webase-node-mgr" ]]; then    
         copy "webase-node-mgr/conf/*.yml" "webase-node-mgr-${new_version}/conf/" 
         copy -r "webase-node-mgr/conf/log" "webase-node-mgr-${new_version}/conf/" 
     else
-        echo "copy directory of webase-node-mgr not exist!"
+        LOG_WARN "copy directory of webase-node-mgr not exist!"
     fi
 }
 
 function copy_sign() {
-    echo "copy front config files"
+    LOG_INFO "copy sign config files"
     if [[ -d "webase-sign" ]]; then       
         copy "webase-sign/conf/*.yml" "webase-sign-${new_version}/conf/" 
     else
-        echo "copy directory of webase-sign not exist!"
+        LOG_WARN "config directory of webase-sign not exist!"
     fi
 }
 
@@ -212,13 +218,13 @@ function copy_sign() {
 function backup() {
     local webase_name="$1"
     # stop all
-    echo "now backup old data"
+    LOG_INFO "now backup old data of ${webase_name}"
     if [[ -d "${webase_name}" ]]; then
-        mv "${webase_name}" "${webase_name}-${old_version}" || (echo "backup ${webase_name} failed!" && exit)
+        mv "${webase_name}" "${webase_name}-${old_version}" || (LOG_WARN "backup ${webase_name} failed!" && exit)
     else
-        echo "backup directory of ${webase_name} not exist!"
+        LOG_WARN "backup directory of ${webase_name} not exist!"
     fi    
-    mv "${webase_name}-${new_version}" "${webase_name}" || (echo "backup ${webase_name} failed!" && exit)
+    mv "${webase_name}-${new_version}" "${webase_name}" || (LOG_WARN "backup ${webase_name} failed!" && exit)
 }
 
 
@@ -234,13 +240,13 @@ function upgrade_mgr_sql() {
         local password=${prop "mysql.password"}
         local database=${prop "mysql.database"}
         local backup_mgr_dir="webase-node-mgr-${old_version}/backup_node_mgr_${old_version}.sql"
-        echo "now backup the whole database of node-mgr in $backup_mgr_dir"
+        LOG_INFO "now backup the whole database of node-mgr in $backup_mgr_dir"
         mysqldump  --user=$user --password=$password $database > $backup_mgr_dir
         # exec .sql by mysql -e
-        echo "now upgrade database of node-mgr with script $mgr_script_name"
+        LOG_INFO "now upgrade database of node-mgr with script $mgr_script_name"
         mysql --user=$user --password=$password --host=$ip --port=$port --database=$database -e${mgr_script_name} $--default-character-set=utf8; 
     else
-        echo "node-mgr upgrade sql file of ${mgr_script_name} not exist!"
+        LOG_WARN "node-mgr upgrade sql file of ${mgr_script_name} not exist!"
     fi
 }
 
@@ -258,7 +264,7 @@ function upgrade_sign_sql() {
         # exec .sql by mysql -e
         mysql --user=$user --password=$password --host=$ip --port=$port --database=$database -e${sign_script_name} $--default-character-set=utf8; 
     else
-        echo "sign upgrade sql file of ${sign_script_name} not exist!"
+        LOG_WARN "sign upgrade sql file of ${sign_script_name} not exist!"
     fi
 }
 
@@ -279,14 +285,19 @@ function get_version_num() {
 # update old yml
 function update_node_mgr_yml() {
     mgr_yml="${PWD}/webase-node-mgr/conf/application.yml"    
+    LOG_INFO "now update yml value of node-mgr in $mgr_yml"
+    if [[ ! -f $mgr_yml ]]; then
+        LOG_WARN "yml of node-mgr in $mgr_yml not exist!"
+        exit 1
+    fi
     # v1.5.0 key config to check if already add
-    if [ `grep -c "appStatusCheckCycle" ${mgr_yml}` -eq '0' ]; then
+    if [[ `grep -c "appStatusCheckCycle" ${mgr_yml}` -eq '0' ]]; then
         # 将constant:开头替换为
         local old_app_config="constant:"
         local new_app_config="constant:\n  deployedModifyEnable: true\n  appRequestTimeOut: 300000\n  appStatusCheckCycle: 3000\n"
-        sed_file ${old_app_config} ${new_app_config} ${mgr_yml}        
+        sed_file ${old_app_config} ${new_app_config} ${mgr_yml}  
     fi
-    if [ `grep -c "\/api\/*" ${mgr_yml}` -eq '0' ]; then
+    if [[ `grep -c "\/api\/*" ${mgr_yml}` -eq '0' ]]; then
         # 需要空格开头
         local old_url_config="permitUrlArray: \/account\/login"
         local new_url_config="\ \ permitUrlArray: \/account\/login,\/account\/pictureCheckCode,\/login,\/user\/privateKey\/**,\/encrypt,\/version,\/front\/refresh,\/api\/*"
@@ -298,9 +309,9 @@ function sed_file() {
     local old_config="$1"
     local new_config="$2"
     local file_path="$3"
-    sed -i "/${old_config}/c${new_config}" ${file_path}
+    sed -i "/${old_config}/c${new_config}" ${file_path}  || (echo "sed $new_config failed!" >> "${logfile}" && exit 1)   
 }
 
-main
-echo "upgrade finished from ${old_version} to ${new_version} of ${zip_list}"
+main && LOG_INFO "upgrade script finished from ${old_version} to ${new_version} of ${zip_list}"
+echo "end of script"
 exit ${SUCCESS}
