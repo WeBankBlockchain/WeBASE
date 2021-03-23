@@ -239,6 +239,7 @@ config_properties="${PWD}/common.properties"
 function prop() {
     local key="${1}"
 	if [[ -f "$config_properties" }]; then
+        dos2unix $config_properties
         grep -P "^\s*[^#]?${key}=.*$" $config_properties | cut -d'=' -f2
     fi
 }
