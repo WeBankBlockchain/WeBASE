@@ -320,8 +320,7 @@ function update_node_mgr_yml() {
 
 ## todo sed all yml's version
 function update_webase_yml_version() {
-    LOG_INFO "start pull zip of new webase..."
-    # pull
+    LOG_INFO "start update version of new webase..."
     for webase_name in ${zip_list[@]};
     do
         local yml_path="${PWD}/${webase_name}/conf/application.yml"
@@ -333,7 +332,7 @@ function update_webase_yml_version() {
                 sed -i "/${old_app_config}/c${new_app_config}" ${yml_path}  
             fi
         else
-            echo "jump over webase-web"
+            echo "jump over webase-web(or h5)"
         fi
     done
 }
