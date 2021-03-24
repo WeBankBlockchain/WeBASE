@@ -2,6 +2,34 @@
 
 set -e
 
+
+### 需要文档指明脚本做了什么操作，生产环境的运维如果分步操作怎么完成
+################################################
+# 下载新的zip包，已存在则重命名
+
+# 解压新的zip包到webase-front.zip => webase-front-v1.5.0
+
+# 停止原有的，python3 deploy.py stopAll
+
+# webase-web 直接复制全部
+# 复制已有front的conf/*.yml, *.key, *.crt, *.so，覆盖当前的文件
+# 复制已有sign的conf/*.yml
+# 复制已有node-mgr已有的conf的*.yml，conf/log目录
+# 更新旧的yml，更新版本号
+
+# mv操作，备份已有的，如
+# webase-web => webase-web-v143
+# webase-web-150 => webase-web
+
+# 备份node-mgr数据库到webase-node-mgr-v1.5.0/backup.sql
+# 从common.properties中获取两个数据库密码
+
+# 到node-mgr中检测script/upgrade目录，有匹配v143开头的，v150的结尾的，有则执行 mysql  -e "source $sql_file"
+# 到sign...同上（当前版本不增加）
+
+# 启动新的，执行python3 deploy.py startAll
+################################################
+
 ####### error code
 SUCCESS=0
 
@@ -18,7 +46,7 @@ cdn_url_pre="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/release
 logfile=${PWD}/upgrade.log
 
 ## re-download zip
-force_download_zip="true"
+force_download_zip="false"
 
 LOG_WARN()
 {
@@ -43,13 +71,12 @@ Usage:
 
     -o    old version, ex: v1.4.3
     -n    new version, ex: v1.5.0
-    -f    [true] or [false], force download new zip and rm old zip in ${PWD}, default true
 USAGE
     exit ${PARAM_ERROR}
 }
 
 
-while getopts o:n:f:h OPT;do
+while getopts o:n:h OPT;do
     case ${OPT} in
         o)
             old_version="$OPTARG"
@@ -57,9 +84,6 @@ while getopts o:n:f:h OPT;do
         n)
             new_version="$OPTARG"
             ;;
-        f)
-            force_download_zip="$OPTARG"
-            ;;            
         h)
             usage
             exit ${PARAM_ERROR}
@@ -70,34 +94,6 @@ while getopts o:n:f:h OPT;do
             ;;
     esac
 done
-
-
-### 需要文档指明脚本做了什么操作，生产环境的运维如果分步操作怎么完成
-################################################
-# 下载新的zip包，已存在则删除
-
-# 解压新的zip包到webase-front.zip => webase-front-v1.5.0
-
-# 停止原有的，python3 deploy.py stopAll
-
-# webase-web 直接复制全部
-# 复制已有front的conf/*.yml, *.key, *.crt, *.so，覆盖当前的文件
-# 复制已有sign的conf/*.yml
-# 复制已有node-mgr已有的conf的*.yml，conf/log目录
-## 更新旧的yml
-
-# mv操作，备份已有的，如
-# webase-web => webase-web-v143
-# webase-web-150 => webase-web
-
-# 备份node-mgr数据库，
-# 从common.properties中获取两个数据库密码
-
-# 到node-mgr中检测script/upgrade目录，有匹配v143开头的，v150的结尾的，有则执行 mysql  -e "source $sql_file"
-# 到sign...同上（当前版本不增加）
-
-# 启动新的，执行python3 deploy.py startAll
-################################################
 
 
 function main() {
@@ -127,21 +123,18 @@ function main() {
 function pull_zip() {
     local webase_name="$1"
     local zip="${webase_name}.zip"
-    if [[ "${force_download_zip}" == "true" ]];then
-        echo "now force re-download zip of webase"
-        # delete old zip
-        if [[ -f "$zip" ]];then
-            rm -f "$zip"
-        fi
+    # if [[ "${force_download_zip}" == "true" ]];then
+    echo "now rename old zip of webase"
+    # delete old zip
+    if [[ -f "$zip" ]];then
+        mv "$zip" "${webase_name}-${old_version}.zip"
     fi
+    # fi
     LOG_INFO "pull zip of $zip"
-    #curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
     # webase-web.zip => webase-web-v1.5.0/webase-web
+    #注：unzip后变成了webase-web-v1.5.0/webase-web
     unzip -o "$zip" -d "${webase_name}-${new_version}"
-    # unzip后变成了webase-web-v1.5.0/webase-web
-    # 将webase-web-v1.5.0/webase-web的内容复制到webase-web-v1.5.0中
-    #mv "${webase_name}-${new_version}/${webase_name}/*" "${webase_name}-${new_version}/" 
-    #rm -r "${webase_name}-${new_version}/${webase_name}" 
 }
 
 ## copy config and cert to new unzip dir
@@ -238,16 +231,22 @@ config_properties="${PWD}/common.properties"
 # 定义一个函数从properties文件读取key
 function prop() {
     local key="${1}"
-	if [[ -f "$config_properties" }]; then
+	if [[ -f "$config_properties" ]]; then
         dos2unix $config_properties
         grep -P "^\s*[^#]?${key}=.*$" $config_properties | cut -d'=' -f2
     fi
 }
 
+## 版本号获取数字，v1.5.0 => 150
+function get_version_num() {
+    old_version_num=`echo "${old_version}" | tr -cd "[0-9]"`
+    new_version_num=`echo "${new_version}" | tr -cd "[0-9]"`
+}
+
 # upgrade table of node-mgr after backup webase-node-mgr dir
 function upgrade_mgr_sql() {
     # check whether old=>new .sql shell in new webase-node-mgr/script
-    mgr_script_name="${PWD}/webase-node-mgr/script/${old_version}_${new_version}.sql"
+    mgr_script_name="${PWD}/webase-node-mgr/script/v${old_version_num}_v${old_version_num}.sql"
     if [[ -f "${mgr_script_name}" ]];then
         # get sql config of mgr from common.properties
         local ip=$(prop "mysql.ip")
@@ -285,11 +284,6 @@ function upgrade_mgr_sql() {
 #     fi
 # }
 
-## 版本号获取数字，v1.5.0 => 150
-function get_version_num() {
-    old_version_num=`echo "${old_version}" | tr -cd "[0-9]"`
-    new_version_num=`echo "${new_version}" | tr -cd "[0-9]"`
-}
 
 # update old yml
 # 根据版本号执行其中一段
@@ -301,22 +295,22 @@ function update_node_mgr_yml() {
         LOG_WARN "yml of node-mgr in $mgr_yml not exist!"
         exit 1
     fi
-    #if [[ "${new_version}x" == "v1.5.0x" ]]; then
-    LOG_INFO "update yml of version ${new_version}"
-    # v1.5.0 key config to check if already add
-    if [[ `grep -c "appStatusCheckCycle" ${mgr_yml}` -eq '0' ]]; then
-        # 将constant:开头替换为
-        local old_app_config="constant:"
-        local new_app_config="constant:\n\ \ deployedModifyEnable:\ true\n\ \ appRequestTimeOut:\ 300000\n\ \ appStatusCheckCycle:\ 3000\n"
-        sed -i "/${old_app_config}/c${new_app_config}" ${mgr_yml}  
+    if [[ "${new_version}x" == "v1.5.0x" ]]; then
+        LOG_INFO "update yml of version ${new_version}"
+        # v1.5.0 key config to check if already add
+        if [[ `grep -c "appStatusCheckCycle" ${mgr_yml}` -eq '0' ]]; then
+            # 将constant:开头替换为
+            local old_app_config="constant:"
+            local new_app_config="constant:\n\ \ deployedModifyEnable:\ true\n\ \ appRequestTimeOut:\ 300000\n\ \ appStatusCheckCycle:\ 3000\n"
+            sed -i "/${old_app_config}/c${new_app_config}" ${mgr_yml}  
+        fi
+        if [[ `grep -c "\/api\/*" ${mgr_yml}` -eq '0' ]]; then
+            # 需要空格开头
+            local old_url_config="permitUrlArray:\ \/account\/login"
+            local new_url_config="\ \ permitUrlArray:\ \/account\/login,\/account\/pictureCheckCode,\/login,\/user\/privateKey\/**,\/encrypt,\/version,\/front\/refresh,\/api\/*"
+            sed -i "/${old_url_config}/c${new_url_config}" ${mgr_yml} 
+        fi
     fi
-    if [[ `grep -c "\/api\/*" ${mgr_yml}` -eq '0' ]]; then
-        # 需要空格开头
-        local old_url_config="permitUrlArray:\ \/account\/login"
-        local new_url_config="\ \ permitUrlArray:\ \/account\/login,\/account\/pictureCheckCode,\/login,\/user\/privateKey\/**,\/encrypt,\/version,\/front\/refresh,\/api\/*"
-        sed -i "/${old_url_config}/c${new_url_config}" ${mgr_yml} 
-    fi
-    #fi
 }
 
 ## todo sed all yml's version
@@ -338,6 +332,7 @@ function update_webase_yml_version() {
     done
 }
 
+get_version_num
 main && LOG_INFO "upgrade script finished from ${old_version} to ${new_version} of ${zip_list}"
 echo "end of script"
 exit ${SUCCESS}
