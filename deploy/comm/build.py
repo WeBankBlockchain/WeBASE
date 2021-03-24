@@ -448,7 +448,7 @@ def changeFrontConfig():
     nodeListenIp = getCommProperties("node.listenIp")
     nodeChannelPort = getCommProperties("node.channelPort")
     frontDb = getCommProperties("front.h2.name")
-    encrypt_type = int(getCommProperties("encrypt.type"))
+    #encrypt_type = int(getCommProperties("encrypt.type"))
 
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
@@ -468,7 +468,7 @@ def changeFrontConfig():
     doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
     doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
-    doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
+    #doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
     doCmd('sed -i "s/keyServer: 127.0.0.1:5004/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, sign_port, server_dir))
     doCmd('sed -i "s%/webasefront%/{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
@@ -504,7 +504,7 @@ def installFront():
     # copy node crt
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
-    encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
+    #encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
 
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
