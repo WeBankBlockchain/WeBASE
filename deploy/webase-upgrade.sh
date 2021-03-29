@@ -5,7 +5,7 @@ set -e
 
 ### 需要文档指明脚本做了什么操作，生产环境的运维如果分步操作怎么完成
 ################################################
-# 下载新的zip包，已存在则重命名
+# 下载新的zip包，已存在则移动到{old_version}的目录中
 
 # 解压新的zip包到webase-front.zip => webase-front-v1.5.0
 
@@ -17,9 +17,7 @@ set -e
 # 复制已有node-mgr已有的conf的*.yml，conf/log目录
 # 更新旧的yml，更新版本号
 
-# mv操作，备份已有的，如
-# webase-web => webase-web-v143
-# webase-web-150 => webase-web
+# mv操作，备份已有的，移动到{old_version}的目录中
 
 # 备份node-mgr数据库到webase-node-mgr-v1.5.0/backup.sql
 # 从common.properties中获取两个数据库密码
@@ -36,10 +34,10 @@ SUCCESS=0
 PARAM_ERROR=5
 
 ## default one host, one node+front
-old_version="v1.4.3"
-new_version="v1.5.0"
+old_version=
+new_version=
 ## zip name, todo webase-web-h5
-zip_list=("webase-sign" "webase-front" "webase-node-mgr" "webase-web" "webase-web-h5")
+zip_list=("webase-sign" "webase-front" "webase-web" "webase-web-h5" "webase-node-mgr")
 
 # download url prefix
 cdn_url_pre="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/"
@@ -52,12 +50,14 @@ LOG_WARN()
 {
     local content=${1}
     echo -e "\033[31m[WARN] ${content}\033[0m"
+    echo "[WARN] ${content}" >> ${logfile}
 }
 
 LOG_INFO()
 {
     local content=${1}
     echo -e "\033[32m[INFO] ${content}\033[0m"
+    echo "[INFO] ${content}" >> ${logfile}
 }
 
 ####### 参数解析 #######
@@ -98,57 +98,74 @@ done
 
 function main() {
     LOG_INFO "start pull zip of new webase..."
+
     # pull
     for webase_name in ${zip_list[@]};
     do
-        pull_zip "$webase_name" || (LOG_WARN "pull_zip $webase_name failed!" && exit 1)
+        # todo检测并拉取
+        echo "now [${webase_name}] pull new version zip"
+        pull_zip "$webase_name"
     done
+
     # stop
     LOG_INFO "==========now webase stop all=========="
-    python3 deploy.py stopAll  || (LOG_WARN "==========stopAll failed!==========" && exit 1)
+    python3 deploy.py stopAll 
+    # todo 判断是否已停止
+
     # change new webase's config file, backup old webase and data
     for webase_name in ${zip_list[@]};
     do
-        copy_webase "$webase_name" || (LOG_WARN "copy_webase $webase_name failed!" && exit 1)
+        echo "now [${webase_name}] copy old version config & backup old files & update new data"
+        # todo 更新nginx
+        copy_webase "$webase_name" 
     done
+
     # update version
     LOG_INFO "==========now update webase version in yml=========="
     update_webase_yml_version
+
     # restart
     LOG_INFO "==========now webase start all=========="
-    python3 deploy.py startAll  || (LOG_WARN "==========startAll failed!==========" && exit 1)
+    python3 deploy.py startAll 
 }
 
 
 function pull_zip() {
     local webase_name="$1"
     local zip="${webase_name}.zip"
-    # if [[ "${force_download_zip}" == "true" ]];then
-    echo "now rename old zip of webase"
     # delete old zip
-    if [[ -f "$zip" ]];then
-        mv "$zip" "${webase_name}-${old_version}.zip"
-    fi
+    # if [[ -f "$zip" ]];then
+    #     LOG_INFO "move old version zip $zip to directory of [$PWD/${old_version}]"
+    #     if [[ ! -f  "${old_version}" ]];then
+    #         mkdir "${old_version}"
+    #     fi
+    #     mv "$zip" "${old_version}/"
     # fi
     LOG_INFO "pull zip of $zip"
-    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    #curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "500000" ]];then # 1m=1048576b
+        LOG_WARN "download ${zip} failed, exit!"
+        exit 1
+    fi
     # webase-web.zip => webase-web-v1.5.0/webase-web
     #注：unzip后变成了webase-web-v1.5.0/webase-web
-    unzip -o "$zip" -d "${webase_name}-${new_version}"
+    unzip -o "$zip" -d "${webase_name}-${new_version}"  > /dev/null
 }
 
 ## copy config and cert to new unzip dir
-# first copy from old webase, then backup and rename old webase
+# 先复制到新目录，然后再备份旧的文件夹
 function copy_webase() {
     local webase_name="$1"
     case ${webase_name} in
         "webase-web")
-            backup "webase-web-h5"
             backup "webase-web"
+            backup "webase-web-h5"
+            #update_nginx_conf
             ;;
         "webase-front")
             copy_front
-            backup "webase-front"    
+            backup "webase-front"   
+            #update_front_yml 
             ;;
         "webase-node-mgr")
             copy_node_mgr
@@ -159,6 +176,8 @@ function copy_webase() {
         "webase-sign")
             copy_sign
             backup "webase-sign"
+            #update_sign_yml
+            #upgrade_sign_sql
             ;;            
         \?)
             usage
@@ -170,60 +189,82 @@ function copy_webase() {
 
 # copy webase-web and webase-web-h5
 # no need copy from old web, just use the new one
-# function copy_web() 
+function update_nginx_conf() {
+    LOG_INFO "update webase-web nginx file"
+    local zip="webase-deploy.zip"
+    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "500000" ]];then
+        LOG_WARN "update_nginx_conf failed, exit!"
+        exit 1
+    fi
+    unzip -o "$zip" -d "temp-deploy"  > /dev/null
+    # backup nginx conf in {old_version}
+    mv "${PWD}/comm/nginx.conf" "${PWD}/${old_version}/"
+    cp -f "./temp-deploy/comm/nginx.conf" "${PWD}/comm/"
+    rm -rf "./temp-deploy"
+}
 
 function copy_front() {     
     LOG_INFO "copy webase-front config files"
-    if [[ -d "${PWD}/webase-front" ]]; then
-        cp "${PWD}/webase-front/conf/application.yml" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp "${PWD}/webase-front/conf/log4j2.xml" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp "${PWD}/webase-front/conf/ca.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp "${PWD}/webase-front/conf/sdk.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp "${PWD}/webase-front/conf/sdk.key" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+    if [[ -d "${PWD}/webase-front" && -d "${PWD}/webase-front-${new_version}" ]]; then
+        cp -f "${PWD}/webase-front/conf/application.yml" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/log4j2.xml" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/ca.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/sdk.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/sdk.key" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
         cp -r "${PWD}/webase-front/conf/gm" "${PWD}/webase-front-${new_version}/webase-front/conf/"         
-        cp "${PWD}/webase-front/conf/libsigar-aarch64-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp "${PWD}/webase-front/conf/libsigar-amd64-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp "${PWD}/webase-front/conf/libsigar-universal64-macosx.dylib" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp "${PWD}/webase-front/conf/libsigar-x86-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/libsigar-aarch64-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/libsigar-amd64-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/libsigar-universal64-macosx.dylib" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+        cp -f "${PWD}/webase-front/conf/libsigar-x86-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
         if [[ -f "${PWD}/webase-front/conf/node.key" ]]; then
-            cp "${PWD}/webase-front/conf/node.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-            cp "${PWD}/webase-front/conf/node.key" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+            cp -f "${PWD}/webase-front/conf/node.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
+            cp -f "${PWD}/webase-front/conf/node.key" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
         fi
     else
-        LOG_WARN "copy directory of ${PWD}/webase-front not exist!"
+        LOG_WARN "copy directory of ${PWD}/webase-front not exist!" 
+        exit 1
     fi
 }
 
 function copy_node_mgr() {
     LOG_INFO "copy webase-node-mgr config files"
-    if [[ -d "${PWD}/webase-node-mgr" ]]; then    
-        cp "${PWD}/webase-node-mgr/conf/application.yml" "${PWD}/webase-node-mgr-${new_version}/webase-node-mgr/conf/" 
+    if [[ -d "${PWD}/webase-node-mgr" && -d "${PWD}/webase-node-mgr-${new_version}" ]]; then    
+        cp -f "${PWD}/webase-node-mgr/conf/application.yml" "${PWD}/webase-node-mgr-${new_version}/webase-node-mgr/conf/" 
         #cp -r "${PWD}/webase-node-mgr/conf/log" "${PWD}/webase-node-mgr-${new_version}/webase-node-mgr/conf/" 
     else
         LOG_WARN "copy directory of webase-node-mgr not exist!"
+        exit 1        
     fi
 }
 
 function copy_sign() {
     LOG_INFO "copy sign config files"
-    if [[ -d "${PWD}/webase-sign" ]]; then       
-        cp "${PWD}/webase-sign/conf/application.yml" "${PWD}/webase-sign-${new_version}/webase-sign/conf/" 
+    if [[ -d "${PWD}/webase-sign" &&  -d "${PWD}/webase-sign-${new_version}/webase-sign" ]]; then 
+        cp -f "${PWD}/webase-sign/conf/application.yml" "${PWD}/webase-sign-${new_version}/webase-sign/conf/" 
     else
         LOG_WARN "config directory of webase-sign not exist!"
+        exit 1
     fi
 }
+
+
 
 # backup webase dir
 function backup() {
     local webase_name="$1"
-    # stop all
     LOG_INFO "now backup old data of ${webase_name}"
     if [[ -d "${PWD}/${webase_name}" ]]; then
-        mv "${PWD}/${webase_name}" "${PWD}/${webase_name}-${old_version}" || (LOG_WARN "backup ${PWD}/${webase_name} failed!" && exit)
+        mv "${PWD}/${webase_name}" "${PWD}/${old_version}/"
     else
-        LOG_WARN "backup directory of ${PWD}/${webase_name} not exist!"
-    fi    
-    mv "${PWD}/${webase_name}-${new_version}/${webase_name}" "${PWD}/${webase_name}" || (LOG_WARN "backup ${PWD}/${webase_name}-${new_version}/${webase_name} failed!" && exit)
+        if [[ "${new_version}" == "v1.5.0" && "${webase_name}" == "webase-web-h5" ]]; then
+            echo "jump ovew webase-web-h5 backup"
+        else
+            LOG_WARN "backup directory of ${PWD}/${webase_name} not exist!"
+            exit 1
+        fi
+    fi
+    mv "${PWD}/${webase_name}-${new_version}/${webase_name}" "${PWD}/${webase_name}"
 }
 
 
@@ -234,19 +275,17 @@ function prop() {
 	if [[ -f "$config_properties" ]]; then
         dos2unix $config_properties
         grep -P "^\s*[^#]?${key}=.*$" $config_properties | cut -d'=' -f2
+    else 
+        LOG_WARN "webase $config_properties file not found!"
+        exit 1
     fi
 }
 
-## 版本号获取数字，v1.5.0 => 150
-function get_version_num() {
-    old_version_num=`echo "${old_version}" | tr -cd "[0-9]"`
-    new_version_num=`echo "${new_version}" | tr -cd "[0-9]"`
-}
 
 # upgrade table of node-mgr after backup webase-node-mgr dir
 function upgrade_mgr_sql() {
     # check whether old=>new .sql shell in new webase-node-mgr/script
-    mgr_script_name="${PWD}/webase-node-mgr/script/v${old_version_num}_v${old_version_num}.sql"
+    mgr_script_name="${PWD}/webase-node-mgr/script/v${old_version_num}_v${new_version_num}.sql"
     if [[ -f "${mgr_script_name}" ]];then
         # get sql config of mgr from common.properties
         local ip=$(prop "mysql.ip")
@@ -263,26 +302,9 @@ function upgrade_mgr_sql() {
         mysql --user=$user --password=$password --host=$ip --port=$port --database=$database --default-character-set=utf8 -e "source ${mgr_script_name}"
     else
         LOG_WARN "node-mgr upgrade sql file of ${mgr_script_name} not exist!"
+        exit 1
     fi
 }
-
-# upgrade table of sign
-# function upgrade_sign_sql() {
-#     # check whether old=>new .sql shell in new webase-sign/script
-#     sign_script_name="${PWD}/webase-sign/script/v${old_version}_v${new_version}.sql"
-#     if [[ -f ${sign_script_name} ]];then
-#         # get sql config of sign from common.properties
-#         local ip=$(prop "sign.mysql.ip")
-#         local port=$(prop "sign.mysql.port")
-#         local user=$(prop "sign.mysql.user")
-#         local password=$(prop "sign.mysql.password")
-#         local database=$(prop "sign.mysql.database")
-#         # exec .sql by mysql -e
-#         mysql --user=$user --password=$password --host=$ip --port=$port --database=$database -e${sign_script_name} $--default-character-set=utf8; 
-#     else
-#         LOG_WARN "sign upgrade sql file of ${sign_script_name} not exist!"
-#     fi
-# }
 
 
 # update old yml
@@ -296,7 +318,7 @@ function update_node_mgr_yml() {
         exit 1
     fi
     if [[ "${new_version}x" == "v1.5.0x" ]]; then
-        LOG_INFO "update yml of version ${new_version}"
+        LOG_INFO "update update_node_mgr_yml of version ${new_version}"
         # v1.5.0 key config to check if already add
         if [[ `grep -c "appStatusCheckCycle" ${mgr_yml}` -eq '0' ]]; then
             # 将constant:开头替换为
@@ -331,6 +353,29 @@ function update_webase_yml_version() {
         fi
     done
 }
+
+## 版本号获取数字，v1.5.0 => 150
+function get_version_num() {
+    old_version_num=`echo "${old_version}" | tr -cd "[0-9]"`
+    new_version_num=`echo "${new_version}" | tr -cd "[0-9]"`
+    if [[ "${old_version}" -eq "" || "${new_version}" -eq "" ]];then
+        LOG_WARN "error! please type in version"
+        usage
+        exit 1
+    fi
+    LOG_INFO "upgrade script only support nearing version (new: ${new_version_num}, old: ${old_version_num} )upgrade!"
+    # local result=$(expr ${new_version_num} - ${old_version_num})
+  
+}
+
+exit_with_tips()
+{
+    local content=${1}
+    echo -e "\033[31m[ERROR] ${content}\033[0m"
+    echo "use webase subsystem files in ${PWD}/${old_version} to recover "
+    exit 1
+}
+
 
 get_version_num
 main && LOG_INFO "upgrade script finished from ${old_version} to ${new_version} of ${zip_list}"
