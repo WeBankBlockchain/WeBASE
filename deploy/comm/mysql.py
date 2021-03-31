@@ -198,9 +198,9 @@ def initNodeMgrTable(script_dir):
     else:
         init_sql_path = script_dir + "/webase-dml.sql"
     # create table
-    create_sql_list=readSqlContent(create_sql_path)
+    create_sql_list=readSqlContent(create_sql_path,1)
     # init table data
-    init_sql_list=readSqlContent(init_sql_path)
+    init_sql_list=readSqlContent(init_sql_path,2)
 
     try:
         # connect
@@ -210,12 +210,12 @@ def initNodeMgrTable(script_dir):
 
         log.info("start create tables...")
         for sql_item in create_sql_list:
-            log.info(sql_item)
+            log.info("create sql:{}".format(sql_item))
             cursor.execute(sql_item)
 
         log.info("start init default data of tables...")
         for sql_item in init_sql_list:
-            log.info(sql_item)
+            log.info("init sql:{}".format(sql_item))
             cursor.execute(sql_item)
         
         print ("==============  mgr db script  init  success!  ==============")
@@ -230,7 +230,8 @@ def initNodeMgrTable(script_dir):
         sys.exit(0)
 
 # tool function:
-def readSqlContent(sql_path):
+# sql_type: 1-create, 2-insert
+def readSqlContent(sql_path,sql_type):
     log.info("reading node manager table sql file {}".format(sql_path))        
     # read .sql file in webase-node-mgr/script(/gm)
     with open(sql_path,encoding="utf-8",mode="r") as f:  
@@ -245,9 +246,20 @@ def readSqlContent(sql_path):
                 continue
             else:
                 sql_data += line
-        sql_list = sql_data.split(';')[:-1]
-        sql_list = [x.replace('\n', ' ') if '\n' in x else x for x in sql_list]
-        return sql_list
+        # create
+        if sql_type == 1:
+            final_sql_list = sql_data.split(';')[:-1]
+            final_sql_list = [x.replace('\n', ' ') if '\n' in x else x for x in final_sql_list]
+            return final_sql_list
+        else:
+            sql_list = sql_data.split(');')[:-1]
+            final_sql_list = []
+            for sql_splited in sql_list:
+                sql_splited = sql_splited + ");"
+                log.info("after sql sql_splited:{}".format(sql_splited))
+                final_sql_list.append(sql_splited)
+            final_sql_list = [x.replace('\n', ' ') if '\n' in x else x for x in final_sql_list]
+            return final_sql_list
 
 if __name__ == '__main__':
     pass
