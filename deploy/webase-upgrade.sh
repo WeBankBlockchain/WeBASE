@@ -36,8 +36,8 @@ PARAM_ERROR=5
 ## default one host, one node+front
 old_version=
 new_version=
-## zip name, todo webase-web-h5
-zip_list=("webase-sign" "webase-front" "webase-web" "webase-web-h5" "webase-node-mgr")
+## zip name
+zip_list=("webase-sign" "webase-front" "webase-web" "webase-web-mobile" "webase-node-mgr")
 
 # download url prefix
 cdn_url_pre="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/"
@@ -102,7 +102,6 @@ function main() {
     # pull
     for webase_name in ${zip_list[@]};
     do
-        # todo检测并拉取
         echo "now [${webase_name}] pull new version zip"
         pull_zip "$webase_name"
     done
@@ -166,7 +165,7 @@ function copy_webase() {
     case ${webase_name} in
         "webase-web")
             backup "webase-web"
-            backup "webase-web-h5"
+            backup "webase-web-mobile"
             update_nginx_conf
             ;;
         "webase-front")
@@ -194,7 +193,7 @@ function copy_webase() {
 
 }
 
-# copy webase-web and webase-web-h5
+# copy webase-web and webase-web-mobile
 # no need copy from old web, just use the new one
 function update_nginx_conf() {
     LOG_INFO "now update webase-web nginx file"
@@ -264,8 +263,8 @@ function backup() {
     if [[ -d "${PWD}/${webase_name}" ]]; then
         mv "${PWD}/${webase_name}" "${PWD}/${old_version}/"
     else
-        if [[ "${new_version}" == "v1.5.0" && "${webase_name}" == "webase-web-h5" ]]; then
-            echo "jump ovew webase-web-h5 backup"
+        if [[ "${new_version}" == "v1.5.0" && "${webase_name}" == "webase-web-mobile" ]]; then
+            echo "jump ovew webase-web-mobile backup"
         else
             LOG_WARN "backup directory of ${PWD}/${webase_name} not exist!"
             exit 1
@@ -342,7 +341,7 @@ function update_node_mgr_yml() {
     fi
 }
 
-## todo sed all yml's version
+## sed all yml's version
 function update_webase_yml_version() {
     LOG_INFO "start update version of new webase..."
     for webase_name in ${zip_list[@]};
@@ -356,7 +355,7 @@ function update_webase_yml_version() {
                 sed -i "/${old_app_config}/c${new_app_config}" ${yml_path}  
             fi
         else
-            echo "jump over webase-web(or h5)"
+            echo "jump over webase-web(or mobile)"
         fi
     done
 }
