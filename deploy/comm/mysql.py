@@ -245,7 +245,7 @@ def readSqlContent(sql_path):
                 continue
             else:
                 sql_data += line
-        sql_list = sql_data.split(';')[:-1]
+        sql_list = sql_data.split(';\n')[:-1]
         sql_list = [x.replace('\n', ' ') if '\n' in x else x for x in sql_list]
         return sql_list
 
