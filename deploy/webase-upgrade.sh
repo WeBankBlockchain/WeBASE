@@ -116,7 +116,6 @@ function main() {
     for webase_name in ${zip_list[@]};
     do
         echo "now [${webase_name}] copy old version config & backup old files & update new data"
-        # todo 更新nginx
         copy_webase "$webase_name" 
     done
 
@@ -134,21 +133,29 @@ function pull_zip() {
     local webase_name="$1"
     local zip="${webase_name}.zip"
     # delete old zip
-    # if [[ -f "$zip" ]];then
-    #     LOG_INFO "move old version zip $zip to directory of [$PWD/${old_version}]"
-    #     if [[ ! -f  "${old_version}" ]];then
-    #         mkdir "${old_version}"
-    #     fi
-    #     mv "$zip" "${old_version}/"
-    # fi
+    if [[ -f "$zip" ]];then
+        LOG_INFO "move old version zip $zip to directory of [$PWD/${old_version}]"
+        if [[ ! -f  "${old_version}" ]];then
+            mkdir "${old_version}"
+        fi
+        if [[ -f "${old_version}/${zip}" ]];then
+            LOG_WARN "old version zip of ${zip} already in directory ./${old_version}"
+        else
+            mv "$zip" "${old_version}/"
+        fi
+    fi
     LOG_INFO "pull zip of $zip"
-    #curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
     if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "500000" ]];then # 1m=1048576b
         LOG_WARN "download ${zip} failed, exit!"
         exit 1
     fi
     # webase-web.zip => webase-web-v1.5.0/webase-web
     #注：unzip后变成了webase-web-v1.5.0/webase-web
+    if [[ -d "${webase_name}-${new_version}" ]];then
+        LOG_WARN "unzip destination dir already exist, now rm and re-unzip"
+        rm -rf "${PWD}/${webase_name}-${new_version}"
+    fi
     unzip -o "$zip" -d "${webase_name}-${new_version}"  > /dev/null
 }
 
@@ -160,12 +167,12 @@ function copy_webase() {
         "webase-web")
             backup "webase-web"
             backup "webase-web-h5"
-            #update_nginx_conf
+            update_nginx_conf
             ;;
         "webase-front")
             copy_front
             backup "webase-front"   
-            #update_front_yml 
+            ##update_front_yml 
             ;;
         "webase-node-mgr")
             copy_node_mgr
@@ -176,8 +183,8 @@ function copy_webase() {
         "webase-sign")
             copy_sign
             backup "webase-sign"
-            #update_sign_yml
-            #upgrade_sign_sql
+            ##update_sign_yml
+            ##upgrade_sign_sql
             ;;            
         \?)
             usage
@@ -190,18 +197,18 @@ function copy_webase() {
 # copy webase-web and webase-web-h5
 # no need copy from old web, just use the new one
 function update_nginx_conf() {
-    LOG_INFO "update webase-web nginx file"
+    LOG_INFO "now update webase-web nginx file"
     local zip="webase-deploy.zip"
     curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
     if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "500000" ]];then
-        LOG_WARN "update_nginx_conf failed, exit!"
+        LOG_WARN "update_nginx_conf pull newer webase-deploy.zip failed, exit now"
         exit 1
     fi
     unzip -o "$zip" -d "temp-deploy"  > /dev/null
     # backup nginx conf in {old_version}
     mv "${PWD}/comm/nginx.conf" "${PWD}/${old_version}/"
-    cp -f "./temp-deploy/comm/nginx.conf" "${PWD}/comm/"
-    rm -rf "./temp-deploy"
+    cp -f "${PWD}/temp-deploy/webase-deploy/comm/nginx.conf" "${PWD}/comm/"
+    rm -rf "${PWD}/temp-deploy"
 }
 
 function copy_front() {     
