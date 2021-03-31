@@ -291,7 +291,7 @@ function prop() {
 # upgrade table of node-mgr after backup webase-node-mgr dir
 function upgrade_mgr_sql() {
     # check whether old=>new .sql shell in new webase-node-mgr/script
-    mgr_script_name="${PWD}/webase-node-mgr/script/v${old_version_num}_v${new_version_num}.sql"
+    mgr_script_name="${PWD}/webase-node-mgr/script/upgrade/v${old_version_num}_v${new_version_num}.sql"
     if [[ -f "${mgr_script_name}" ]];then
         # get sql config of mgr from common.properties
         local ip=$(prop "mysql.ip")
@@ -364,14 +364,12 @@ function update_webase_yml_version() {
 function get_version_num() {
     old_version_num=`echo "${old_version}" | tr -cd "[0-9]"`
     new_version_num=`echo "${new_version}" | tr -cd "[0-9]"`
-    if [[ "${old_version}" -eq "" || "${new_version}" -eq "" ]];then
+    if [[ "${old_version_num}" -eq "" || "${old_version_num}" -eq "" ]];then
         LOG_WARN "error! please type in version"
         usage
         exit 1
     fi
     LOG_INFO "upgrade script only support nearing version (new: ${new_version_num}, old: ${old_version_num} )upgrade!"
-    # local result=$(expr ${new_version_num} - ${old_version_num})
-  
 }
 
 exit_with_tips()

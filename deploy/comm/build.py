@@ -220,7 +220,7 @@ def changeWebConfig():
     h5_web_dir = web_dir
     if h5_enable == 1:
         # mobile phone h5 dir
-        h5_web_dir = currentDir + "/webase-web-h5"
+        h5_web_dir = currentDir + "/webase-web-mobile"
     web_log_dir = web_dir + "/log"
     doCmd('mkdir -p {}'.format(web_log_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
@@ -244,8 +244,8 @@ def installWeb():
     pullSourceExtract(gitComm,"webase-web")
     web_h5_enable = int(getCommProperties("web.h5.enable"))
     if web_h5_enable == 1:
-        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web-h5.zip ".format(web_version)
-        pullSourceExtract(gitComm,"webase-web-h5")    
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web-mobile.zip ".format(web_version)
+        pullSourceExtract(gitComm,"webase-web-mobile")    
     changeWebConfig()
     startWeb()
 
