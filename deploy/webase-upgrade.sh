@@ -99,7 +99,12 @@ done
 function main() {
     LOG_INFO "start pull zip of new webase..."
 
-    # pull
+    # pull 
+    if [[ ! -f  "${old_version}" ]];then
+        # backup old zip
+        mkdir "${old_version}"
+    fi
+
     for webase_name in ${zip_list[@]};
     do
         echo "now [${webase_name}] pull new version zip"
@@ -134,11 +139,9 @@ function pull_zip() {
     # delete old zip
     if [[ -f "$zip" ]];then
         LOG_INFO "move old version zip $zip to directory of [$PWD/${old_version}]"
-        if [[ ! -f  "${old_version}" ]];then
-            mkdir "${old_version}"
-        fi
         if [[ -f "${old_version}/${zip}" ]];then
             LOG_WARN "old version zip of ${zip} already in directory ./${old_version}"
+            rm -rf "${PWD}/${zip}"
         else
             mv "$zip" "${old_version}/"
         fi
@@ -193,23 +196,6 @@ function copy_webase() {
 
 }
 
-# copy webase-web and webase-web-mobile
-# no need copy from old web, just use the new one
-function update_nginx_conf() {
-    LOG_INFO "now update webase-web nginx file"
-    local zip="webase-deploy.zip"
-    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
-    if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "500000" ]];then
-        LOG_WARN "update_nginx_conf pull newer webase-deploy.zip failed, exit now"
-        exit 1
-    fi
-    unzip -o "$zip" -d "temp-deploy"  > /dev/null
-    # backup nginx conf in {old_version}
-    mv "${PWD}/comm/nginx.conf" "${PWD}/${old_version}/"
-    cp -f "${PWD}/temp-deploy/webase-deploy/comm/nginx.conf" "${PWD}/comm/"
-    rm -rf "${PWD}/temp-deploy"
-}
-
 function copy_front() {     
     LOG_INFO "copy webase-front config files"
     if [[ -d "${PWD}/webase-front" && -d "${PWD}/webase-front-${new_version}" ]]; then
@@ -218,7 +204,7 @@ function copy_front() {
         cp -f "${PWD}/webase-front/conf/ca.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
         cp -f "${PWD}/webase-front/conf/sdk.crt" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
         cp -f "${PWD}/webase-front/conf/sdk.key" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
-        cp -r "${PWD}/webase-front/conf/gm" "${PWD}/webase-front-${new_version}/webase-front/conf/"         
+        cp -rf "${PWD}/webase-front/conf/gm" "${PWD}/webase-front-${new_version}/webase-front/conf/"         
         cp -f "${PWD}/webase-front/conf/libsigar-aarch64-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
         cp -f "${PWD}/webase-front/conf/libsigar-amd64-linux.so" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
         cp -f "${PWD}/webase-front/conf/libsigar-universal64-macosx.dylib" "${PWD}/webase-front-${new_version}/webase-front/conf/" 
@@ -264,7 +250,7 @@ function backup() {
         mv "${PWD}/${webase_name}" "${PWD}/${old_version}/"
     else
         if [[ "${new_version}" == "v1.5.0" && "${webase_name}" == "webase-web-mobile" ]]; then
-            echo "jump ovew webase-web-mobile backup"
+            LOG_INFO "jump ovew webase-web-mobile backup: ${webase_name}"
         else
             LOG_WARN "backup directory of ${PWD}/${webase_name} not exist!"
             exit 1
@@ -329,7 +315,7 @@ function update_node_mgr_yml() {
         if [[ `grep -c "appStatusCheckCycle" ${mgr_yml}` -eq '0' ]]; then
             # 将constant:开头替换为
             local old_app_config="constant:"
-            local new_app_config="constant:\n\ \ deployedModifyEnable:\ true\n\ \ appRequestTimeOut:\ 300000\n\ \ appStatusCheckCycle:\ 3000\n"
+            local new_app_config="constant:\n\ \ deployedModifyEnable:\ true\n\ \ appRequestTimeOut:\ 300000\n\ \ appStatusCheckCycle:\ 3000\n\ \ statBlockRetainMax:\ 100000\n\ \ statBlockFixedDelay: 5000\n\ \ statBlockPageSize:\ 10\n\ \ enableExternalFromBlock:\ true\n"
             sed -i "/${old_app_config}/c${new_app_config}" ${mgr_yml}  
         fi
         if [[ `grep -c "\/api\/*" ${mgr_yml}` -eq '0' ]]; then
@@ -340,6 +326,49 @@ function update_node_mgr_yml() {
         fi
     fi
 }
+
+# copy webase-web and webase-web-mobile
+function update_nginx_conf() {
+    LOG_INFO "now update webase-web nginx file in ${PWD}/comm/nginx.conf"
+    if [[ ! -f "${PWD}/comm/nginx.conf" ]]; then
+        LOG_WARN "nginx config file not exist, cannot auto update, now jump over!"
+        #exit 1
+    fi
+    local zip="webase-deploy.zip"
+    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "10000" ]];then
+        LOG_WARN "update_nginx_conf pull newer webase-deploy.zip failed, exit now"
+        #exit 1
+    fi
+    unzip -o "$zip" -d "temp-deploy"  > /dev/null
+    # backup nginx conf in {old_version}
+    mv "${PWD}/comm/nginx.conf" "${PWD}/${old_version}/"
+    # copy new one into ./comm
+    cp -f "${PWD}/temp-deploy/webase-deploy/comm/nginx.conf" "${PWD}/comm/"
+    # sed new conf file
+    web_port=$(prop "web.port")
+    mgr_port=$(prop "mgr.port")
+    local pid_file="${PWD}/nginx-webase-web.pid"
+    local web_dir="${PWD}/webase-web"
+    local web_log_dir="${web_dir}/log"
+    local h5_web_dir="${PWD}/webase-web-mobile"
+    # create log dir
+    if [[ ! -d "${PWD}/${web_log_dir}" ]]; then
+        mkdir -p "$web_log_dir"
+    fi
+
+    sed -i "s/5000/${web_port}/g" "${PWD}/comm/nginx.conf"
+    sed -i "s/5001/${mgr_port}/g" "${PWD}/comm/nginx.conf"
+    sed -i "s:log_path:${web_log_dir}:g" "${PWD}/comm/nginx.conf"
+    sed -i "s:pid_file:${pid_file}:g" "${PWD}/comm/nginx.conf"
+    # set web_page_url(root & static) globally
+    sed -i "s:web_page_url:${web_dir}:g" "${PWD}/comm/nginx.conf"
+    # set mobile phone phone_page_url globally
+    sed -i "s:phone_page_url:${h5_web_dir}:g" "${PWD}/comm/nginx.conf"
+    # remove temp dir    
+    rm -rf "${PWD}/temp-deploy"
+}
+
 
 ## sed all yml's version
 function update_webase_yml_version() {
