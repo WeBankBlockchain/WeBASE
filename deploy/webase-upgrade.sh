@@ -250,7 +250,7 @@ function backup() {
         mv "${PWD}/${webase_name}" "${PWD}/${old_version}/"
     else
         if [[ "${new_version}" == "v1.5.0" && "${webase_name}" == "webase-web-mobile" ]]; then
-            echo "jump ovew webase-web-mobile backup"
+            LOG_INFO "jump ovew webase-web-mobile backup: ${webase_name}"
         else
             LOG_WARN "backup directory of ${PWD}/${webase_name} not exist!"
             exit 1
