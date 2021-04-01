@@ -360,7 +360,7 @@ function update_nginx_conf() {
 
     sed -i "s/127.0.0.1/${deply_ip}/g" "${PWD}/comm/nginx.conf"
     sed -i "s/5000/${web_port}/g" "${PWD}/comm/nginx.conf"
-    sed -i "s/server 127.0.0.1:5001/server ${deploy_ip}:${mgr_port}/g" "${PWD}/comm/nginx.conf"
+    sed -i "s/server\ 127.0.0.1\:5001/server\ ${deploy_ip}\:${mgr_port}/g" "${PWD}/comm/nginx.conf"
     sed -i "s:log_path:${web_log_dir}:g" "${PWD}/comm/nginx.conf"
     sed -i "s:pid_file:${pid_file}:g" "${PWD}/comm/nginx.conf"
     # set web_page_url(root & static) globally
