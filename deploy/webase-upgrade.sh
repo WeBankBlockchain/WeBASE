@@ -315,7 +315,7 @@ function update_node_mgr_yml() {
         if [[ `grep -c "appStatusCheckCycle" ${mgr_yml}` -eq '0' ]]; then
             # 将constant:开头替换为
             local old_app_config="constant:"
-            local new_app_config="constant:\n\ \ deployedModifyEnable:\ true\n\ \ appRequestTimeOut:\ 300000\n\ \ appStatusCheckCycle:\ 3000\n"
+            local new_app_config="constant:\n\ \ deployedModifyEnable:\ true\n\ \ appRequestTimeOut:\ 300000\n\ \ appStatusCheckCycle:\ 3000\n\ \ statBlockRetainMax:\ 100000\n\ \ statBlockFixedDelay: 5000\n\ \ statBlockPageSize:\ 10\n\ \ enableExternalFromBlock:\ true\n"
             sed -i "/${old_app_config}/c${new_app_config}" ${mgr_yml}  
         fi
         if [[ `grep -c "\/api\/*" ${mgr_yml}` -eq '0' ]]; then
