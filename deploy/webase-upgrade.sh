@@ -346,9 +346,8 @@ function update_nginx_conf() {
     # copy new one into ./comm
     cp -f "${PWD}/temp-deploy/webase-deploy/comm/nginx.conf" "${PWD}/comm/"
     # sed new conf file
-    local deploy_ip="127.0.0.1"
-    local web_port=$(prop "web.port")
-    local mgr_port=$(prop "mgr.port")
+    web_port=$(prop "web.port")
+    mgr_port=$(prop "mgr.port")
     local pid_file="${PWD}/nginx-webase-web.pid"
     local web_dir="${PWD}/webase-web"
     local web_log_dir="${web_dir}/log"
@@ -358,9 +357,8 @@ function update_nginx_conf() {
         mkdir -p "$web_log_dir"
     fi
 
-    sed -i "s/127.0.0.1/${deply_ip}/g" "${PWD}/comm/nginx.conf"
     sed -i "s/5000/${web_port}/g" "${PWD}/comm/nginx.conf"
-    sed -i "s/server\ 127.0.0.1\:5001/server\ ${deploy_ip}\:${mgr_port}/g" "${PWD}/comm/nginx.conf"
+    sed -i "s/5001/${mgr_port}/g" "${PWD}/comm/nginx.conf"
     sed -i "s:log_path:${web_log_dir}:g" "${PWD}/comm/nginx.conf"
     sed -i "s:pid_file:${pid_file}:g" "${PWD}/comm/nginx.conf"
     # set web_page_url(root & static) globally

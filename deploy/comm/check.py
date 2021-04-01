@@ -302,6 +302,10 @@ def checkVersion():
     fisco_ver_str = getCommProperties("fisco.version")
     webase_front_ver_str = getCommProperties("webase.front.version")
     print ("check webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
+    # check from common.properties
+    checkVersionUtil(fisco_ver_str,webase_front_ver_str)
+
+def checkVersionUtil(fisco_ver_str,webase_front_ver_str):
     fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
     # webase-front version greater or equal with other webase version
     webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
@@ -402,6 +406,37 @@ def checkEncryptTypeByRpc():
     else:
         print ('check finished sucessfully.')
         return
+
+
+# def checkExitedChainVersionByRpc():
+#     print ("check encrypt type same with exited chain...")
+#     existChain = getCommProperties("if.exist.fisco")
+#     listenIp = getCommProperties("node.listenIp")
+#     rpcPort = getCommProperties("node.rpcPort")
+#     chainRpcUrl = "http://{}:{}".format(listenIp,rpcPort)
+#     webase_front_ver_str = getCommProperties("webase.front.version")
+ 
+#     # request for chain encrypt type
+#     if (existChain == 'yes'):
+#         # check chain existed
+#         checkExistChainConnect()
+#         # request chain
+#         data={"jsonrpc":"2.0","method":"getClientVersion","params":[],"id":1}
+#         result=rest_post(chainRpcUrl, data)
+#         # handle result
+#         log.info("request result:{}".format(result))
+#         # resultStr=str(result, encoding="utf-8")
+#         # 获取版本号 support version
+#         # read().decode("utf-8")
+#         # json
+#         # result_dic = json.loads()
+#         # 判断
+#         print ("check webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
+#         # check from common.properties
+#         checkVersionUtil(fisco_ver_str,webase_front_ver_str)
+#     else:
+#         print ('check finished sucessfully.')
+#         return
 
 
 if __name__ == '__main__':
