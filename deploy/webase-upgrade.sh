@@ -330,7 +330,7 @@ function update_node_mgr_yml() {
 # copy webase-web and webase-web-mobile
 function update_nginx_conf() {
     LOG_INFO "now update webase-web nginx file in ${PWD}/comm/nginx.conf"
-    if [[ ! -f "${PWD}/comm/nginx.conf" } ]]; then
+    if [[ ! -f "${PWD}/comm/nginx.conf" ]]; then
         LOG_WARN "nginx config file not exist, cannot auto update, now jump over!"
         #exit 1
     fi
