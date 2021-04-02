@@ -321,7 +321,7 @@ function update_node_mgr_yml() {
         if [[ `grep -c "\/api\/*" ${mgr_yml}` -eq '0' ]]; then
             # 需要空格开头
             local old_url_config="permitUrlArray:\ \/account\/login"
-            local new_url_config="\ \ permitUrlArray:\ \/account\/login,\/account\/pictureCheckCode,\/login,\/user\/privateKey\/**,\/encrypt,\/version,\/front\/refresh,\/api\/*"
+            local new_url_config="\ \ permitUrlArray:\ \/account\/login,\/account\/pictureCheckCode,\/login,\/user\/privateKey\/**,\/config\/encrypt,\/config\/version,\/front\/refresh,\/api\/*"
             sed -i "/${old_url_config}/c${new_url_config}" ${mgr_yml} 
         fi
     fi
