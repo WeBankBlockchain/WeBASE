@@ -272,11 +272,19 @@ def rest_post(url,data):
     try:
         req = request.Request(url=url, data=params, headers=headers, method='POST')
         res = request.urlopen(req).read()
-        log.info("rest_post success: {}".format(res))
-        return res
+        res_dict = json.loads(res)
+        log.info("rest_post success: {}".format(res_dict))
+        return res_dict
     except:
         log.error("rest_post fail: {}".format(sys.exc_info()))
         return ''
+
+def rest_getClientVersion(chainRpcUrl):
+    data={"jsonrpc":"2.0","method":"getClientVersion","params":[],"id":1}
+    resJson = rest_post(chainRpcUrl,data)
+    result = resJson['result']
+    log.info("rest_getClientVersion result: {}".format(result))
+    return result
 
 if __name__ == '__main__':
     print(getIpAddress("eth0"))
