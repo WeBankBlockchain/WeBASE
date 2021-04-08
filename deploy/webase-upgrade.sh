@@ -3,7 +3,6 @@
 set -e
 
 
-### 需要文档指明脚本做了什么操作，生产环境的运维如果分步操作怎么完成
 ################################################
 # 下载新的zip包，已存在则移动到{old_version}的目录中
 
@@ -45,6 +44,9 @@ logfile=${PWD}/upgrade.log
 
 ## re-download zip
 force_download_zip="false"
+
+# dependencies
+depend_list=("python3" "dos2unix" "unzip" "mysql" "mysqldump")
 
 LOG_WARN()
 {
@@ -95,8 +97,41 @@ while getopts o:n:h OPT;do
     esac
 done
 
+function checkDependencies() {
+    for package in ${depend_list[@]};
+    do
+        if [[ ! $(command -v ${package}) ]]; then
+            LOG_WARN "dependencies of [${package}] not installed, please install it and try again!"
+            exit 1
+        fi
+    done
+    LOG_INFO "check dependencies passed!"
+#   if [[ ! $(command -v python3) ]]; then
+#       LOG_WARN "dependencies of [python3] not installed, please install it and try again!"
+#       exit 1
+#   fi
+#   if [[ ! $(command -v mysql) ]]; then
+#       LOG_WARN "dependencies of [dos2unix] not installed, please install it  and try again!"
+#       exit 1
+#   fi      
+#   if [[ ! $(command -v mysqldump) ]]; then
+#       LOG_WARN "dependencies of [mysqldump] not installed, please install it and try again!"
+#       exit 1
+#   fi
+#   if [[ ! $(command -v dos2unix) ]]; then
+#       LOG_WARN "dependencies of [dos2unix] not installed, please install it and try again!"
+#       exit 1
+#   fi
+}
 
 function main() {
+    
+    # pull 
+    if [[ ! -f  "deploy.py" ]];then
+        LOG_WARN "deploy.py not in this directory!"
+        exit 1
+    fi
+
     LOG_INFO "start pull zip of new webase..."
 
     # pull 
@@ -250,7 +285,7 @@ function backup() {
         mv "${PWD}/${webase_name}" "${PWD}/${old_version}/"
     else
         if [[ "${new_version}" == "v1.5.0" && "${webase_name}" == "webase-web-mobile" ]]; then
-            LOG_INFO "jump ovew webase-web-mobile backup: ${webase_name}"
+            LOG_INFO "jump over webase-web-mobile backup: ${webase_name}"
         else
             LOG_WARN "backup directory of ${PWD}/${webase_name} not exist!"
             exit 1
@@ -409,8 +444,8 @@ exit_with_tips()
     exit 1
 }
 
-
+checkDependencies
 get_version_num
-main && LOG_INFO "upgrade script finished from ${old_version} to ${new_version} of ${zip_list}"
+main && LOG_INFO "upgrade script finished from ${old_version} to ${new_version}"
 echo "end of script"
 exit ${SUCCESS}
