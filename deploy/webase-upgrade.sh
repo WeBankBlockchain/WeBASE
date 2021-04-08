@@ -106,22 +106,6 @@ function checkDependencies() {
         fi
     done
     LOG_INFO "check dependencies passed!"
-#   if [[ ! $(command -v python3) ]]; then
-#       LOG_WARN "dependencies of [python3] not installed, please install it and try again!"
-#       exit 1
-#   fi
-#   if [[ ! $(command -v mysql) ]]; then
-#       LOG_WARN "dependencies of [dos2unix] not installed, please install it  and try again!"
-#       exit 1
-#   fi      
-#   if [[ ! $(command -v mysqldump) ]]; then
-#       LOG_WARN "dependencies of [mysqldump] not installed, please install it and try again!"
-#       exit 1
-#   fi
-#   if [[ ! $(command -v dos2unix) ]]; then
-#       LOG_WARN "dependencies of [dos2unix] not installed, please install it and try again!"
-#       exit 1
-#   fi
 }
 
 function main() {
