@@ -29,7 +29,7 @@ def do():
     print ("============================================================")
     print ("==============      checking envrionment      ==============")
     installRequirements()
-    checkVersion()
+    checkConfigVersion()
     checkMemAndCpu()
     checkNginx()
     checkJava()
@@ -42,7 +42,7 @@ def do():
     checkSignDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
-    checkEncryptTypeByRpc()
+    checkExitedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -298,13 +298,22 @@ def installByYum(server):
 
 # update every version
 # check fisco version and webase-front version
-def checkVersion():
-    fisco_ver_str = getCommProperties("fisco.version")
-    webase_front_ver_str = getCommProperties("webase.front.version")
-    print ("check webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
+def checkConfigVersion():
+    existChain = getCommProperties("if.exist.fisco")
+    if (existChain == 'no'):
+        fisco_ver_str = getCommProperties("fisco.version")
+        webase_front_ver_str = getCommProperties("webase.front.version")
+        print ("check config webase {} and fisco version {}...".format(webase_front_ver_str, fisco_ver_str))
+        # check from common.properties
+        checkVersionUtil(fisco_ver_str,webase_front_ver_str)
+        print ('check finished sucessfully.')
+
+def checkVersionUtil(fisco_ver_str,webase_front_ver_str):
+    log.info("checkVersionUtil webase: {} and fisco version: {}".format(webase_front_ver_str, fisco_ver_str))
     fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
     # webase-front version greater or equal with other webase version
     webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
+    log.info("checkVersionUtil int webase: {} and fisco version: {}".format(webase_front_version_int, fisco_version_int))
     flag=False
     # require if webase <= 1.3.2, fisco < 2.5.0
     if ( webase_front_version_int <= 132 and fisco_version_int >= 250 ):
@@ -315,11 +324,9 @@ def checkVersion():
 
     # if version conflicts, exit
     if (flag):
-        raise Exception ('[ERROR]WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(fisco_ver_str, webase_front_ver_str))
+        raise Exception ('[ERROR]WeBASE of version {} not support FISCO of version {}, please check WeBASE version description or ChangeLog for detail!'.format(webase_front_ver_str, fisco_ver_str))
     else:
-        print ('check finished sucessfully.')
         return
-
 
 def checkMemAndCpu():
     print ("check host free memory and cpu core...")
@@ -362,47 +369,60 @@ def checkMemAndCpu():
         print ('check finished sucessfully.')
         return
 
+def checkExitedChainInfo():
+    existChain = getCommProperties("if.exist.fisco")
+    if (existChain == 'yes'):
+        print ("check exited chain info...")
+        
+        listenIp = getCommProperties("node.listenIp")
+        rpcPort = getCommProperties("node.rpcPort")
+        chainRpcUrl = "http://{}:{}".format(listenIp,rpcPort)
+        
+        # check chain connect
+        checkExistChainConnect()
+        # request chain
+        clientVersion=rest_getClientVersion(chainRpcUrl)
+        # handle result
+        fiscoVersion=clientVersion['FISCO-BCOS Version']
+        log.info("fiscoVersion: {}".format(fiscoVersion))
+        # check encrypt type
+        checkEncryptType(fiscoVersion)
+        # check version
+        checkExitedChainVersion(fiscoVersion)
+        
+        print ('check exited chain info sucessfully.')
+    else:
+        return
+
+def checkEncryptType(fiscoVersion):
+    print ("check encrypt type...")
+    encryptType = getCommProperties("encrypt.type")
+    isGuomi="gm" in fiscoVersion
+    if (isGuomi and encryptType != '1'):
+        raise Exception("config's encryptType CONFLICTS with existed [guomi] chain")
+    elif ((isGuomi == False) and encryptType == '1'):
+        raise Exception("config's encryptType CONFLICTS with existed [ecdsa] chain")
+    else:
+        print ('check encrypt type finished.')
+        return
+    print ('check encrypt type finished.')
+
+def checkExitedChainVersion(fisco_ver_str):
+    print ("check version...")
+    webase_front_ver_str = getCommProperties("webase.front.version")
+    checkVersionUtil(fisco_ver_str,webase_front_ver_str)
+    print ("check version finished.")
+
 def checkExistChainConnect():
-    print ("check exist chain connection...")
+    print ("check connection...")
     listenIp = getCommProperties("node.listenIp")
     rpcPort = getCommProperties("node.rpcPort")
     ifLink = do_telnet(listenIp,rpcPort)
     if not ifLink:
         print ('Exist chain listen ip:{} port:{} is disconnected, please confirm.'.format(listenIp, rpcPort))
         sys.exit(0)
-    print ("check finished sucessfully.")
+    print ("check connection finished.")
     return
-
-def checkEncryptTypeByRpc():
-    print ("check encrypt type same with exited chain...")
-    existChain = getCommProperties("if.exist.fisco")
-    listenIp = getCommProperties("node.listenIp")
-    rpcPort = getCommProperties("node.rpcPort")
-    chainRpcUrl = "http://{}:{}".format(listenIp,rpcPort)
-
-    encryptType = getCommProperties("encrypt.type")
-    # request for chain encrypt type
-    if (existChain == 'yes'):
-        # check chain existed
-        checkExistChainConnect()
-        # request chain
-        data={"jsonrpc":"2.0","method":"getClientVersion","params":[],"id":1}
-        result=rest_post(chainRpcUrl, data)
-        # handle result
-        log.info("request result:{}".format(result))
-        resultStr=str(result, encoding="utf-8")
-        isGuomi="gm" in resultStr
-        if (isGuomi and encryptType != '1'):
-            raise Exception("config's encryptType CONFLICTS with existed [guomi] chain")
-        elif ((isGuomi == False) and encryptType == '1'):
-            raise Exception("config's encryptType CONFLICTS with existed [ecdsa] chain")
-        else:
-            print ('check finished sucessfully.')
-            return
-    else:
-        print ('check finished sucessfully.')
-        return
-
 
 if __name__ == '__main__':
     pass

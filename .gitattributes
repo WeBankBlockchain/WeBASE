@@ -1,2 +1,4 @@
 *.sh linguist-language=JAVA
 *.py linguist-language=JAVA
+*.log
+*.zip

@@ -216,6 +216,11 @@ def changeWebConfig():
 
     # change web config
     web_dir = currentDir + "/webase-web"
+    h5_enable = int(getCommProperties("web.h5.enable"))
+    h5_web_dir = web_dir
+    if h5_enable == 1:
+        # mobile phone h5 dir
+        h5_web_dir = currentDir + "/webase-web-mobile"
     web_log_dir = web_dir + "/log"
     doCmd('mkdir -p {}'.format(web_log_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
@@ -225,6 +230,8 @@ def changeWebConfig():
     doCmd('sed -i "s:pid_file:{}:g" {}/comm/nginx.conf'.format(pid_file, currentDir))
     # set web_page_url(root & static) globally
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
+    # set mobile phone phone_page_url globally
+    doCmd('sed -i "s:phone_page_url:{}:g" {}/comm/nginx.conf'.format(h5_web_dir, currentDir))
 
     # change the path of mime.types, which is in the path of nginx configuration by default.
     res = doCmd("which nginx")
@@ -256,6 +263,10 @@ def installWeb():
     web_version = getCommProperties("webase.web.version")
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web.zip ".format(web_version)
     pullSourceExtract(gitComm,"webase-web")
+    web_h5_enable = int(getCommProperties("web.h5.enable"))
+    if web_h5_enable == 1:
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web-mobile.zip ".format(web_version)
+        pullSourceExtract(gitComm,"webase-web-mobile")    
     changeWebConfig()
     startWeb()
 
@@ -458,7 +469,7 @@ def changeFrontConfig():
     nodeListenIp = getCommProperties("node.listenIp")
     nodeChannelPort = getCommProperties("node.channelPort")
     frontDb = getCommProperties("front.h2.name")
-    encrypt_type = int(getCommProperties("encrypt.type"))
+    #encrypt_type = int(getCommProperties("encrypt.type"))
 
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
@@ -478,7 +489,7 @@ def changeFrontConfig():
     doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
     doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
     doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
-    doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
+    #doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
     doCmd('sed -i "s/keyServer: 127.0.0.1:5004/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, sign_port, server_dir))
     doCmd('sed -i "s%/webasefront%/{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
@@ -514,7 +525,7 @@ def installFront():
     # copy node crt
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
-    encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
+    #encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
 
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
@@ -523,10 +534,12 @@ def installFront():
         print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
         sys.exit(0)
     os.chdir(server_dir)
-    if encrypt_ssl_type == 1:
-        copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
-    else:
-        copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # copy the whole sdk(sdk.key and gm dir) to conf/
+    copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # if encrypt_ssl_type == 1:
+    #     copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
+    # else:
+    #     copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
 
     startFront()
     return
