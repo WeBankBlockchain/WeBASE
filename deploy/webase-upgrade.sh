@@ -46,7 +46,7 @@ logfile=${PWD}/upgrade.log
 force_download_zip="false"
 
 # dependencies
-depend_list=("python3" "dos2unix" "unzip" "mysql" "mysqldump")
+depend_list=("python3" "dos2unix" "unzip" "mysql" "mysqldump" "curl")
 
 LOG_WARN()
 {

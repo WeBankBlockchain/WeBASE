@@ -110,7 +110,8 @@ def installNode():
         doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
         doCmdIgnoreException("dos2unix nodeconf")
 
-        gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        # gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if os.path.exists("{}/build_chain.sh".format(currentDir)):
             info = "n"      
             if sys.version_info.major == 2:
