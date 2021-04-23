@@ -110,7 +110,8 @@ def installNode():
         doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
         doCmdIgnoreException("dos2unix nodeconf")
 
-        gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        # gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if os.path.exists("{}/build_chain.sh".format(currentDir)):
             info = "n"      
             if sys.version_info.major == 2:
@@ -232,6 +233,27 @@ def changeWebConfig():
     doCmd('sed -i "s:web_page_url:{}:g" {}/comm/nginx.conf'.format(web_dir, currentDir))
     # set mobile phone phone_page_url globally
     doCmd('sed -i "s:phone_page_url:{}:g" {}/comm/nginx.conf'.format(h5_web_dir, currentDir))
+
+    # change the path of mime.types, which is in the path of nginx configuration by default.
+    res = doCmd("which nginx")
+    if res["status"] == 0:
+        res2 = doCmd("sudo " + res["output"] + " -t ")
+        if res2["status"] == 0:
+           oneLineOutput = res2["output"].split('\n')[0]; 
+           print("onelineOutput: %s" %(oneLineOutput));
+           startIndex = oneLineOutput.index("/");
+           endIndex = oneLineOutput.rindex("/");
+
+           nginxConfPath = oneLineOutput[startIndex:endIndex];
+           print("Defualt nginx config path: %s" %(nginxConfPath)); 
+           doCmd('sed -i "s/include .*\/mime.types/include {}\/mime.types/g" {}/comm/nginx.conf'.format(nginxConfPath.replace("/", "\/"), currentDir))
+
+        else:
+            print ("==============   WebBASE-web start fail when checking the path of nginx configuration fail. Please view log file (default path:./webase-web/log/). ==============")
+            sys.exit(0)
+    else:
+        print ("==============    WeBASE-Web start fail when getting nginx. Please view log file (default path:./webase-web/log/). ==============")
+        sys.exit(0)
 
     return
 
