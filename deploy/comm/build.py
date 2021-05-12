@@ -334,32 +334,20 @@ def changeManagerConfig(visual_deploy=False):
     # init file
     server_dir = currentDir + "/webase-node-mgr"
     script_dir = server_dir + "/script"
-    script_dir_gm = script_dir + "/gm"
     conf_dir = server_dir + "/conf"
-    if encrypt_type == 1:
-        if not os.path.exists(script_dir_gm + "/temp-gm.sh"):
-            doCmd('cp -f {}/webase-gm.sh {}/temp-gm.sh'.format(script_dir_gm, script_dir_gm))
-        else:
-            doCmd('cp -f {}/temp-gm.sh {}/webase-gm.sh'.format(script_dir_gm, script_dir_gm))
+    if not os.path.exists(script_dir + "/temp.sh"):
+        doCmd('cp -f {}/webase.sh {}/temp.sh'.format(script_dir, script_dir))
     else:
-        if not os.path.exists(script_dir + "/temp.sh"):
-            doCmd('cp -f {}/webase.sh {}/temp.sh'.format(script_dir, script_dir))
-        else:
-            doCmd('cp -f {}/temp.sh {}/webase.sh'.format(script_dir, script_dir))
+        doCmd('cp -f {}/temp.sh {}/webase.sh'.format(script_dir, script_dir))
     if not os.path.exists(conf_dir + "/temp.yml"):
         doCmd('cp -f {}/application.yml {}/temp.yml'.format(conf_dir, conf_dir))
     else:
         doCmd('cp -f {}/temp.yml {}/application.yml'.format(conf_dir, conf_dir))
 
     # change script config
-    if encrypt_type == 1:
-        doCmd('sed -i "s/defaultAccount/{}/g" {}/webase-gm.sh'.format(mysql_user, script_dir_gm))
-        doCmd('sed -i "s/defaultPassword/{}/g" {}/webase-gm.sh'.format(mysql_password, script_dir_gm))
-        doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase-gm.sh'.format(mysql_database, script_dir_gm))
-    else:
-        doCmd('sed -i "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
-        doCmd('sed -i "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
-        doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
+    doCmd('sed -i "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
+    doCmd('sed -i "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
+    doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
 
     # change server config
     doCmd('sed -i "s/5001/{}/g" {}/application.yml'.format(mgr_port, conf_dir))
@@ -537,10 +525,6 @@ def installFront():
     os.chdir(server_dir)
     # copy the whole sdk(sdk.key and gm dir) to conf/
     copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
-    # if encrypt_ssl_type == 1:
-    #     copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
-    # else:
-    #     copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
 
     startFront()
     return
