@@ -14,7 +14,7 @@
 
 ## Subsystem introduction
 * **Node Front service [WeBASE-Front](https://github.com/WeBankFinTech/WeBASE-Front)** 
-It integrates web3sdk and provides restful interface. The client can interact with the node in the form of HTTP. The built-in memory database collects the health data of the node. Built in Web console to realize the visual operation of nodes and solidity IDE etc..
+It integrates fisco-bcos-java-sdk and provides restful interface. The client can interact with the node in the form of HTTP. The built-in memory database collects the health data of the node. Built in Web console to realize the visual operation of nodes and solidity IDE etc..
 
 * **Node management service [WeBASE-Node-Manager](https://github.com/WeBankFinTech/WeBASE-Node-Manager)**
 Based on WeBASE-Front, handle all web requests from WeBASE-Web pages, manage the status of each node, manage all smart contracts on the chain, make statistics and Analysis on the data of the blockchain, audit abnormal transactions, private key management, etc.
@@ -53,3 +53,5 @@ I hope that with your participation, WeBASE will get better and better!
 
 ## Community
 Contact us: webase@webank.com
+
+WeChat Community ID : WeBank_Blockchain

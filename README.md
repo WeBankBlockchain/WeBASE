@@ -16,7 +16,7 @@
 
 ## 各子系统简介
 * **节点前置服务 [WeBASE-Front](https://github.com/WeBankFinTech/WeBASE-Front)** 
-集成web3sdk，提供restful风格的接口，客户端可以使用http的形式和节点进行交互，内置内存数据库，采集节点健康度数据。内置web控制台，实现节点的可视化、合约部署IDE等功能。
+集成java-sdk，提供restful风格的接口，客户端可以使用http的形式和节点进行交互，内置内存数据库，采集节点健康度数据。内置web控制台，实现节点的可视化、合约部署IDE等功能。
 
 * **节点管理服务 [WeBASE-Node-Manager](https://github.com/WeBankFinTech/WeBASE-Node-Manager)**
 处理WeBASE-Web前端页面所有web请求，基于前置服务，管理各个节点的状态，管理链上所有智能合约，对区块链的数据进行统计、分析，对异常交易的审计，私钥管理等。
@@ -57,3 +57,4 @@
 ## 社区
 联系我们：webase@webank.com
 
+社区小助手微信ID : WeBank_Blockchain

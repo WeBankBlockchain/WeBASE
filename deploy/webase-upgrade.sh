@@ -208,8 +208,7 @@ function copy_webase() {
             ##upgrade_sign_sql
             ;;            
         \?)
-            usage
-            exit ${PARAM_ERROR}
+            LOG_WARN "not support update this service [${webase_name}]"
             ;;
     esac
 
@@ -261,7 +260,7 @@ function copy_sign() {
 
 
 
-# backup webase dir
+# backup webase package and use new version package
 function backup() {
     local webase_name="$1"
     LOG_INFO "now backup old data of ${webase_name}"
