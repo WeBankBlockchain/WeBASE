@@ -188,15 +188,9 @@ def initNodeMgrTable(script_dir):
     mysql_password = parse.unquote_plus(mysql_password_raw)    
     mysql_database = getCommProperties("mysql.database")
     
-      # 0:ecdsa, 1:gm 
-    encrypt_type = int(getCommProperties("encrypt.type"))
-    
     # read .sql content
     create_sql_path = script_dir + "/webase-ddl.sql"
-    if encrypt_type == 1:
-        init_sql_path = script_dir + "/gm/webase-dml-gm.sql"
-    else:
-        init_sql_path = script_dir + "/webase-dml.sql"
+    init_sql_path = script_dir + "/webase-dml.sql"
     # create table
     create_sql_list=readSqlContent(create_sql_path,1)
     # init table data
@@ -233,7 +227,7 @@ def initNodeMgrTable(script_dir):
 # sql_type: 1-create, 2-insert
 def readSqlContent(sql_path,sql_type):
     log.info("reading node manager table sql file {}".format(sql_path))        
-    # read .sql file in webase-node-mgr/script(/gm)
+    # read .sql file in webase-node-mgr/script
     with open(sql_path,encoding="utf-8",mode="r") as f:  
         data = f.read()
         lines = data.splitlines()
