@@ -247,7 +247,6 @@ def changeWebConfig():
            nginxConfPath = oneLineOutput[startIndex:endIndex];
            print("Defualt nginx config path: %s" %(nginxConfPath)); 
            doCmd('sed -i "s/include .*\/mime.types/include {}\/mime.types/g" {}/comm/nginx.conf'.format(nginxConfPath.replace("/", "\/"), currentDir))
-
         else:
             print ("==============   WebBASE-web start fail when checking the path of nginx configuration fail. Please view log file (default path:./webase-web/log/). ==============")
             sys.exit(0)
