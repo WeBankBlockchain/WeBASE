@@ -87,7 +87,6 @@ def visualCheckPort():
     checkWebPort()
     checkMgrPort()
     checkSignPort()
-    checkFrontPort()
     print ("==============        port    available       ==============")
 
 def installRequirements():
