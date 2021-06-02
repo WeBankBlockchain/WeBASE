@@ -209,7 +209,7 @@ def initNodeMgrTable(script_dir):
 
         log.info("start init default data of tables...")
         for sql_item in init_sql_list:
-            log.info("init sql:{}".format(sql_item))
+            #log.info("init sql:{}".format(sql_item))
             cursor.execute(sql_item)
         
         print ("==============  mgr db script  init  success!  ==============")
