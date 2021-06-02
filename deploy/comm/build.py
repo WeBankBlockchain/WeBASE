@@ -247,7 +247,6 @@ def changeWebConfig():
            nginxConfPath = oneLineOutput[startIndex:endIndex];
            print("Defualt nginx config path: %s" %(nginxConfPath)); 
            doCmd('sed -i "s/include .*\/mime.types/include {}\/mime.types/g" {}/comm/nginx.conf'.format(nginxConfPath.replace("/", "\/"), currentDir))
-
         else:
             print ("==============   WebBASE-web start fail when checking the path of nginx configuration fail. Please view log file (default path:./webase-web/log/). ==============")
             sys.exit(0)
@@ -334,32 +333,20 @@ def changeManagerConfig(visual_deploy=False):
     # init file
     server_dir = currentDir + "/webase-node-mgr"
     script_dir = server_dir + "/script"
-    script_dir_gm = script_dir + "/gm"
     conf_dir = server_dir + "/conf"
-    if encrypt_type == 1:
-        if not os.path.exists(script_dir_gm + "/temp-gm.sh"):
-            doCmd('cp -f {}/webase-gm.sh {}/temp-gm.sh'.format(script_dir_gm, script_dir_gm))
-        else:
-            doCmd('cp -f {}/temp-gm.sh {}/webase-gm.sh'.format(script_dir_gm, script_dir_gm))
+    if not os.path.exists(script_dir + "/temp.sh"):
+        doCmd('cp -f {}/webase.sh {}/temp.sh'.format(script_dir, script_dir))
     else:
-        if not os.path.exists(script_dir + "/temp.sh"):
-            doCmd('cp -f {}/webase.sh {}/temp.sh'.format(script_dir, script_dir))
-        else:
-            doCmd('cp -f {}/temp.sh {}/webase.sh'.format(script_dir, script_dir))
+        doCmd('cp -f {}/temp.sh {}/webase.sh'.format(script_dir, script_dir))
     if not os.path.exists(conf_dir + "/temp.yml"):
         doCmd('cp -f {}/application.yml {}/temp.yml'.format(conf_dir, conf_dir))
     else:
         doCmd('cp -f {}/temp.yml {}/application.yml'.format(conf_dir, conf_dir))
 
     # change script config
-    if encrypt_type == 1:
-        doCmd('sed -i "s/defaultAccount/{}/g" {}/webase-gm.sh'.format(mysql_user, script_dir_gm))
-        doCmd('sed -i "s/defaultPassword/{}/g" {}/webase-gm.sh'.format(mysql_password, script_dir_gm))
-        doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase-gm.sh'.format(mysql_database, script_dir_gm))
-    else:
-        doCmd('sed -i "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
-        doCmd('sed -i "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
-        doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
+    doCmd('sed -i "s/defaultAccount/{}/g" {}/webase.sh'.format(mysql_user, script_dir))
+    doCmd('sed -i "s/defaultPassword/{}/g" {}/webase.sh'.format(mysql_password, script_dir))
+    doCmd('sed -i "s/webasenodemanager/{}/g" {}/webase.sh'.format(mysql_database, script_dir))
 
     # change server config
     doCmd('sed -i "s/5001/{}/g" {}/application.yml'.format(mgr_port, conf_dir))
@@ -475,9 +462,10 @@ def changeFrontConfig():
     if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
     node_dir = getCommProperties("node.dir")
+    final_node_dir = fisco_dir + "/" + node_dir
     if if_exist_fisco == "no":
         fisco_dir = currentDir + "/nodes/127.0.0.1"
-        node_dir = currentDir + "/nodes/127.0.0.1/node0"
+        final_node_dir = currentDir + "/nodes/127.0.0.1/node0"
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
@@ -494,7 +482,7 @@ def changeFrontConfig():
     doCmd('sed -i "s/keyServer: 127.0.0.1:5004/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, sign_port, server_dir))
     doCmd('sed -i "s%/webasefront%/{}%g" {}/application.yml'.format(frontDb, server_dir))
     doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
-    doCmd('sed -i "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(node_dir, server_dir))
+    doCmd('sed -i "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(final_node_dir, server_dir))
 
     return
 
@@ -537,10 +525,6 @@ def installFront():
     os.chdir(server_dir)
     # copy the whole sdk(sdk.key and gm dir) to conf/
     copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
-    # if encrypt_ssl_type == 1:
-    #     copyFiles(fisco_dir + "/sdk" + "/gm", server_dir + "/conf")
-    # else:
-    #     copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
 
     startFront()
     return

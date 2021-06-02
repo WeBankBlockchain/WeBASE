@@ -127,6 +127,11 @@ function main() {
     for webase_name in ${zip_list[@]};
     do
         echo "now [${webase_name}] pull new version zip"
+        # skip v1.5.0 webase-sign upgrade        
+        if [[ "${new_version}" == "v1.5.1" && "${webase_name}" == "webase-sign" ]]; then
+            LOG_INFO "skip upgrade to ${new_version} in webase-sign"
+            continue
+        fi
         pull_zip "$webase_name"
     done
 
@@ -139,6 +144,11 @@ function main() {
     for webase_name in ${zip_list[@]};
     do
         echo "now [${webase_name}] copy old version config & backup old files & update new data"
+        # skip v1.5.0 webase-sign upgrade        
+        if [[ "${new_version}" == "v1.5.1" && "${webase_name}" == "webase-sign" ]]; then
+            LOG_INFO "skip upgrade to ${new_version} in webase-sign"
+            continue
+        fi
         copy_webase "$webase_name" 
     done
 
@@ -208,8 +218,7 @@ function copy_webase() {
             ##upgrade_sign_sql
             ;;            
         \?)
-            usage
-            exit ${PARAM_ERROR}
+            LOG_WARN "not support update this service [${webase_name}]"
             ;;
     esac
 
@@ -261,13 +270,14 @@ function copy_sign() {
 
 
 
-# backup webase dir
+# backup webase package and use new version package
 function backup() {
     local webase_name="$1"
     LOG_INFO "now backup old data of ${webase_name}"
     if [[ -d "${PWD}/${webase_name}" ]]; then
         mv "${PWD}/${webase_name}" "${PWD}/${old_version}/"
     else
+        # skip v1.5.0 web-mobile upgrade, cuz added in v1.5.0
         if [[ "${new_version}" == "v1.5.0" && "${webase_name}" == "webase-web-mobile" ]]; then
             LOG_INFO "jump over webase-web-mobile backup: ${webase_name}"
         else
@@ -395,8 +405,13 @@ function update_webase_yml_version() {
     for webase_name in ${zip_list[@]};
     do
         local yml_path="${PWD}/${webase_name}/conf/application.yml"
+        # skip v1.5.0 webase-sign upgrade
+        if [[ "${new_version}" == "v1.5.1" && "${webase_name}" == "webase-sign" ]]; then
+            LOG_INFO "skip upgrade to ${new_version} in webase-sign"
+            continue
+        fi
         if [[ -f $yml_path ]]; then
-            # check v1.5.0 exist
+            # check new version exist
             if [[ `grep -c "${new_version}" ${yml_path}` -eq '0' ]]; then
                 local old_app_config="version:"
                 local new_app_config="version:\ ${new_version}\n"

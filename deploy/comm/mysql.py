@@ -188,15 +188,9 @@ def initNodeMgrTable(script_dir):
     mysql_password = parse.unquote_plus(mysql_password_raw)    
     mysql_database = getCommProperties("mysql.database")
     
-      # 0:ecdsa, 1:gm 
-    encrypt_type = int(getCommProperties("encrypt.type"))
-    
     # read .sql content
     create_sql_path = script_dir + "/webase-ddl.sql"
-    if encrypt_type == 1:
-        init_sql_path = script_dir + "/gm/webase-dml-gm.sql"
-    else:
-        init_sql_path = script_dir + "/webase-dml.sql"
+    init_sql_path = script_dir + "/webase-dml.sql"
     # create table
     create_sql_list=readSqlContent(create_sql_path,1)
     # init table data
@@ -210,12 +204,12 @@ def initNodeMgrTable(script_dir):
 
         log.info("start create tables...")
         for sql_item in create_sql_list:
-            log.info("create sql:{}".format(sql_item))
+            #log.info("create sql:{}".format(sql_item))
             cursor.execute(sql_item)
 
         log.info("start init default data of tables...")
         for sql_item in init_sql_list:
-            log.info("init sql:{}".format(sql_item))
+            #log.info("init sql:{}".format(sql_item))
             cursor.execute(sql_item)
         
         print ("==============  mgr db script  init  success!  ==============")
@@ -233,7 +227,7 @@ def initNodeMgrTable(script_dir):
 # sql_type: 1-create, 2-insert
 def readSqlContent(sql_path,sql_type):
     log.info("reading node manager table sql file {}".format(sql_path))        
-    # read .sql file in webase-node-mgr/script(/gm)
+    # read .sql file in webase-node-mgr/script
     with open(sql_path,encoding="utf-8",mode="r") as f:  
         data = f.read()
         lines = data.splitlines()
@@ -256,7 +250,7 @@ def readSqlContent(sql_path,sql_type):
             final_sql_list = []
             for sql_splited in sql_list:
                 sql_splited = sql_splited + ");"
-                log.info("after sql sql_splited:{}".format(sql_splited))
+                #log.info("after sql sql_splited:{}".format(sql_splited))
                 final_sql_list.append(sql_splited)
             final_sql_list = [x.replace('\n', ' ') if '\n' in x else x for x in final_sql_list]
             return final_sql_list
