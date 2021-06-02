@@ -204,7 +204,7 @@ def initNodeMgrTable(script_dir):
 
         log.info("start create tables...")
         for sql_item in create_sql_list:
-            log.info("create sql:{}".format(sql_item))
+            #log.info("create sql:{}".format(sql_item))
             cursor.execute(sql_item)
 
         log.info("start init default data of tables...")
