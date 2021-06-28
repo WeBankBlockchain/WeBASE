@@ -17,7 +17,8 @@ old_version=
 new_version=
 
 # download url prefix
-cdn_url_pre="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/"
+cdn_url_pre="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download"
+logfile=${PWD}/upgrade.log
 
 # dependencies
 depend_list=("python3" "dos2unix" "unzip" "mysql" "mysqldump" "curl")
@@ -87,7 +88,7 @@ function get_upgrade() {
         LOG_INFO "upgrade.sh script exists, now delete and re-download"            
         rm -f ${PWD}/upgrade.sh
     fi
-    curl -#LO "${cdn_url_pre}${new_version}/upgrade.sh" 
+    curl -#LO "${cdn_url_pre}/${new_version}/upgrade.sh" 
     if [[ "$(ls -al . | grep upgrade.sh | awk '{print $5}')" -lt "10000" ]];then # 1m=1048576b
         LOG_WARN "download  upgrade script failed, exit!"
         exit 1
@@ -101,12 +102,12 @@ function get_upgrade() {
 function get_version_num() {
     old_version_num=`echo "${old_version}" | tr -cd "[0-9]"`
     new_version_num=`echo "${new_version}" | tr -cd "[0-9]"`
-    if [[ "${old_version_num}" -eq "" || "${old_version_num}" -eq "" ]];then
+    if [[ "${old_version_num}" -eq "" || "${new_version_num}" -eq "" ]];then
         LOG_WARN "error! please type in version"
         usage
         exit 1
     fi
-    LOG_INFO "upgrade script only support nearing version (new: ${new_version_num}, old: ${old_version_num} )upgrade!"
+    LOG_INFO "Tips: upgrade script only support nearing version (new: ${new_version_num}, old: ${old_version_num} )upgrade"
 }
 
 get_version_num

@@ -26,84 +26,9 @@ set -e
 # 启动新的，执行python3 deploy.py startAll
 ################################################
 
-####### error code
-# SUCCESS=0
-
-# PARAM_ERROR=5
-
-## default one host, one node+front
-# old_version=
-# new_version=
 
 ## zip name
 zip_list=("webase-front" "webase-web" "webase-node-mgr")
-
-# download url prefix
-# cdn_url_pre="https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/"
-# logfile=${PWD}/upgrade.log
-
-# dependencies
-# depend_list=("python3" "dos2unix" "unzip" "mysql" "mysqldump" "curl")
-
-# LOG_WARN()
-# {
-#     local content=${1}
-#     echo -e "\033[31m[WARN] ${content}\033[0m"
-#     echo "[WARN] ${content}" >> ${logfile}
-# }
-
-# LOG_INFO()
-# {
-#     local content=${1}
-#     echo -e "\033[32m[INFO] ${content}\033[0m"
-#     echo "[INFO] ${content}" >> ${logfile}
-# }
-
-# ####### 参数解析 #######
-# cmdname=$(basename "$0")
-
-# # usage help doc.
-# usage() {
-#     cat << USAGE  >&2
-# Usage:
-#     $cmdname [-o old_version] [-n new_version]
-
-#     -o    old version, ex: v1.4.3
-#     -n    new version, ex: v1.5.0
-# USAGE
-#     exit ${PARAM_ERROR}
-# }
-
-
-# while getopts o:n:h OPT;do
-#     case ${OPT} in
-#         o)
-#             old_version="$OPTARG"
-#             ;;
-#         n)
-#             new_version="$OPTARG"
-#             ;;
-#         h)
-#             usage
-#             exit ${PARAM_ERROR}
-#             ;;
-#         \?)
-#             usage
-#             exit ${PARAM_ERROR}
-#             ;;
-#     esac
-# done
-
-# function checkDependencies() {
-#     for package in ${depend_list[@]};
-#     do
-#         if [[ ! $(command -v ${package}) ]]; then
-#             LOG_WARN "dependencies of [${package}] not installed, please install it and try again!"
-#             exit 1
-#         fi
-#     done
-#     LOG_INFO "check dependencies passed!"
-# }
 
 function main() {
     
@@ -125,10 +50,10 @@ function main() {
     do
         echo "now [${webase_name}] pull new version zip"
         # skip v1.5.0 webase-sign upgrade        
-        if [[ "${new_version}" == "v1.5.1" && "${webase_name}" == "webase-sign" ]]; then
-            LOG_INFO "skip upgrade to ${new_version} in webase-sign"
-            continue
-        fi
+        # if [[ "${new_version}" == "v1.5.1" && "${webase_name}" == "webase-sign" ]]; then
+        #     LOG_INFO "skip upgrade to ${new_version} in webase-sign"
+        #     continue
+        # fi
         pull_zip "$webase_name"
     done
 
@@ -142,10 +67,10 @@ function main() {
     do
         echo "now [${webase_name}] copy old version config & backup old files & update new data"
         # skip v1.5.0 webase-sign upgrade        
-        if [[ "${new_version}" == "v1.5.1" && "${webase_name}" == "webase-sign" ]]; then
-            LOG_INFO "skip upgrade to ${new_version} in webase-sign"
-            continue
-        fi
+        # if [[ "${new_version}" == "v1.5.1" && "${webase_name}" == "webase-sign" ]]; then
+        #     LOG_INFO "skip upgrade to ${new_version} in webase-sign"
+        #     continue
+        # fi
         copy_webase "$webase_name" 
     done
 
@@ -173,7 +98,7 @@ function pull_zip() {
         fi
     fi
     LOG_INFO "pull zip of $zip"
-    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    curl -#LO "${cdn_url_pre}/${new_version}/${zip}" 
     if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "500000" ]];then # 1m=1048576b
         LOG_WARN "download ${zip} failed, exit!"
         exit 1
@@ -361,7 +286,7 @@ function update_nginx_conf() {
         #exit 1
     fi
     local zip="webase-deploy.zip"
-    curl -#LO "${cdn_url_pre}${new_version}/${zip}" 
+    curl -#LO "${cdn_url_pre}/${new_version}/${zip}" 
     if [[ "$(ls -al . | grep ${zip} | awk '{print $5}')" -lt "10000" ]];then
         LOG_WARN "update_nginx_conf pull newer webase-deploy.zip failed, exit now"
         #exit 1
@@ -420,17 +345,6 @@ function update_webase_yml_version() {
     done
 }
 
-## 版本号获取数字，v1.5.0 => 150
-function get_version_num() {
-    old_version_num=`echo "${old_version}" | tr -cd "[0-9]"`
-    new_version_num=`echo "${new_version}" | tr -cd "[0-9]"`
-    if [[ "${old_version_num}" -eq "" || "${old_version_num}" -eq "" ]];then
-        LOG_WARN "error! please type in version"
-        usage
-        exit 1
-    fi
-    LOG_INFO "upgrade script only support nearing version (new: ${new_version_num}, old: ${old_version_num} )upgrade!"
-}
 
 exit_with_tips()
 {
