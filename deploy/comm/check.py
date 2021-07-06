@@ -71,6 +71,8 @@ def visual_do():
     checkMgrDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
+    checkMgrDbVersion()
+    checkSignDbVersion()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
