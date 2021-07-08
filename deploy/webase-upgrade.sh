@@ -84,17 +84,17 @@ function checkCurl() {
 }
 
 function get_upgrade() {
-    if [[ ! -f "${PWD}/upgrade.sh" ]]; then
-        LOG_INFO "upgrade.sh script exists, now delete and re-download"            
-        rm -f ${PWD}/upgrade.sh
+    if [[ ! -f "${PWD}/upgrade-${new_version}.sh" ]]; then
+        LOG_INFO "upgrade-${new_version}.sh script exists, now delete and re-download"            
+        rm -f ${PWD}/upgrade-${new_version}.sh
     fi
-    curl -#LO "${cdn_url_pre}/${new_version}/upgrade.sh" 
-    if [[ "$(ls -al . | grep upgrade.sh | awk '{print $5}')" -lt "10000" ]];then # 1m=1048576b
-        LOG_WARN "download  upgrade script failed, exit!"
+    curl -#LO "${cdn_url_pre}/${new_version}/upgrade-${new_version}.sh" 
+    if [[ "$(ls -al . | grep upgrade-${new_version}.sh | awk '{print $5}')" -lt "10000" ]];then # 1m=1048576b
+        LOG_WARN "download upgrade script failed, exit!"
         exit 1
     fi
-    chmod +x upgrade.sh
-    source upgrade.sh
+    chmod +x upgrade-${new_version}.sh
+    source upgrade-${new_version}.sh
 }
 
 
