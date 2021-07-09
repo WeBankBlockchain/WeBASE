@@ -204,15 +204,17 @@ def checkMgrDbVersion():
                 # 提取version第二位
                 secondInt = int(version.split(".")[1])
                 # 5.6+
-                if secondInt < 6:
+                if secondInt < 5:
                     sys.exit(0)
+                elif secondInt == 5:
+                    print("[WARN]webase-node-mgr recommend mysql 5.6 or above")
         cursor.close()
         conn.close()
         print("check finished sucessfully.")        
         log.info("check mgr db version correct!")
     except:
         import traceback
-        print("======[Error]node-mgr's mysql require 5.6 or above!======")
+        print("======[Error]webase-node-mgr require mysql 5.6 or above======")
         log.info("mgr mysql require 5.6 or above error {}".format(traceback.format_exc()))
         traceback.print_exc()
         sys.exit(0)
@@ -246,15 +248,18 @@ def checkSignDbVersion():
             if firstInt == 5:
                 # 提取version第二位
                 secondInt = int(version.split(".")[1])
-                if secondInt < 6:
+                # 5.6+
+                if secondInt < 5:
                     sys.exit(0)
+                elif secondInt == 5:
+                    print("[WARN]webase-sign recommend mysql 5.6 or above")
         cursor.close()
         conn.close()
         print("check finished sucessfully.")        
         log.info("check sign db version correct!")
     except:
         import traceback
-        print("======[Error]sign's mysql require 5.6 or above!======")
+        print("======[Error]webase-sign require mysql 5.6 or above!======")
         log.info("sign mysql require 5.6 or above error {}".format(traceback.format_exc()))
         traceback.print_exc()
         sys.exit(0)
