@@ -42,6 +42,8 @@ def do():
     checkSignDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
+    checkMgrDbVersion()
+    checkSignDbVersion()
     checkExitedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
