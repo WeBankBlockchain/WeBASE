@@ -27,6 +27,8 @@ addons:
     - curl
     - nginx
     - dos2unix
+    - unzip
+    - wget
   homebrew:
     packages:
     - git
@@ -34,6 +36,8 @@ addons:
     - curl
     - nginx
     - dos2unix
+    - unzip
+    - wget
 install:
   - pip install -r requirements.txt
 script:

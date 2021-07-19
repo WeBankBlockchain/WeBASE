@@ -6,6 +6,7 @@ import sys
 import MySQLdb as mdb
 from .utils import *
 from urllib import parse
+import re
 
 log = deployLog.getLocalLogger()
 
@@ -130,8 +131,6 @@ def signDbInit():
         sys.exit(0)
     
 
-### to check by mysql.py
-
 def checkMgrDbAuthorized():
     print ("check mgr database user/password...")
     # get properties
@@ -143,13 +142,12 @@ def checkMgrDbAuthorized():
     try:
         # connect
         conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
-        # conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, database=mysql_database, charset='utf8')
         conn.close()
         print("check finished sucessfully.")        
         log.info("check mgr db user/password correct!")
     except:
         import traceback
-        print("======mgr mysql user/password error!======")
+        print("======[Error]node-mgr's mysql user/password error!======")
         log.info("mgr mysql user/password error {}".format(traceback.format_exc()))
         traceback.print_exc()
         sys.exit(0)
@@ -171,8 +169,98 @@ def checkSignDbAuthorized():
         log.info("check sign db user/password correct!")
     except:
         import traceback
-        print("======sign mysql user/password error!======")
+        print("======[Error]sign's mysql user/password error!======")
         log.info("sign mysql user/password error {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+
+
+def checkMgrDbVersion():
+    print ("check mgr mysql version...")
+    # get properties
+    mysql_ip = getCommProperties("mysql.ip")
+    mysql_port = int(getCommProperties("mysql.port"))
+    mysql_user = getCommProperties("mysql.user")
+    mysql_password_raw = getCommProperties("mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
+        # start check mysql version
+        cursor = conn.cursor(cursor=mdb.cursors.DictCursor)
+        log.info("checking node-mgr's mysql version")
+        cursor.execute("select version();")
+        # 5.6.xx-XX
+        mysqlVersion = cursor.fetchall()[0].get("version()", "cannot_get_version")
+        print("node-mgr's mysql version is [{}]".format(mysqlVersion))
+        match = re.search("\d+(.\d+){0,2}", mysqlVersion)
+        log.info("version match is:[{}]".format(match))
+        # match不为空
+        if match != "" and match != None:
+            version = match.group()
+            # 提取version第一位
+            firstInt = int(version.split(".")[0])
+            if firstInt == 5:
+                # 提取version第二位
+                secondInt = int(version.split(".")[1])
+                # 5.6+
+                if secondInt < 5:
+                    sys.exit(0)
+                elif secondInt == 5:
+                    print("[WARN]webase-node-mgr recommend mysql 5.6 or above")
+        cursor.close()
+        conn.close()
+        print("check finished sucessfully.")        
+        log.info("check mgr db version correct!")
+    except:
+        import traceback
+        print("======[Error]webase-node-mgr require mysql 5.6 or above======")
+        log.info("mgr mysql require 5.6 or above error {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+
+
+def checkSignDbVersion():
+    print ("check sign mysql version...")
+    # get properties
+    mysql_ip = getCommProperties("sign.mysql.ip")
+    mysql_port = int(getCommProperties("sign.mysql.port"))
+    mysql_user = getCommProperties("sign.mysql.user")
+    mysql_password_raw = getCommProperties("sign.mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password)
+        # start check mysql version
+        cursor = conn.cursor(cursor=mdb.cursors.DictCursor)
+        log.info("checking sign's mysql version")
+        cursor.execute("select version();")
+        # 5.6.xx-XX
+        mysqlVersion = cursor.fetchall()[0].get("version()", "cannot_get_version")
+        print("sign's mysql version is [{}]".format(mysqlVersion))
+        match = re.search("\d+(.\d+){0,2}", mysqlVersion)
+        log.info("version match is:[{}]".format(match))
+        # match不为空
+        if match != "" and match != None:
+            version = match.group()
+            # 提取version第一位
+            firstInt = int(version.split(".")[0])
+            if firstInt == 5:
+                # 提取version第二位
+                secondInt = int(version.split(".")[1])
+                # 5.6+
+                if secondInt < 5:
+                    sys.exit(0)
+                elif secondInt == 5:
+                    print("[WARN]webase-sign recommend mysql 5.6 or above")
+        cursor.close()
+        conn.close()
+        print("check finished sucessfully.")        
+        log.info("check sign db version correct!")
+    except:
+        import traceback
+        print("======[Error]webase-sign require mysql 5.6 or above!======")
+        log.info("sign mysql require 5.6 or above error {}".format(traceback.format_exc()))
         traceback.print_exc()
         sys.exit(0)
 

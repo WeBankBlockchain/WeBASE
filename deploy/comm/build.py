@@ -623,7 +623,7 @@ def installSign():
     print ("==============     Installing WeBASE-Sign     ==============")
     os.chdir(currentDir)
     sign_version = getCommProperties("webase.sign.version")
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip ".format(sign_version)
+    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip".format(sign_version)
     pullSourceExtract(gitComm,"webase-sign")
     changeSignConfig()
     signDbInit()

@@ -42,6 +42,8 @@ def do():
     checkSignDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
+    checkMgrDbVersion()
+    checkSignDbVersion()
     checkExitedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
@@ -71,6 +73,8 @@ def visual_do():
     checkMgrDbConnect()
     checkMgrDbAuthorized()
     checkSignDbAuthorized()
+    checkMgrDbVersion()
+    checkSignDbVersion()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
