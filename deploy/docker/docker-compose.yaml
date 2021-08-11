@@ -2,7 +2,7 @@ version: "v1.5.3"
 services:
  
   webase-front:
-    image: webase-front:v0.0.2
+    image: webasepro/webase-front:v0.0.2
     container_name: webase-front-5002
     network_mode: "host"
     networks:
@@ -18,7 +18,7 @@ services:
       # - fisco
   
   webase-node-mgr:
-    image: webase-node-mgr:v0.0.2
+    image: webasepro/webase-node-mgr:v0.0.2
     container_name: webase-node-mgr-5001
     network_mode: "host"
     networks:
@@ -33,7 +33,7 @@ services:
       - webase-sign
  
   webase-sign:
-    image: webase-sign:v0.0.2
+    image: webasepro/webase-sign:v0.0.2
     container_name: webase-sign-5004
     network_mode: "host"
     networks:
@@ -47,7 +47,7 @@ services:
       - mysql
  
   webase-web:
-    image: webase-web:v0.0.2
+    image: webasepro/webase-web:v0.0.2
     container_name: webase-web-5000
     network_mode: "host"
     networks:
@@ -72,7 +72,7 @@ services:
 
   # todo multi nodes
   # fisco:
-  #   image: fisco-bcos:v2.7.2
+  #   image: fiscoorg/fiscobcos:v2.7.2
   #   network_mode: "host"
   #   networks:
   #     - webase
