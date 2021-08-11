@@ -1,0 +1,84 @@
+version: "v1.5.3"
+services:
+ 
+  webase-front:
+    image: webase-front:v0.0.2
+    container_name: webase-front-5002
+    network_mode: "host"
+    networks:
+      - webase
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - /webase-deploy/nodes/127.0.0.1/sdk:/dist/sdk 
+      - /webase-deploy/webase-front/application-docker.yml:/dist/conf/application-docker.yml
+      - /webase-deploy/webase-front/log:/dist/log
+    depends_on:
+      - webase-sign
+      # - fisco
+  
+  webase-node-mgr:
+    image: webase-node-mgr:v0.0.2
+    container_name: webase-node-mgr-5001
+    network_mode: "host"
+    networks:
+      - webase
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - /webase-deploy/webase-node-mgr/application-docker.yml:/dist/conf/application-docker.yml
+      - /webase-deploy/webase-node-mgr/log:/dist/log
+    depends_on:
+      - mysql
+      - webase-sign
+ 
+  webase-sign:
+    image: webase-sign:v0.0.2
+    container_name: webase-sign-5004
+    network_mode: "host"
+    networks:
+      - webase
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+    volumes:
+      - /webase-deploy/webase-sign/application-docker.yml:/dist/conf/application-docker.yml
+      - /webase-deploy/webase-sign/log:/dist/log
+    depends_on:
+      - mysql
+ 
+  webase-web:
+    image: webase-web:v0.0.2
+    container_name: webase-web-5000
+    network_mode: "host"
+    networks:
+      - webase
+    volumes:
+      - /webase-deploy/webase-web/nginx-docker.conf:/data/webase-web/nginx/nginx.conf
+      - /webase-deploy/webase-web/log:/usr/share/nginx/log
+    depends_on:
+      - webase-node-mgr
+
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "23306:3306"
+    container_name: mysql-webase-23306
+    volumes:
+    - "/webase-deploy/mysql/data:/var/lib/mysql"
+    networks:
+      - webase
+
+  # todo multi nodes
+  # fisco:
+  #   image: fisco-bcos:v2.7.2
+  #   network_mode: "host"
+  #   networks:
+  #     - webase
+  #   volumes:
+  #     - "/webase-deploy/nodes/127.0.0.1/node0/data:/var/lib/mysql"
+
+networks:
+  webase:
+  
