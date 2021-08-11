@@ -292,7 +292,7 @@ def initNodeMgrTable(script_dir):
 
         log.info("start create tables...")
         for sql_item in create_sql_list:
-            log.info("create sql:{}".format(sql_item))
+            #log.info("create sql:{}".format(sql_item))
             cursor.execute(sql_item)
 
         log.info("start init default data of tables...")
@@ -338,7 +338,7 @@ def readSqlContent(sql_path,sql_type):
             final_sql_list = []
             for sql_splited in sql_list:
                 sql_splited = sql_splited + ");"
-                log.info("after sql sql_splited:{}".format(sql_splited))
+                #log.info("after sql sql_splited:{}".format(sql_splited))
                 final_sql_list.append(sql_splited)
             final_sql_list = [x.replace('\n', ' ') if '\n' in x else x for x in final_sql_list]
             return final_sql_list
