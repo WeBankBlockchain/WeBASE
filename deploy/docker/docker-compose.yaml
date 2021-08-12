@@ -1,62 +1,67 @@
-version: "v1.5.3"
 services:
  
   webase-front:
     image: webasepro/webase-front:v0.0.2
     container_name: webase-front-5002
     network_mode: "host"
-    networks:
-      - webase
     environment:
       SPRING_PROFILES_ACTIVE: docker
     volumes:
       - /webase-deploy/nodes/127.0.0.1/sdk:/dist/sdk 
       - /webase-deploy/webase-front/application-docker.yml:/dist/conf/application-docker.yml
       - /webase-deploy/webase-front/log:/dist/log
+      - /webase-deploy/webase-front/h2:/h2
+      - ./script/wait-for-it.sh:/wait-for-it.sh # chmod +x wait-for-it.sh
+      - ./script/front-start.sh:/start.sh
     depends_on:
       - webase-sign
-      # - fisco
+    entrypoint: ["/wait-for-it.sh", "127.0.0.1:20200", "--timeout=15", "--strict", "--",  "bash", "/start.sh"]
   
   webase-node-mgr:
     image: webasepro/webase-node-mgr:v0.0.2
     container_name: webase-node-mgr-5001
     network_mode: "host"
-    networks:
-      - webase
     environment:
       SPRING_PROFILES_ACTIVE: docker
     volumes:
       - /webase-deploy/webase-node-mgr/application-docker.yml:/dist/conf/application-docker.yml
       - /webase-deploy/webase-node-mgr/log:/dist/log
+      - ./script/wait-for-it.sh:/wait-for-it.sh
+      - ./script/mgr-start.sh:/start.sh
     depends_on:
       - mysql
       - webase-sign
- 
+      - webase-front
+    entrypoint: ["/wait-for-it.sh", "127.0.0.1:23306", "--timeout=10", "--strict", "--", "bash", "/start.sh"]
+
+
   webase-sign:
     image: webasepro/webase-sign:v0.0.2
     container_name: webase-sign-5004
     network_mode: "host"
-    networks:
-      - webase
     environment:
       SPRING_PROFILES_ACTIVE: docker
     volumes:
       - /webase-deploy/webase-sign/application-docker.yml:/dist/conf/application-docker.yml
       - /webase-deploy/webase-sign/log:/dist/log
+      - ./script/wait-for-it.sh:/wait-for-it.sh    
+      - ./script/sign-start.sh:/start.sh
     depends_on:
       - mysql
- 
+    entrypoint: ["/wait-for-it.sh", "127.0.0.1:23306", "--timeout=10", "--strict", "--", "bash", "/start.sh"]
+
   webase-web:
     image: webasepro/webase-web:v0.0.2
     container_name: webase-web-5000
     network_mode: "host"
-    networks:
-      - webase
     volumes:
       - /webase-deploy/webase-web/nginx-docker.conf:/data/webase-web/nginx/nginx.conf
       - /webase-deploy/webase-web/log:/usr/share/nginx/log
+      - ./script/wait-for-it.sh:/wait-for-it.sh
+      - ./script/web-start.sh:/start.sh
     depends_on:
       - webase-node-mgr
+    entrypoint: ["/wait-for-it.sh", "127.0.0.1:5001", "--timeout=10", "--strict", "--", "bash", "/start.sh"]
 
   mysql:
     image: mysql:5.6
@@ -66,19 +71,12 @@ services:
       - "23306:3306"
     container_name: mysql-webase-23306
     volumes:
-    - "/webase-deploy/mysql/data:/var/lib/mysql"
-    networks:
-      - webase
+    - /webase-deploy/mysql/data:/var/lib/mysql
 
-  # todo multi nodes
+  ### use build_chain.sh -d(docker mode), and start_all.sh to start nodes
   # fisco:
   #   image: fiscoorg/fiscobcos:v2.7.2
   #   network_mode: "host"
-  #   networks:
-  #     - webase
   #   volumes:
-  #     - "/webase-deploy/nodes/127.0.0.1/node0/data:/var/lib/mysql"
+  #     - "/webase-deploy/nodes/127.0.0.1/node0:/var/lib/mysql"
 
-networks:
-  webase:
-  
