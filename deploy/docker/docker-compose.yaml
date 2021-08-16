@@ -6,6 +6,10 @@ services:
     network_mode: "host"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 5002
+      SDK_IP: 127.0.0.1
+      SDK_CHANNEL_PORT: 20200
+      KEY_SERVER: "127.0.0.1:5004"
     volumes:
       - /webase-deploy/nodes/127.0.0.1/sdk:/dist/sdk 
       - /webase-deploy/webase-front/application-docker.yml:/dist/conf/application-docker.yml
@@ -23,6 +27,13 @@ services:
     network_mode: "host"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 5001
+      WEBASE_DB_IP: 127.0.0.1
+      WEBASE_DB_PORT: 3306
+      WEBASE_DB_NAME: webasenodemanager
+      WEBASE_DB_UNAME: defaultAccount
+      WEBASE_DB_PWD: defaultPassword
+      ENCRYPT_TYPE: 0
     volumes:
       - /webase-deploy/webase-node-mgr/application-docker.yml:/dist/conf/application-docker.yml
       - /webase-deploy/webase-node-mgr/log:/dist/log
@@ -41,6 +52,12 @@ services:
     network_mode: "host"
     environment:
       SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 5004
+      WEBASE_DB_IP: 127.0.0.1
+      WEBASE_DB_PORT: 3306
+      WEBASE_DB_NAME: webasenodemanager
+      WEBASE_DB_UNAME: defaultAccount
+      WEBASE_DB_PWD: defaultPassword      
     volumes:
       - /webase-deploy/webase-sign/application-docker.yml:/dist/conf/application-docker.yml
       - /webase-deploy/webase-sign/log:/dist/log
