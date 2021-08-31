@@ -6,7 +6,7 @@ import os
 import time
 from .utils import *
 from .mysql import *
-from .docker as docker
+import comm.docker as docker
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
@@ -60,9 +60,9 @@ def visual_do():
 
 # docker-compose do
 def docker_do():
-   print ("==============        starting  deploy        ==============")
+    print ("==============        starting  deploy        ==============")
     # build chain by -d (docker mode) and start by docker(start_all.sh)
-    installNode(True)
+    #installNode(True)
     docker.installDockerAll()
     # set docker-compose.yaml's sign front nodemgr web's config env variable
     # todo chmod +x docker/script/*.sh

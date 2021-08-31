@@ -47,8 +47,8 @@ dockerDir = currentDir + "/docker"
 def installDockerAll():
     configDockerAll()
     # if timeout, use cdn
-    pullDockerImages()
-    startDockerCompose()
+    # pullDockerImages()
+    # startDockerCompose()
 
 def pullDockerImages():
     # check docker-compose
@@ -80,7 +80,7 @@ def configDockerAll():
     doCmdIgnoreException("chmod u+x ./docker/script/*.sh")
     doCmdIgnoreException("dos2unix ./docker/script/*.sh")
     if not os.path.exists(dockerDir + "/docker-compose-temp.yaml"):
-        doCmd('cp -f {}/docker-compose.yaml {}/docker-compose-temp.yaml'.format(dockerDir, web_dir))
+        doCmd('cp -f {}/docker-compose.yaml {}/docker-compose-temp.yaml'.format(dockerDir, dockerDir))
 
     # config nginx.conf
     configWeb()
@@ -136,8 +136,8 @@ def updateYamlMysql():
         doCmd('sed -i "s:mgrDefaultAccount:root:g" {}/docker-compose.yaml'.format(dockerDir))
         doCmd('sed -i "s:mgrDefaultPassword:{}:g" {}/docker-compose.yaml'.format(docker_mysql_pwd, dockerDir))
         # sign docker
-        doCmd('sed -i "s:mgrDbIp:127.0.0.1:g" {}/docker-compose.yaml'.format(dockerDir))
-        doCmd('sed -i "s:mgrDbPort:{}:g" {}/docker-compose.yaml'.format(docker_mysql_port, dockerDir))
+        doCmd('sed -i "s:signDbIp:127.0.0.1:g" {}/docker-compose.yaml'.format(dockerDir))
+        doCmd('sed -i "s:signDbPort:{}:g" {}/docker-compose.yaml'.format(docker_mysql_port, dockerDir))
         doCmd('sed -i "s:signDefaultAccount:root:g" {}/docker-compose.yaml'.format(dockerDir))
         doCmd('sed -i "s:signDefaultPassword:{}:g" {}/docker-compose.yaml'.format(docker_mysql_pwd, dockerDir))
     else:

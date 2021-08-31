@@ -93,10 +93,4 @@ services:
     # entrypoint: ["echo", "Service [mysql] disabled"]
 
 
-  ### use build_chain.sh -d(docker mode), and start_all.sh to start nodes
-  # fisco:
-  #   image: fiscoorg/fiscobcos:v2.7.2
-  #   network_mode: "host"
-  #   volumes:
-  #     - "/webase-deploy/nodes/127.0.0.1/node0:/var/lib/mysql"
 
