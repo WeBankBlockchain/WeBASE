@@ -62,10 +62,8 @@ def visual_do():
 def docker_do():
     print ("==============        starting  deploy        ==============")
     # build chain by -d (docker mode) and start by docker(start_all.sh)
-    #installNode(True)
+    installNode(True)
     docker.installDockerAll()
-    # set docker-compose.yaml's sign front nodemgr web's config env variable
-    # todo chmod +x docker/script/*.sh
     print ("============================================================")
     print ("==============      deploy  has completed     ==============")
     print ("============================================================")

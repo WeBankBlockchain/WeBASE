@@ -7,37 +7,6 @@ import time
 from .utils import *
 from .mysql import *
 
-# update all path with webase-deploy's path
-### mysql update
-# if mysql ip is not 127.0.0.1 or localhost, then not entrypoint disable
-# set pwd and all db user, db pwd
-#### front
-# set front version
-# set front 5002
-# set sdk ip(must 127.0.0.1) sdk port
-# set sign port 5004
-# set sdk cert path
-# set node path
-# mkdir of front log and h2
-### node-mgr
-# set mgr version
-# set mgr 5001
-# set db ip, db port 23306
-# set db name, (if mysql docker on, not set) db user, db pwd 
-# set encrypt type
-# mkdir of log
-### sign
-# set sign version
-# set sign 5004(already set in front)
-# set db ip, db port 23306
-# set db name,(if mysql docker on, not set) db user, db pwd
-# mkdir of log
-### web
-# set web version
-# set port 5000
-# set nginx conf
-
-
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
 dockerDir = currentDir + "/docker"
@@ -47,8 +16,8 @@ dockerDir = currentDir + "/docker"
 def installDockerAll():
     configDockerAll()
     # if timeout, use cdn
-    # pullDockerImages()
-    # startDockerCompose()
+    pullDockerImages()
+    startDockerCompose()
 
 def pullDockerImages():
     # check docker-compose
