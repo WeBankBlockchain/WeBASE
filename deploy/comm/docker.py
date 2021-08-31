@@ -68,13 +68,22 @@ def updateYamlFront():
     front_port = getCommProperties("front.port")
     channel_ip = getCommProperties("node.listenIp")
     channel_port = getCommProperties("node.channelPort")
+    front_db = getCommProperties("front.h2.name")
+    sign_port = getCommProperties("sign.port")
+
+    # config node path and sdk path
+    if_exist_fisco = getCommProperties("if.exist.fisco")
     fisco_dir = getCommProperties("fisco.dir")
     node_relative_dir = getCommProperties("node.dir")
     node_dir = fisco_dir + "/" + node_relative_dir
+    if if_exist_fisco == "no":
+        fisco_dir = currentDir + "/nodes/127.0.0.1"
+        node_dir = currentDir + "/nodes/127.0.0.1/node0"
     sdk_dir = fisco_dir + "/sdk"
-    sign_port = getCommProperties("sign.port")
+
 
     doCmd('sed -i "s/5002/{}/g" {}/docker-compose.yaml'.format(front_port, dockerDir))
+    doCmd('sed -i "s/webasefront/{}/g" {}/docker-compose.yaml'.format(front_db, dockerDir))
     doCmd('sed -i "s/webase-front:v0.0.2/webase-front:{}/g" {}/docker-compose.yaml'.format(front_version, dockerDir))
     doCmd('sed -i "s/sdkIp/{}/g" {}/docker-compose.yaml'.format(channel_ip, dockerDir))
     doCmd('sed -i "s/sdkChannelPort/{}/g" {}/docker-compose.yaml'.format(channel_port, dockerDir))
