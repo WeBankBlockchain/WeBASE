@@ -468,19 +468,17 @@ def checkExistChainConnect():
 
 def dockerCheckDb():
     print ("==============      checking    mysql           ==============")
-    docker_mode = int(getCommProperties("docker.mode"))
     docker_mysql = int(getCommProperties("docker.mysql"))
     # use docker and also use docker mysql
-    if docker_mode == 1:
-        if docker_mysql == 0:
-            checkMgrDbConnect()
-            checkSignDbConnect()
-            checkMgrDbAuthorized()
-            checkSignDbAuthorized()
-            checkMgrDbVersion()
-            checkSignDbVersion()
-        else: 
-            print ("use mysql in docker, skip check mysql")
+    if docker_mysql == 0:
+        checkMgrDbConnect()
+        checkSignDbConnect()
+        checkMgrDbAuthorized()
+        checkSignDbAuthorized()
+        checkMgrDbVersion()
+        checkSignDbVersion()
+    else: 
+        print ("use [mysql in docker], skip check mysql")
     print ("==============        mysql    available       ==============")
 
 if __name__ == '__main__':
