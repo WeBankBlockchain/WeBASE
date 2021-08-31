@@ -6,6 +6,7 @@ import os
 import time
 from .utils import *
 from .mysql import *
+from .docker as docker
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
@@ -62,6 +63,7 @@ def docker_do():
    print ("==============        starting  deploy        ==============")
     # build chain by -d (docker mode) and start by docker(start_all.sh)
     installNode(True)
+    docker.installDockerAll()
     # set docker-compose.yaml's sign front nodemgr web's config env variable
     # todo chmod +x docker/script/*.sh
     print ("============================================================")
@@ -106,6 +108,20 @@ def visualEnd():
     stopManager()
     stopSign()
     return
+
+def dockerStartAll():
+    startNode()
+    docker.startDockerCompose()
+
+def dockerEndAll():
+    docker.stopDockerCompose()
+    stopNode()
+
+def dockerStart():
+    docker.startDockerCompose()
+
+def dockerEnd():
+    docker.stopDockerCompose()
 
 def installNode(docker_mode=False):
     if_exist_fisco = getCommProperties("if.exist.fisco")

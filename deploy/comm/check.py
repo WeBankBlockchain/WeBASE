@@ -78,6 +78,36 @@ def visual_do():
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
+def docker_do():
+    print ("============================================================"),
+    webaseMsg = '''
+              _    _     ______  ___  _____ _____ 
+             | |  | |    | ___ \/ _ \/  ___|  ___|
+             | |  | | ___| |_/ / /_\ \ `--.| |__  
+             | |/\| |/ _ | ___ |  _  |`--. |  __| 
+             \  /\  |  __| |_/ | | | /\__/ | |___ 
+              \/  \/ \___\____/\_| |_\____/\____/  
+    '''
+    print (webaseMsg)
+    print ("============================================================")
+    print ("==============      checking envrionment      ==============")
+    installRequirements()
+    checkDocker()
+    checkDockerCompose()
+    checkConfigVersion()
+    checkMemAndCpu()
+    checkNodePort()
+    checkWebPort()
+    checkMgrPort()
+    checkSignPort()
+    checkFrontPort()
+    # if not docker mysql, check connect, auth, version
+    dockerCheckDb()
+    checkExitedChainInfo()
+    print ("==============      envrionment available     ==============")
+    print ("============================================================")
+    
+
 def checkPort():
     print ("==============      checking    port          ==============")
     checkWebPort()
@@ -118,6 +148,15 @@ def checkDocker():
 
     print("Try to start Docker...")
     doCmd("sudo systemctl start docker")
+    print ("check finished sucessfully.")
+
+def checkDockerCompose():
+    print ("check docker-compose...")
+    require = "docker-compose"
+    hasInstall = hasInstallServer(require)
+    if not hasInstall:
+        print ("  error! [{}] has not been installed or configured!".format(require))
+        sys.exit(0)
     print ("check finished sucessfully.")
 
 def checkJava():
@@ -426,6 +465,23 @@ def checkExistChainConnect():
         sys.exit(0)
     print ("check connection finished.")
     return
+
+def dockerCheckDb():
+    print ("==============      checking    mysql           ==============")
+    docker_mode = int(getCommProperties("docker.mode"))
+    docker_mysql = int(getCommProperties("docker.mysql"))
+    # use docker and also use docker mysql
+    if docker_mode == 1:
+        if docker_mysql == 0:
+            checkMgrDbConnect()
+            checkSignDbConnect()
+            checkMgrDbAuthorized()
+            checkSignDbAuthorized()
+            checkMgrDbVersion()
+            checkSignDbVersion()
+        else: 
+            print ("use mysql in docker, skip check mysql")
+    print ("==============        mysql    available       ==============")
 
 if __name__ == '__main__':
     pass

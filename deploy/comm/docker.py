@@ -7,9 +7,6 @@ import time
 from .utils import *
 from .mysql import *
 
-baseDir = getBaseDir()
-currentDir = getCurrentBaseDir()
-dockerDir = currentDir + "/docker"
 # update all path with webase-deploy's path
 ### mysql update
 # if mysql ip is not 127.0.0.1 or localhost, then not entrypoint disable
@@ -40,12 +37,44 @@ dockerDir = currentDir + "/docker"
 # set port 5000
 # set nginx conf
 
+
+baseDir = getBaseDir()
+currentDir = getCurrentBaseDir()
+dockerDir = currentDir + "/docker"
+
+# 要求docker无需sudo
+
+def installDockerAll():
+    configDockerAll()
+    # if timeout, use cdn
+    pullDockerImages()
+    startDockerCompose()
+
+def pullDockerImages():
+    # check docker-compose
+    os.chdir(dockerDir)
+    doCmd("docker-compose pull –parallel")
+    
 def startDockerCompose():
     # check docker-compose
     os.chdir(dockerDir)
-    doCmd("docker-compose up")
+    doCmd("docker-compose up -d")
+    # docker-compose down
 
-def configComposeYaml():
+def stopDockerCompose():
+    os.chdir(dockerDir)
+    doCmd("docker-compose down")
+    # restart by [docker-compose stop, docker-compose start, docker-compose restart]
+
+def statusFisco():
+    # check docker-compose
+    doCmd("docker ps | grep fiscobcos")
+
+def statusWebase():
+    # check docker-compose
+    doCmd("docker-compose ps")
+
+def configDockerAll():
     # in deploy.py dir
     os.chdir(currentDir)
     doCmdIgnoreException("chmod u+x ./docker/script/*.sh")
@@ -53,9 +82,18 @@ def configComposeYaml():
     if not os.path.exists(dockerDir + "/docker-compose-temp.yaml"):
         doCmd('cp -f {}/docker-compose.yaml {}/docker-compose-temp.yaml'.format(dockerDir, web_dir))
 
-    # configWebDocker()
+    # config nginx.conf
+    configWeb()
+    # update yaml of each service
+    updateYamlMysql()
+    updateYamlSign()
+    updateYamlFront()
+    updateYamlMgr()
+    updateYamlWeb()
+    
 
 def updateYamlFront():
+    print ("update webase-front configuration in yaml")
     front_dir = currentDir + "/webase-front"
     front_version = getCommProperties("webase.front.version")
     front_port = getCommProperties("front.port")
@@ -75,11 +113,13 @@ def updateYamlFront():
     doCmd('sed -i "s:/webase-deploy/webase-front:{}:g" {}/docker-compose.yaml'.format(front_dir, dockerDir))
     doCmd('sed -i "s:frontNodePath:{}:g" {}/docker-compose.yaml'.format(node_dir, dockerDir))
     doCmd('sed -i "s:/webase-deploy/nodes/127.0.0.1/sdk:{}:g" {}/docker-compose.yaml'.format(sdk_dir, dockerDir))
+    print ("end webase-front configuration in yaml")
 
 
 ###### mysql config ######
 # update mysql/node-mgr/sign configuration
 def updateYamlMysql():
+    print ("update mysql configuration in yaml")
     # set root's password
     docker_mysql = int(getCommProperties("docker.mysql"))
     if docker_mysql == 1:
@@ -129,8 +169,11 @@ def updateYamlMysql():
         doCmd('sed -i "s:signDbPort:{}:g" {}/docker-compose.yaml'.format(sign_mysql_port, dockerDir))
         doCmd('sed -i "s:signDefaultAccount:{}:g" {}/docker-compose.yaml'.format(sign_mysql_user, dockerDir))
         doCmd('sed -i "s:signDefaultPassword:{}:g" {}/docker-compose.yaml'.format(sign_mysql_password, dockerDir))
+   
+    print ("end mysql configuration in yaml")
 
 def updateYamlMgr():
+    print ("update webase-node-mgr configuration in yaml")
     mgr_version = getCommProperties("webase.mgr.version")
     mgr_port = getCommProperties("mgr.port")
     encrypt_type = getCommProperties("encrypt.type")
@@ -139,29 +182,35 @@ def updateYamlMgr():
     doCmd('sed -i "s/webase-node-mgr:v0.0.2/webase-node-mgr:{}/g" {}/docker-compose.yaml'.format(mgr_version, dockerDir))
     doCmd('sed -i "s/5001/{}/g" {}/docker-compose.yaml'.format(mgr_port, dockerDir))
     doCmd('sed -i "s/mgrEncryptType/{}/g" {}/docker-compose.yaml'.format(encrypt_type, dockerDir))
+    print ("end webase-node-mgr configuration in yaml")
 
 
 def updateYamlSign():
+    print ("update webase-sign configuration in yaml")
     sign_version = getCommProperties("webase.sign.version")
     sign_port = getCommProperties("sign.port")
     sign_dir = currentDir + "/webase-sign"
     doCmd('sed -i "s:/webase-deploy/webase-sign:{}:g" {}/docker-compose.yaml'.format(sign_dir, dockerDir))
     doCmd('sed -i "s/webase-sign:v0.0.2/webase-sign:{}/g" {}/docker-compose.yaml'.format(sign_version, dockerDir))
     doCmd('sed -i "s/5004/{}/g" {}/docker-compose.yaml'.format(sign_port, dockerDir))
+    print ("end webase-sign configuration in yaml")
     
 
 
 def updateYamlWeb():
+    print ("update webase-web configuration in yaml")
     web_version = getCommProperties("webase.web.version")
     web_port = getCommProperties("web.port")
     web_dir = currentDir + "/webase-web"
     doCmd('sed -i "s:/webase-deploy/webase-web:{}:g" {}/docker-compose.yaml'.format(web_dir, dockerDir))
     doCmd('sed -i "s/webase-web:v0.0.2/webase-web:{}/g" {}/docker-compose.yaml'.format(web_version, dockerDir))
     doCmd('sed -i "s/5000/{}/g" {}/docker-compose.yaml'.format(web_port, dockerDir))
+    print ("end webase-web configuration in yaml")
     
 
 ###### webase-web config ######
 def configWeb():
+    print ("configure nginx.conf file of webase-web")
     # dir of webase-web
     web_conf_dir = currentDir + "/comm"
     web_dir = currentDir + "/webase-web"
@@ -185,4 +234,5 @@ def configWeb():
     ## todo docker mode not support h5 mobile version of webase-web
     # set mobile phone phone_page_url globally
     doCmd('sed -i "s:phone_page_url:/data/webase-web/dist:g" {}/nginx-docker.conf'.format(web_dir))
+    print ("end nginx configuration")
 
