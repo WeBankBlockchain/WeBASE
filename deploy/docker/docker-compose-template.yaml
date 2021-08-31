@@ -1,7 +1,7 @@
 services:
  
   webase-front:
-    image: webasepro/webase-front:v0.0.2
+    image: webasepro/webase-front:v1.5.3
     container_name: webase-front-5002
     network_mode: "host"
     environment:
@@ -23,7 +23,7 @@ services:
     entrypoint: ["/wait-for-it.sh", "127.0.0.1:20200", "--timeout=5", "--strict", "--",  "bash", "/start.sh"]
   
   webase-node-mgr:
-    image: webasepro/webase-node-mgr:v0.0.2
+    image: webasepro/webase-node-mgr:v1.5.3
     container_name: webase-node-mgr-5001
     network_mode: "host"
     environment:
@@ -48,7 +48,7 @@ services:
 
 
   webase-sign:
-    image: webasepro/webase-sign:v0.0.2
+    image: webasepro/webase-sign:v1.5.3
     container_name: webase-sign-5004
     network_mode: "host"
     environment:
@@ -69,7 +69,7 @@ services:
     entrypoint: ["/wait-for-it.sh", "127.0.0.1:23306", "--timeout=10", "--strict", "--", "bash", "/start.sh"]
 
   webase-web:
-    image: webasepro/webase-web:v0.0.2
+    image: webasepro/webase-web:v1.5.3
     container_name: webase-web-5000
     network_mode: "host"
     volumes:
