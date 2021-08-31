@@ -22,7 +22,7 @@ def installDockerAll():
 def pullDockerImages():
     # check docker-compose
     os.chdir(dockerDir)
-    doCmd("docker-compose pull –parallel")
+    doCmd("docker-compose pull --parallel")
     
 def startDockerCompose():
     # check docker-compose
