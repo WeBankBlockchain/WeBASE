@@ -16,19 +16,20 @@ dockerDir = currentDir + "/docker"
 def installDockerAll():
     configDockerAll()
     # if timeout, use cdn
-    pullDockerImages()
+    # pullDockerImages()
     startDockerCompose()
 
 def pullDockerImages():
-    # check docker-compose
+    print ("start pull docker images of mysql and WeBASE...(1min or more)")
     os.chdir(dockerDir)
-    doCmd("docker-compose pull --parallel")
+    doCmd("docker-compose pull --parallel") # 没有日志输出，无法感知进度条
+    # 通过cdn拉取
+    print ("Successfully pull!")
     
 def startDockerCompose():
     # check docker-compose
     os.chdir(dockerDir)
-    doCmd("docker-compose up -d")
-    # docker-compose down
+    doCmd("docker-compose up -d") # 需要输出日志
 
 def stopDockerCompose():
     os.chdir(dockerDir)
@@ -80,7 +81,6 @@ def updateYamlFront():
         fisco_dir = currentDir + "/nodes/127.0.0.1"
         node_dir = currentDir + "/nodes/127.0.0.1/node0"
     sdk_dir = fisco_dir + "/sdk"
-
 
     doCmd('sed -i "s/5002/{}/g" {}/docker-compose.yaml'.format(front_port, dockerDir))
     doCmd('sed -i "s/webasefront/{}/g" {}/docker-compose.yaml'.format(front_db, dockerDir))

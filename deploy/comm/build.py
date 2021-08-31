@@ -108,18 +108,29 @@ def visualEnd():
     return
 
 def dockerStartAll():
+    print ("start nodes...")
     startNode()
+    print ("start WeBASE by docker-compose...")
     docker.startDockerCompose()
+    print ("Successfully start WeBASE by docker-compose...(30s or more)")
+    print ("Please check by [docker ps]")
 
 def dockerEndAll():
+    print ("stop WeBASE by docker-compose...(30s or more)")
     docker.stopDockerCompose()
+    print ("stop nodes...")
     stopNode()
+    print ("Please check by [docker ps]")
 
 def dockerStart():
+    print ("start WeBASE by docker-compose...(30s or more)")
     docker.startDockerCompose()
+    print ("Please check by [docker ps]")
 
 def dockerEnd():
+    print ("stop WeBASE by docker-compose...(30s or more)")
     docker.stopDockerCompose()
+    print ("Please check by [docker ps]")
 
 def installNode(docker_mode=False):
     if_exist_fisco = getCommProperties("if.exist.fisco")
