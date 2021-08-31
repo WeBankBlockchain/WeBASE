@@ -123,6 +123,7 @@ def updateYamlMysql():
     # set root's password
     docker_mysql = int(getCommProperties("docker.mysql"))
     if docker_mysql == 1:
+        print ("using [mysql in docker] mode")    
         docker_mysql_port = getCommProperties("docker.mysql.port")
         docker_mysql_pwd = getCommProperties("docker.mysql.password")
         mysql_data_dir = currentDir + "/mysql/data"
@@ -141,6 +142,7 @@ def updateYamlMysql():
         doCmd('sed -i "s:signDefaultAccount:root:g" {}/docker-compose.yaml'.format(dockerDir))
         doCmd('sed -i "s:signDefaultPassword:{}:g" {}/docker-compose.yaml'.format(docker_mysql_pwd, dockerDir))
     else:
+        print ("using [mysql in host] mode")    
         ## not use mysql docker, read configured mysql of node-mgr and sign
         # disable mysql docker
         doCmd('sed -i "s:# entrypoint:entrypoint:g" {}/docker-compose.yaml'.format(dockerDir))
