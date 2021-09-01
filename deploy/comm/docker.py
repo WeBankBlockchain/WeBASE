@@ -132,6 +132,8 @@ def updateYamlMysql():
         ### set mgr ip port
         # checkMgrDb
         mgr_mysql_ip = getCommProperties("mysql.ip")
+        if mgr_mysql_ip == 'localhost':
+            mgr_mysql_ip = '127.0.0.1'
         mgr_mysql_port = getCommProperties("mysql.port")
         mgr_mysql_user = getCommProperties("mysql.user")
         mgr_mysql_password = getCommProperties("mysql.password")
@@ -143,6 +145,8 @@ def updateYamlMysql():
         doCmd('sed -i "s:mgrDefaultPassword:{}:g" {}/docker-compose.yaml'.format(mgr_mysql_password, dockerDir))
 
         sign_mysql_ip = getCommProperties("sign.mysql.ip")
+        if mgr_mysql_ip == 'localhost':
+            mgr_mysql_ip = '127.0.0.1'        
         sign_mysql_port = getCommProperties("sign.mysql.port")
         sign_mysql_user = getCommProperties("sign.mysql.user")
         sign_mysql_password = getCommProperties("sign.mysql.password")
