@@ -29,7 +29,10 @@ def pullDockerImages():
 def startDockerCompose():
     # check docker-compose
     os.chdir(dockerDir)
-    doCmd("docker-compose up -d") # 需要输出日志
+    doCmd("docker-compose up -d") 
+    print ("start docker container success!")
+    print ("======= check logs by [docker-compose -f docker/docker-compose.yaml logs -f], press [ctrl c] to stop logging")
+    doCmd("docker-compose logs -f") 
 
 def stopDockerCompose():
     os.chdir(dockerDir)

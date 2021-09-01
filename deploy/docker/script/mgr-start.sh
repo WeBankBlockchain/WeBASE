@@ -22,7 +22,7 @@ while true ; do
     else
         (( ex_count = ${ex_count} + 1 ))
         echo "Waiting mysql to start! ex_count = ${ex_count}."
-        if [ ${ex_count}  > 10 ]; then
+        if [ ${ex_count} -ge 10 ]; then
             echo "Connect to mysql timeout failed!"
             break;
         fi
