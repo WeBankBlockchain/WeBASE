@@ -31,8 +31,7 @@ def startDockerCompose():
     os.chdir(dockerDir)
     doCmd("docker-compose up -d") 
     print ("start docker container success!")
-    print ("======= check logs by [docker-compose -f docker/docker-compose.yaml logs -f], press [ctrl c] to stop logging")
-    doCmd("docker-compose logs -f") 
+    print ("======= check logs by [docker-compose -f docker/docker-compose.yaml logs -f]")
 
 def stopDockerCompose():
     os.chdir(dockerDir)
@@ -145,8 +144,8 @@ def updateYamlMysql():
         doCmd('sed -i "s:mgrDefaultPassword:{}:g" {}/docker-compose.yaml'.format(mgr_mysql_password, dockerDir))
 
         sign_mysql_ip = getCommProperties("sign.mysql.ip")
-        if mgr_mysql_ip == 'localhost':
-            mgr_mysql_ip = '127.0.0.1'        
+        if sign_mysql_ip == 'localhost':
+            sign_mysql_ip = '127.0.0.1'        
         sign_mysql_port = getCommProperties("sign.mysql.port")
         sign_mysql_user = getCommProperties("sign.mysql.user")
         sign_mysql_password = getCommProperties("sign.mysql.password")

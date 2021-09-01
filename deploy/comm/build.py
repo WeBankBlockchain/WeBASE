@@ -112,22 +112,22 @@ def dockerStartAll():
     startNode()
     print ("start WeBASE by docker-compose...")
     docker.startDockerCompose()
-    print ("Successfully start WeBASE by docker-compose...(30s or more)")
+    print ("Successfully start WeBASE by docker-compose...(30 seconds or more)")
     print ("Please check by [docker ps]")
 
 def dockerEndAll():
-    print ("stop WeBASE by docker-compose...(30s or more)")
+    print ("stop WeBASE by docker-compose...(30 seconds or more)")
     docker.stopDockerCompose()
     print ("stop nodes...")
     stopNode()
 
 def dockerStart():
-    print ("start WeBASE by docker-compose...(30s or more)")
+    print ("start WeBASE by docker-compose...(30 seconds or more)")
     docker.startDockerCompose()
     print ("Please check by [docker ps]")
 
 def dockerEnd():
-    print ("stop WeBASE by docker-compose...(30s or more)")
+    print ("stop WeBASE by docker-compose...(30 seconds or more)")
     docker.stopDockerCompose()
 
 def installNode(docker_mode=False):
