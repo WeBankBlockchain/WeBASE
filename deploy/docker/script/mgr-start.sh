@@ -6,44 +6,57 @@
 echo "check database of ${WEBASE_DB_NAME}"
 echo "using u ${WEBASE_DB_UNAME} p ${WEBASE_DB_PWD} -h ${WEBASE_DB_IP} -P ${WEBASE_DB_PORT}"
 
-useCommand="'use ${WEBASE_DB_NAME}'"
+useCommand="use ${WEBASE_DB_NAME}"
 createCommand="create database ${WEBASE_DB_NAME}"
 # echo "run command: [mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -e ${useCommand}]"
 # echo "run command: [mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -e ${createCommand}]"
 
 while true ; do
-        #command
-        sleep 100
-        echo "try to connect to Mysql"
-        echo "select version();" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}
-        if [ $? == 0 ] ; then
-            echo "mysql is on"
+    #command
+    sleep 1
+    echo "check mysql status..."
+    echo "select version();" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}
+    if [ $? == 0 ] ; then
+        echo "mysql is on"
+        break;
+    else
+        (( ex_count = ${ex_count} + 1 ))
+        echo "Waiting mysql to start! ex_count = ${ex_count}."
+        if [ ${ex_count}  > 10 ]; then
+            echo "Connect to mysql timeout failed!"
             break;
-        else
-            (( ex_count = ${ex_count} + 1 ))
-            echo "Waiting mysql to start! ex_count = ${ex_count}."
-            if [ ${ex_count}  > 50 ]; then
-                echo "Connect to mysql failed!"
-                break;
-            fi
         fi
-    done
+    fi
 done
 
-if mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -e ${useCommand}; then
+echo "${useCommand}" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}
+if [ $? == 0 ]; then
+    echo "database of [${WEBASE_DB_UNAME}] already exist, skip init"
+else
     # if return 1(db not exist), create db
     echo "now create database [${WEBASE_DB_NAME}]"
-    if echo "${createCommand}" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}; then
-        echo "create database success!"
+    echo "${createCommand}" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}
+    if [ $? == 0 ]; then
+        echo "======== create database success!"
         echo "now create tables"
         # sed /dist/script/webase.sh
         # sed -i "s:defaultAccount:${WEBASE_DB_UNAME}:g" /dist/script/webase.sh
         # sed -i "s:defaultPassword:${WEBASE_DB_PWD}:g" /dist/script/webase.sh
         # create table
-        if mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -D ${WEBASE_DB_NAME} -e "source /dist/script/webase-ddl.sql"; then
+        mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -D ${WEBASE_DB_NAME} -e "source /dist/script/webase-ddl.sql"
+        if [ $? == 0 ]; then
             echo "now init table data"
             mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -D ${WEBASE_DB_NAME} -e "source /dist/script/webase-dml.sql"
-        fi        
+            if [ $? == 0 ]; then
+                echo "======== init table data success!"
+            else 
+                echo "======= int table data of [webase-dml.sql] failed!"
+            fi
+        else 
+            echo "  ======= create tables of [webase-ddl.sql] failed!"
+        fi
+    else 
+        echo "======= create database of [${WEBASE_DB_NAME}] failed!"
     fi
 fi
 
