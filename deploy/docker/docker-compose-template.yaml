@@ -74,7 +74,7 @@ services:
     network_mode: "host"
     volumes:
       - /webase-deploy/webase-web/nginx-docker.conf:/data/webase-web/nginx/nginx.conf
-      - /webase-deploy/webase-web/log:/usr/share/nginx/log
+      - /webase-deploy/webase-web/log:/dist/log
       - ./script/wait-for-it.sh:/wait-for-it.sh
       - ./script/web-start.sh:/start.sh
     depends_on:

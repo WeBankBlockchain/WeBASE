@@ -20,7 +20,7 @@ services:
       - ./script/front-start.sh:/start.sh
     depends_on:
       - webase-sign
-    entrypoint: ["/wait-for-it.sh", "sdkIp:sdkChannelPort", "--timeout=5", "--strict", "--",  "bash", "/start.sh"]
+    entrypoint: ["/wait-for-it.sh", "sdkIp:sdkChannelPort", "--timeout=10", "--strict", "--",  "bash", "/start.sh"]
   
   webase-node-mgr:
     image: webasepro/webase-node-mgr:v0.0.2
@@ -44,7 +44,7 @@ services:
       - mysql
       - webase-sign
       - webase-front
-    entrypoint: ["/wait-for-it.sh", "mgrDbIp:mgrDbPort", "--timeout=10", "--strict", "--", "bash", "/start.sh"]
+    entrypoint: ["/wait-for-it.sh", "mgrDbIp:mgrDbPort", "--timeout=5", "--strict", "--", "bash", "/start.sh"]
 
 
   webase-sign:
@@ -66,7 +66,7 @@ services:
       - ./script/sign-start.sh:/start.sh
     depends_on:
       - mysql
-    entrypoint: ["/wait-for-it.sh", "signDbIp:signDbPort", "--timeout=10", "--strict", "--", "bash", "/start.sh"]
+    entrypoint: ["/wait-for-it.sh", "signDbIp:signDbPort", "--timeout=5", "--strict", "--", "bash", "/start.sh"]
 
   webase-web:
     image: webasepro/webase-web:v0.0.2
@@ -74,7 +74,7 @@ services:
     network_mode: "host"
     volumes:
       - /webase-deploy/webase-web/nginx-docker.conf:/data/webase-web/nginx/nginx.conf
-      - /webase-deploy/webase-web/log:/usr/share/nginx/log
+      - /webase-deploy/webase-web/log:/dist/log
       - ./script/wait-for-it.sh:/wait-for-it.sh
       - ./script/web-start.sh:/start.sh
     depends_on:
