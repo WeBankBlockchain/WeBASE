@@ -15,8 +15,9 @@ dockerDir = currentDir + "/docker"
 
 def installDockerAll():
     configDockerAll()
-    # if timeout, use cdn
+    ## if timeout, use cdn
     # pullDockerImages()
+    checkDbExist()
     startDockerCompose()
 
 def pullDockerImages():
@@ -71,38 +72,20 @@ def checkDbExist():
     # if docker mysql
     # check mysql file, then docker-compose up mysql
     # use pymysql to drop db
-    
-
-def updateYamlFront():
-    print ("update webase-front configuration in yaml")
-    front_dir = currentDir + "/webase-front"
-    front_version = getCommProperties("webase.front.version")
-    front_port = getCommProperties("front.port")
-    channel_ip = getCommProperties("node.listenIp")
-    channel_port = getCommProperties("node.channelPort")
-    front_db = getCommProperties("front.h2.name")
-    sign_port = getCommProperties("sign.port")
-
-    # config node path and sdk path
-    if_exist_fisco = getCommProperties("if.exist.fisco")
-    fisco_dir = getCommProperties("fisco.dir")
-    node_relative_dir = getCommProperties("node.dir")
-    node_dir = fisco_dir + "/" + node_relative_dir
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
-        node_dir = currentDir + "/nodes/127.0.0.1/node0"
-    sdk_dir = fisco_dir + "/sdk"
-
-    doCmd('sed -i "s/5002/{}/g" {}/docker-compose.yaml'.format(front_port, dockerDir))
-    doCmd('sed -i "s/webasefront/{}/g" {}/docker-compose.yaml'.format(front_db, dockerDir))
-    doCmd('sed -i "s/webase-front:v0.0.2/webase-front:{}/g" {}/docker-compose.yaml'.format(front_version, dockerDir))
-    doCmd('sed -i "s/sdkIp/{}/g" {}/docker-compose.yaml'.format(channel_ip, dockerDir))
-    doCmd('sed -i "s/sdkChannelPort/{}/g" {}/docker-compose.yaml'.format(channel_port, dockerDir))
-    doCmd('sed -i "s/signIpPort/127.0.0.1:{}/g" {}/docker-compose.yaml'.format(sign_port, dockerDir))
-    doCmd('sed -i "s:/webase-deploy/webase-front:{}:g" {}/docker-compose.yaml'.format(front_dir, dockerDir))
-    doCmd('sed -i "s:frontNodePath:{}:g" {}/docker-compose.yaml'.format(node_dir, dockerDir))
-    doCmd('sed -i "s:/webase-deploy/nodes/127.0.0.1/sdk:{}:g" {}/docker-compose.yaml'.format(sdk_dir, dockerDir))
-    print ("end webase-front configuration in yaml")
+    docker_mysql = int(getCommProperties("docker.mysql"))
+    if docker_mysql == 1:
+        # start
+        print ("check database if exist in [docker mysql]...")
+        doCmd("docker-compose -f docker/docker-compose.yaml up mysql -d")
+        # sleep until mysql is on
+        dropDockerDb("webasesign")
+        dropDockerDb("webasenodemgr")
+        # end
+        doCmd("docker-compose -f docker/docker-compose.yaml stop mysql") 
+    else:
+        print ("check database if exist in mysql...")
+        dropSignDb()
+        dropMgrDb()
 
 
 ###### mysql config ######
@@ -166,6 +149,39 @@ def updateYamlMysql():
         doCmd('sed -i "s:signDefaultPassword:{}:g" {}/docker-compose.yaml'.format(sign_mysql_password, dockerDir))
    
     print ("end mysql configuration in yaml")
+
+
+def updateYamlFront():
+    print ("update webase-front configuration in yaml")
+    front_dir = currentDir + "/webase-front"
+    front_version = getCommProperties("webase.front.version")
+    front_port = getCommProperties("front.port")
+    channel_ip = getCommProperties("node.listenIp")
+    channel_port = getCommProperties("node.channelPort")
+    front_db = getCommProperties("front.h2.name")
+    sign_port = getCommProperties("sign.port")
+
+    # config node path and sdk path
+    if_exist_fisco = getCommProperties("if.exist.fisco")
+    fisco_dir = getCommProperties("fisco.dir")
+    node_relative_dir = getCommProperties("node.dir")
+    node_dir = fisco_dir + "/" + node_relative_dir
+    if if_exist_fisco == "no":
+        fisco_dir = currentDir + "/nodes/127.0.0.1"
+        node_dir = currentDir + "/nodes/127.0.0.1/node0"
+    sdk_dir = fisco_dir + "/sdk"
+
+    doCmd('sed -i "s/5002/{}/g" {}/docker-compose.yaml'.format(front_port, dockerDir))
+    doCmd('sed -i "s/webasefront/{}/g" {}/docker-compose.yaml'.format(front_db, dockerDir))
+    doCmd('sed -i "s/webase-front:v0.0.2/webase-front:{}/g" {}/docker-compose.yaml'.format(front_version, dockerDir))
+    doCmd('sed -i "s/sdkIp/{}/g" {}/docker-compose.yaml'.format(channel_ip, dockerDir))
+    doCmd('sed -i "s/sdkChannelPort/{}/g" {}/docker-compose.yaml'.format(channel_port, dockerDir))
+    doCmd('sed -i "s/signIpPort/127.0.0.1:{}/g" {}/docker-compose.yaml'.format(sign_port, dockerDir))
+    doCmd('sed -i "s:/webase-deploy/webase-front:{}:g" {}/docker-compose.yaml'.format(front_dir, dockerDir))
+    doCmd('sed -i "s:frontNodePath:{}:g" {}/docker-compose.yaml'.format(node_dir, dockerDir))
+    doCmd('sed -i "s:/webase-deploy/nodes/127.0.0.1/sdk:{}:g" {}/docker-compose.yaml'.format(sdk_dir, dockerDir))
+    print ("end webase-front configuration in yaml")
+
 
 def updateYamlMgr():
     print ("update webase-node-mgr configuration in yaml")
@@ -231,3 +247,108 @@ def configWeb():
     doCmd('sed -i "s:phone_page_url:/data/webase-web/dist:g" {}/nginx-docker.conf'.format(web_dir))
     print ("end nginx configuration")
 
+
+## check mysql in docker exsit and drop
+def dropDockerDb(db2reset="webasesign"):
+    # get properties
+    mysql_ip = "127.0.0.1"
+    mysql_user = "root"
+    mysql_port = int(getCommProperties("docker.mysql.port"))
+    mysql_password_raw = getCommProperties("docker.mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)  
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, charset='utf8')
+        conn.autocommit(1)
+        cursor = conn.cursor()
+        
+        # check db
+        result = cursor.execute('show databases like "%s"' %db2reset)
+        drop_db = 'DROP DATABASE IF EXISTS {}'.format(db2reset)
+        if result == 1:
+            info = "n"
+            if sys.version_info.major == 2:
+                info = raw_input("database of {} already exists. Do you want drop and recreate it?[y/n]:".format(db2reset))
+            else:
+                info = input("database of {} already exists. Do you want drop and recreate it?[y/n]:".format(db2reset))
+            if info == "y" or info == "Y":
+                log.info(drop_db)
+                cursor.execute(drop_db)
+        cursor.close()
+        conn.close()
+    except:
+        import traceback
+        log.info(" mysql except {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+    
+
+def dropMgrDb():
+    # get properties
+    mysql_ip = getCommProperties("mysql.ip")
+    mysql_port = int(getCommProperties("mysql.port"))
+    mysql_user = getCommProperties("mysql.user")
+    mysql_password_raw = getCommProperties("mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)      
+    mysql_database = getCommProperties("mysql.database")
+
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, charset='utf8')
+        conn.autocommit(1)
+        cursor = conn.cursor()
+        
+        # check db
+        result = cursor.execute('show databases like "%s"' %mysql_database)
+        drop_db = 'DROP DATABASE IF EXISTS {}'.format(mysql_database)
+        if result == 1:
+            info = "n"
+            if sys.version_info.major == 2:
+                info = raw_input("WeBASE-Node-Manager database {} already exists. Do you want drop and re-initialize it?[y/n]:".format(mysql_database))
+            else:
+                info = input("WeBASE-Node-Manager database {} already exists. Do you want drop and re-initialize it?[y/n]:".format(mysql_database))
+            if info == "y" or info == "Y":
+                log.info(drop_db)
+                cursor.execute(drop_db)
+        cursor.close()
+        conn.close()
+    except:
+        import traceback
+        log.info(" mysql except {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+
+def dropSignDb():
+    # get properties
+    mysql_ip = getCommProperties("sign.mysql.ip")
+    mysql_port = int(getCommProperties("sign.mysql.port"))
+    mysql_user = getCommProperties("sign.mysql.user")
+    mysql_password_raw = getCommProperties("sign.mysql.password")
+    mysql_password = parse.unquote_plus(mysql_password_raw)  
+    mysql_database = getCommProperties("sign.mysql.database")
+    try:
+        # connect
+        conn = mdb.connect(host=mysql_ip, port=mysql_port, user=mysql_user, passwd=mysql_password, charset='utf8')
+        conn.autocommit(1)
+        cursor = conn.cursor()
+        
+        # check db
+        result = cursor.execute('show databases like "%s"' %mysql_database)
+        drop_db = 'DROP DATABASE IF EXISTS {}'.format(mysql_database)
+        if result == 1:
+            info = "n"
+            if sys.version_info.major == 2:
+                info = raw_input("WeBASE-Sign database {} already exists. Do you want drop and recreate it?[y/n]:".format(mysql_database))
+            else:
+                info = input("WeBASE-Sign database {} already exists. Do you want drop and recreate it?[y/n]:".format(mysql_database))
+            if info == "y" or info == "Y":
+                log.info(drop_db)
+                cursor.execute(drop_db)
+        cursor.close()
+        conn.close()
+    except:
+        import traceback
+        log.info(" mysql except {}".format(traceback.format_exc()))
+        traceback.print_exc()
+        sys.exit(0)
+    
