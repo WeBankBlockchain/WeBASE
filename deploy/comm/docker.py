@@ -75,25 +75,29 @@ def checkDbExist():
     # use pymysql to drop db
     docker_mysql = int(getCommProperties("docker.mysql"))
     if docker_mysql == 1:
-        # start
+        # check mysql files
         print ("check database if exist in [docker mysql]")
-        doCmd("docker-compose -f docker/docker-compose.yaml up mysql -d")
-        print ("checking...")
-        timeTemp = 0
-        while timeTemp < serverWaitTime :
-            print(".", end='')
-            sys.stdout.flush()
-            time.sleep(1)
-            timeTemp = timeTemp + 1
-        # sleep until mysql is on
-        dropDockerDb("webasesign")
-        dropDockerDb("webasenodemgr")
-        # end
-        doCmd("docker-compose -f docker/docker-compose.yaml stop mysql") 
+        if os.path.exists("{}/mysql/data/{}".format(currentDir(),"webasesign")) or os.path.exists("{}/mysql/data/{}".format(currentDir(),"webasenodemgr")):
+            # start
+            doCmd("docker-compose -f docker/docker-compose.yaml up mysql -d")
+            print ("checking...")
+            timeTemp = 0
+            while timeTemp < serverWaitTime :
+                print(".", end='')
+                sys.stdout.flush()
+                time.sleep(1)
+                timeTemp = timeTemp + 1
+            # sleep until mysql is on
+            dropDockerDb("webasesign")
+            dropDockerDb("webasenodemgr")
+            # end
+            print ("ending check [docker mysql]...")
+            doCmd("docker-compose -f docker/docker-compose.yaml stop mysql") 
     else:
         print ("check database if exist in mysql...")
-        dropSignDb()
-        dropMgrDb()
+        checkAndDropSignDb()
+        checkAndDropMgrDb()
+    print ("end check mysql databases")
 
 
 ###### mysql config ######
@@ -291,7 +295,7 @@ def dropDockerDb(db2reset="webasesign"):
         sys.exit(0)
     
 
-def dropMgrDb():
+def checkAndDropMgrDb():
     # get properties
     mysql_ip = getCommProperties("mysql.ip")
     mysql_port = int(getCommProperties("mysql.port"))
@@ -326,7 +330,7 @@ def dropMgrDb():
         traceback.print_exc()
         sys.exit(0)
 
-def dropSignDb():
+def checkAndDropSignDb():
     # get properties
     mysql_ip = getCommProperties("sign.mysql.ip")
     mysql_port = int(getCommProperties("sign.mysql.port"))
