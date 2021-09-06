@@ -10,6 +10,7 @@ from .mysql import *
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
 dockerDir = currentDir + "/docker"
+serverWaitTime = 5
 
 # 要求docker无需sudo
 
@@ -75,8 +76,15 @@ def checkDbExist():
     docker_mysql = int(getCommProperties("docker.mysql"))
     if docker_mysql == 1:
         # start
-        print ("check database if exist in [docker mysql]...")
+        print ("check database if exist in [docker mysql]")
         doCmd("docker-compose -f docker/docker-compose.yaml up mysql -d")
+        print ("checking...")
+        timeTemp = 0
+        while timeTemp < serverWaitTime :
+            print(".", end='')
+            sys.stdout.flush()
+            time.sleep(1)
+            timeTemp = timeTemp + 1
         # sleep until mysql is on
         dropDockerDb("webasesign")
         dropDockerDb("webasenodemgr")
