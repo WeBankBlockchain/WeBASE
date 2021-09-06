@@ -51,8 +51,11 @@ def configDockerAll():
     os.chdir(currentDir)
     doCmdIgnoreException("chmod u+x ./docker/script/*.sh")
     doCmdIgnoreException("dos2unix ./docker/script/*.sh")
+    # init default template yaml
     if not os.path.exists(dockerDir + "/docker-compose-temp.yaml"):
         doCmd('cp -f {}/docker-compose.yaml {}/docker-compose-temp.yaml'.format(dockerDir, dockerDir))
+    else:
+        doCmd('cp -f {}/docker-compose-temp.yaml {}/docker-compose.yaml'.format(dockerDir, dockerDir))
 
     # config nginx.conf
     configWeb()
@@ -62,6 +65,12 @@ def configDockerAll():
     updateYamlFront()
     updateYamlMgr()
     updateYamlWeb()
+    
+# run after config yaml
+def checkDbExist():
+    # if docker mysql
+    # check mysql file, then docker-compose up mysql
+    # use pymysql to drop db
     
 
 def updateYamlFront():
