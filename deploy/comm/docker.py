@@ -22,9 +22,16 @@ def installDockerAll():
     startDockerCompose()
 
 def pullDockerImages():
-    print ("start pull docker images of mysql and WeBASE...(1min or more)")
-    os.chdir(dockerDir)
-    doCmd("docker-compose pull --parallel") # 没有日志输出，无法感知进度条
+    print ("start pull docker images of mysql and WeBASE...")
+    # check timeout
+    doCmd("docker pull mysql:5.6")
+    front_version = getCommProperties("webase.front.version")
+    mgr_version = getCommProperties("webase.mgr.version")
+    sign_version = getCommProperties("webase.sign.version")
+    web_version = getCommProperties("webase.web.version")
+    node_version = getCommProperties("fisco.version")
+    doCmd("docker pull webasepro/webase-front:{}".format(front_version))
+
     # 通过cdn拉取
     print ("Successfully pull!")
     
@@ -39,6 +46,16 @@ def pullDockerImages():
 # else
 #     curl -#LO \${download_link}
 # fi
+
+def pullImageTimeout(image_name):
+    print ("start pull image of {}".format(image_name))
+    # timeout
+    result = doCmdTimeout("docker pull {}".format(image_name), 30)
+    if result["status"] == 0 and result["output"] == "timeout":
+        # curl from cdn
+        # docker load -i 
+
+    
 
 def startDockerCompose():
     # check docker-compose
