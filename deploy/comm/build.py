@@ -78,6 +78,7 @@ def docker_do():
     print ("==============    webase-sign version  {}       ========".format(sign_version))
     print ("==============    webase-front version  {}      ========".format(front_version))
     print ("============================================================")
+    print ("======= check logs by [docker-compose -f docker/docker-compose.yaml logs -f]")
     return
 
 def start():

@@ -28,12 +28,23 @@ def pullDockerImages():
     # 通过cdn拉取
     print ("Successfully pull!")
     
+# download_link=https://github.com/FISCO-BCOS/console/releases/download/v\${version}/\${package_name}
+# cos_download_link=${cdn_link_header}/console/releases/v\${version}/\${package_name}
+# echo "Downloading console \${version} from \${download_link}"
+# if [ \$(curl -IL -o /dev/null -s -w %{http_code}  \${cos_download_link}) == 200 ];then
+#     curl -#LO \${download_link} --speed-time 30 --speed-limit 102400 -m 450 || {
+#         echo -e "\033[32m Download speed is too low, try \${cos_download_link} \033[0m"
+#         curl -#LO \${cos_download_link}
+#     }
+# else
+#     curl -#LO \${download_link}
+# fi
+
 def startDockerCompose():
     # check docker-compose
     os.chdir(dockerDir)
     doCmd("docker-compose up -d") 
     print ("start docker container success!")
-    print ("======= check logs by [docker-compose -f docker/docker-compose.yaml logs -f]")
 
 def stopDockerCompose():
     os.chdir(dockerDir)
@@ -77,9 +88,9 @@ def checkDbExist():
     if docker_mysql == 1:
         # check mysql files
         print ("check database if exist in [docker mysql]")
-        if os.path.exists("{}/mysql/data/{}".format(currentDir(),"webasesign")) or os.path.exists("{}/mysql/data/{}".format(currentDir(),"webasenodemgr")):
+        if os.path.exists("{}/mysql/data/webasesign".format(currentDir)) or os.path.exists("{}/mysql/data/webasenodemanager".format(currentDir)):
             # start
-            doCmd("docker-compose -f docker/docker-compose.yaml up mysql -d")
+            doCmd("docker-compose -f docker/docker-compose.yaml up -d mysql")
             print ("checking...")
             timeTemp = 0
             while timeTemp < serverWaitTime :
@@ -89,7 +100,7 @@ def checkDbExist():
                 timeTemp = timeTemp + 1
             # sleep until mysql is on
             dropDockerDb("webasesign")
-            dropDockerDb("webasenodemgr")
+            dropDockerDb("webasenodemanager")
             # end
             print ("ending check [docker mysql]...")
             doCmd("docker-compose -f docker/docker-compose.yaml stop mysql") 
@@ -130,7 +141,6 @@ def updateYamlMysql():
         ## not use mysql docker, read configured mysql of node-mgr and sign
         # disable mysql docker
         doCmd('sed -i "s:# entrypoint:entrypoint:g" {}/docker-compose.yaml'.format(dockerDir))
-        # print("!!Important!! you should type in mysql's configuration in ./docker/docker-compose.yaml of webase-node-mgr and webase-sign")
     
         ### set mgr ip port
         # checkMgrDb
@@ -261,7 +271,8 @@ def configWeb():
 
 
 ## check mysql in docker exsit and drop
-def dropDockerDb(db2reset="webasesign"):
+def dropDockerDb(db2reset):
+    log.info("dropDockerDb {}".format(db2reset))
     # get properties
     mysql_ip = "127.0.0.1"
     mysql_user = "root"
@@ -280,9 +291,9 @@ def dropDockerDb(db2reset="webasesign"):
         if result == 1:
             info = "n"
             if sys.version_info.major == 2:
-                info = raw_input("database of {} already exists. Do you want drop and recreate it?[y/n]:".format(db2reset))
+                info = raw_input("database of [{}] already exists. Do you want drop and recreate it?[y/n]:".format(db2reset))
             else:
-                info = input("database of {} already exists. Do you want drop and recreate it?[y/n]:".format(db2reset))
+                info = input("database of [{}] already exists. Do you want drop and recreate it?[y/n]:".format(db2reset))
             if info == "y" or info == "Y":
                 log.info(drop_db)
                 cursor.execute(drop_db)
