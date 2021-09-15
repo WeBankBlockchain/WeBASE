@@ -50,12 +50,10 @@ def pullDockerImages():
 def pullImageTimeout(image_name):
     print ("start pull image of {}".format(image_name))
     # timeout
-    result = doCmdTimeout("docker pull {}".format(image_name), 30)
-    if result["status"] == 0 and result["output"] == "timeout":
+    # result = doCmdTimeout("docker pull {}".format(image_name), 30)
+    # if result["status"] == 0 and result["output"] == "timeout":
         # curl from cdn
-        # docker load -i 
-
-    
+        # docker load -i \
 
 def startDockerCompose():
     # check docker-compose
