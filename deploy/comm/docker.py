@@ -54,8 +54,9 @@ def pullDockerComposeImages():
         raise Exception("input [timeout] number of {} not validate, must be digit number!".format(info))
     print ("start pull docker images of fiscobcos, mysql and WeBASE...")
     # pull fisco bcos node
+    # version ex: 2.8.0, required add v as v2.8.0
     node_version = getCommProperties("fisco.version")
-    fisco_repo = "fiscoorg/fiscobcos:" + node_version 
+    fisco_repo = "fiscoorg/fiscobcos:v" + node_version 
     if not checkDockerImageExist(fisco_repo):
         print("now pull docker image of {}".format(fisco_repo))
         result = doCmdTimeout("docker pull {}".format(fisco_repo), timeout)
