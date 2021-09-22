@@ -249,7 +249,7 @@ def checkDockerImageExist(repo_name):
     result = doCmd("docker image ls {} | wc -l".format(repo_name))
     log.info("local image result {} ".format(result))
     if int(result["output"]) <= 1 :
-        print ("Local docker image {} not exist!".format(fileName))
+        print ("Local docker image {} not exist!".format(repo_name))
         return False
     else:
         return True
