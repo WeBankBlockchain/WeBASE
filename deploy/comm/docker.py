@@ -63,7 +63,7 @@ def pullDockerComposeImages():
         # if code is not zero, throw exception
         # if code is zero, success or timeout
         if result["status"] == 0 and result["output"] == "timeout":
-            print("[ERROR] pull image of {} timeout, please manually pull".format(fisco_repo))
+            print("[ERROR] pull image of [{}] timeout, please manually pull".format(fisco_repo))
         else:
             print("pull docker image of {} success".format(fisco_repo))
             
@@ -75,7 +75,7 @@ def pullDockerComposeImages():
         # if code is not zero, throw exception
         # if code is zero, success or timeout
         if result["status"] == 0 and result["output"] == "timeout":
-            print("[ERROR] pull image of {} timeout, please manually pull".format(mysql_repo_name))
+            print("[ERROR] pull image of [{}] timeout, please manually pull".format(mysql_repo_name))
         else:
             print("pull docker image of {} success".format(mysql_repo_name))
    
@@ -101,7 +101,7 @@ def pullSingleImage(image_name,image_ver,timeout):
         # if code is not zero, throw exception
         # if code is zero, success or timeout
         if result["status"] == 0 and result["output"] == "timeout":
-            print("[ERROR] pull image of {} timeout, please manually pull".format(repo_with_ver))
+            print("[ERROR] pull image of [{}] timeout, please manually pull".format(repo_with_ver))
         else:
             print("pull docker image of {} success".format(repo_with_ver))
 
