@@ -12,48 +12,12 @@ currentDir = getCurrentBaseDir()
 dockerDir = currentDir + "/docker"
 serverWaitTime = 5
 
-# 要求docker无需sudo
 
 def installDockerAll():
     configDockerAll()
-    ## if timeout, use cdn
-    # pullDockerImages()
     checkDbExist()
     startDockerCompose()
 
-def pullDockerImages():
-    print ("start pull docker images of mysql and WeBASE...")
-    # check timeout
-    doCmd("docker pull mysql:5.6")
-    front_version = getCommProperties("webase.front.version")
-    mgr_version = getCommProperties("webase.mgr.version")
-    sign_version = getCommProperties("webase.sign.version")
-    web_version = getCommProperties("webase.web.version")
-    node_version = getCommProperties("fisco.version")
-    doCmd("docker pull webasepro/webase-front:{}".format(front_version))
-
-    # 通过cdn拉取
-    print ("Successfully pull!")
-    
-# download_link=https://github.com/FISCO-BCOS/console/releases/download/v\${version}/\${package_name}
-# cos_download_link=${cdn_link_header}/console/releases/v\${version}/\${package_name}
-# echo "Downloading console \${version} from \${download_link}"
-# if [ \$(curl -IL -o /dev/null -s -w %{http_code}  \${cos_download_link}) == 200 ];then
-#     curl -#LO \${download_link} --speed-time 30 --speed-limit 102400 -m 450 || {
-#         echo -e "\033[32m Download speed is too low, try \${cos_download_link} \033[0m"
-#         curl -#LO \${cos_download_link}
-#     }
-# else
-#     curl -#LO \${download_link}
-# fi
-
-def pullImageTimeout(image_name):
-    print ("start pull image of {}".format(image_name))
-    # timeout
-    # result = doCmdTimeout("docker pull {}".format(image_name), 30)
-    # if result["status"] == 0 and result["output"] == "timeout":
-        # curl from cdn
-        # docker load -i \
 
 def startDockerCompose():
     # check docker-compose
@@ -73,6 +37,73 @@ def statusFisco():
 def statusWebase():
     # check docker-compose
     doCmd("docker-compose ps")
+
+
+def pullDockerComposeImages():
+    print("use [vi /etc/docker/daemon.json] to alter your docker image repository source")
+    # check docker deamon.json
+    timeout=30
+    info = "30"      
+    if sys.version_info.major == 2:
+        info =  raw_input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180] seconds ")
+    else:
+        info = input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180] seconds")
+    if info.isdigit():
+        timeout=int(info)
+    else: 
+        raise Exception("input [timeout] number of {} not validate, must be digit number!".format(info))
+    print ("start pull docker images of fiscobcos, mysql and WeBASE...")
+    # pull fisco bcos node
+    node_version = getCommProperties("fisco.version")
+    fisco_repo = "fiscoorg/fiscobcos:" + node_version 
+    if not checkDockerImageExist(fisco_repo):
+        print("now pull docker image of {}".format(fisco_repo))
+        result = doCmdTimeout("docker pull {}".format(fisco_repo), timeout)
+        # if code is not zero, throw exception
+        # if code is zero, success or timeout
+        if result["status"] == 0 and result["output"] == "timeout":
+            print("[ERROR] pull image of {} timeout, please manually pull".format(fisco_repo))
+        else:
+            print("pull docker image of {} success".format(fisco_repo))
+            
+    # pull mysql
+    mysql_repo_name = "mysql:5.6"
+    if not checkDockerImageExist(mysql_repo_name):
+        print("now pull docker image of {}".format(mysql_repo_name))
+        result = doCmdTimeout("docker pull {}".format(mysql_repo_name), timeout)
+        # if code is not zero, throw exception
+        # if code is zero, success or timeout
+        if result["status"] == 0 and result["output"] == "timeout":
+            print("[ERROR] pull image of {} timeout, please manually pull".format(mysql_repo_name))
+        else:
+            print("pull docker image of {} success".format(mysql_repo_name))
+   
+    front_version = getCommProperties("webase.front.version")
+    mgr_version = getCommProperties("webase.mgr.version")
+    sign_version = getCommProperties("webase.sign.version")
+    web_version = getCommProperties("webase.web.version")
+    
+    pullSingleImage("webase-front", front_version, timeout)
+    pullSingleImage("webase-node-mgr", mgr_version, timeout)
+    pullSingleImage("webase-sign", sign_version, timeout)
+    pullSingleImage("webase-web", web_version, timeout)
+    print ("Successfully pull!")
+
+# image_name: webase-front
+# image_ver: v1.5.3
+def pullSingleImage(image_name,image_ver,timeout):
+    # ex: webasepro/webase-front:v1.5.3
+    repo_with_ver = "webasepro/" + image_name + ":" + image_ver
+    if not checkDockerImageExist(repo_with_ver):
+        print("now pull docker image of {}".format(repo_with_ver))
+        result = doCmdTimeout("docker pull {}".format(repo_with_ver), timeout)
+        # if code is not zero, throw exception
+        # if code is zero, success or timeout
+        if result["status"] == 0 and result["output"] == "timeout":
+            print("[ERROR] pull image of {} timeout, please manually pull".format(repo_with_ver))
+        else:
+            print("pull docker image of {} success".format(repo_with_ver))
+
 
 def configDockerAll():
     # in deploy.py dir
