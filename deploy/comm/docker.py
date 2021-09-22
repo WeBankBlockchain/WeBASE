@@ -45,9 +45,9 @@ def pullDockerComposeImages():
     timeout=30
     info = "30"      
     if sys.version_info.major == 2:
-        info =  raw_input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180] seconds ")
+        info =  raw_input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180]: ")
     else:
-        info = input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180] seconds")
+        info = input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180]: ")
     if info.isdigit():
         timeout=int(info)
     else: 
