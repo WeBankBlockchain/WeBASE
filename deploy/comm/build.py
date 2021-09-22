@@ -131,6 +131,10 @@ def dockerEnd():
     print ("stop WeBASE by docker-compose...(30 seconds or more)")
     docker.stopDockerCompose()
 
+def dockerPull():
+    print ("start pull docker compose images...")
+    docker.pullDockerComposeImages()
+
 def installNode(docker_mode=False):
     if_exist_fisco = getCommProperties("if.exist.fisco")
     node_p2pPort = int(getCommProperties("node.p2pPort"))
@@ -707,9 +711,6 @@ def installDockerImage():
         image_version = getCommProperties("fisco.webase.docker.cdn.version")
         gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
         pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
-
-        #gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
-        #pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase")
     else: 
         print ("============ Skip download docker image from CDN... =============")
     return

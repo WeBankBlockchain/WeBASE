@@ -222,6 +222,7 @@ def do_telnet(host,port):
 def pullDockerImage(gitComm,fileName,repo_name):
     if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
         print (gitComm)
+        # get tar file from this gitComm command
         os.system(gitComm)
     else:
         info = "n"
@@ -232,6 +233,7 @@ def pullDockerImage(gitComm,fileName,repo_name):
         if info == "y" or info == "Y":
             doCmd("rm -rf {}".format(fileName))
             print (gitComm)
+            # get tar file from this gitComm command
             os.system(gitComm)
 
     doCmd("docker load -i {}".format(fileName))
@@ -241,6 +243,16 @@ def pullDockerImage(gitComm,fileName,repo_name):
     if int(result["output"]) <= 1 :
         print ("Unzip docker image from file {} failed!".format(fileName))
         sys.exit(0)
+
+# repo_name ex: fiscoorg/fiscobcos, webasepro/webase-front:v1.5.3
+def checkDockerImageExist(repo_name):
+    result = doCmd("docker image ls {} | wc -l".format(repo_name))
+    log.info("local image result {} ".format(result))
+    if int(result["output"]) <= 1 :
+        print ("Local docker image {} not exist!".format(fileName))
+        return False
+    else:
+        return True
 
 def pullSourceExtract(gitComm,fileName):
     if not os.path.exists("{}/{}.zip".format(getCurrentBaseDir(),fileName)):

@@ -45,6 +45,8 @@ def do():
         commBuild.dockerStartAll()
     elif "stopDockerAll" == param:
         commBuild.dockerEndAll()
+    elif "pullDockerAll" == param:
+        commBuild.dockerPull()
     elif "startDocker" == param:
         commCheck.checkPort()
         commBuild.dockerStart()
@@ -103,6 +105,7 @@ Parameter:
     installDockerAll    check dependency, deploy FISCO-BCOS nodes and all service, start by docker
     startDockerAll      check docker container, start FISCO-BCOS nodes and all service by docker
     stopDockerAll       stop FISCO-BCOS nodes and all service in docker
+    pullDockerAll       pull FISCO-BCOS, WeBASE and mysql images from dockerhub
     startDocker         check docker container, start all webase service by docker
     stopDocker          stop all webase service in docker
 
