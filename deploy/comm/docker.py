@@ -42,12 +42,12 @@ def statusWebase():
 def pullDockerComposeImages():
     print("use [vi /etc/docker/daemon.json] to alter your docker image repository source")
     # check docker deamon.json
-    timeout=30
-    info = "30"      
+    timeout=60
+    info = "60"      
     if sys.version_info.major == 2:
-        info =  raw_input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180]: ")
+        info =  raw_input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/120]: ")
     else:
-        info = input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/180]: ")
+        info = input("Exec [docker pull] command to get images, please type in timeout seconds, example: [30/60/120]: ")
     if info.isdigit():
         timeout=int(info)
     else: 
@@ -68,17 +68,21 @@ def pullDockerComposeImages():
             print("pull docker image of {} success".format(fisco_repo))
             
     # pull mysql
-    mysql_repo_name = "mysql:5.6"
-    if not checkDockerImageExist(mysql_repo_name):
-        print("now pull docker image of {}".format(mysql_repo_name))
-        result = doCmdTimeout("docker pull {}".format(mysql_repo_name), timeout)
-        # if code is not zero, throw exception
-        # if code is zero, success or timeout
-        if result["status"] == 0 and result["output"] == "timeout":
-            print("[ERROR] pull image of [{}] timeout, please manually pull".format(mysql_repo_name))
-        else:
-            print("pull docker image of {} success".format(mysql_repo_name))
-   
+    docker_mysql = int(getCommProperties("docker.mysql"))
+    if docker_mysql == 1:
+        mysql_repo_name = "mysql:5.6"    
+        if not checkDockerImageExist(mysql_repo_name):
+            print("now pull docker image of {}".format(mysql_repo_name))
+            result = doCmdTimeout("docker pull {}".format(mysql_repo_name), timeout)
+            # if code is not zero, throw exception
+            # if code is zero, success or timeout
+            if result["status"] == 0 and result["output"] == "timeout":
+                print("[ERROR] pull image of [{}] timeout, please manually pull".format(mysql_repo_name))
+            else:
+                print("pull docker image of {} success".format(mysql_repo_name))
+    else:
+        print("not using docker mysql, skip pull mysql:5.6")
+
     front_version = getCommProperties("webase.front.version")
     mgr_version = getCommProperties("webase.mgr.version")
     sign_version = getCommProperties("webase.sign.version")
