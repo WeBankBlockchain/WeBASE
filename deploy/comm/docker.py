@@ -251,7 +251,7 @@ def updateYamlFront():
     doCmd('sed -i "s/sdkChannelPort/{}/g" {}/docker-compose.yaml'.format(channel_port, dockerDir))
     doCmd('sed -i "s/signIpPort/127.0.0.1:{}/g" {}/docker-compose.yaml'.format(sign_port, dockerDir))
     doCmd('sed -i "s:/webase-deploy/webase-front:{}:g" {}/docker-compose.yaml'.format(front_dir, dockerDir))
-    doCmd('sed -i "s:frontNodePath:{}:g" {}/docker-compose.yaml'.format(node_dir, dockerDir))
+    # doCmd('sed -i "s:frontNodePath:{}:g" {}/docker-compose.yaml'.format(node_dir, dockerDir))
     doCmd('sed -i "s:/webase-deploy/nodes/127.0.0.1/sdk:{}:g" {}/docker-compose.yaml'.format(sdk_dir, dockerDir))
     print ("end webase-front configuration in yaml")
 
