@@ -63,7 +63,7 @@ def mgrDbInit():
         # check db
         result = cursor.execute('show databases like "%s"' %mysql_database)
         drop_db = 'DROP DATABASE IF EXISTS {}'.format(mysql_database)
-        create_db = 'CREATE DATABASE IF NOT EXISTS {}'.format(mysql_database)
+        create_db = 'CREATE DATABASE IF NOT EXISTS {} default character set utf8'.format(mysql_database)
         if result == 1:
             info = "n"
             if sys.version_info.major == 2:
@@ -107,7 +107,7 @@ def signDbInit():
         # check db
         result = cursor.execute('show databases like "%s"' %mysql_database)
         drop_db = 'DROP DATABASE IF EXISTS {}'.format(mysql_database)
-        create_db = 'CREATE DATABASE IF NOT EXISTS {}'.format(mysql_database)
+        create_db = 'CREATE DATABASE IF NOT EXISTS {} default character set utf8'.format(mysql_database)
         if result == 1:
             info = "n"
             if sys.version_info.major == 2:

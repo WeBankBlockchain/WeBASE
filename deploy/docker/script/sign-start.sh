@@ -6,7 +6,7 @@
 echo "check database of ${WEBASE_DB_NAME}"
 echo "using u ${WEBASE_DB_UNAME} p ${WEBASE_DB_PWD} -h ${WEBASE_DB_IP} -P ${WEBASE_DB_PORT}"
 useCommand="use ${WEBASE_DB_NAME}"
-createCommand="create database ${WEBASE_DB_NAME};"
+createCommand="create database ${WEBASE_DB_NAME} default character set utf8;"
 # echo "run command: [mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -e ${useCommand}]"
 # echo "run command: [mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} -e ${createCommand}]"
 
@@ -15,7 +15,7 @@ while true ; do
     #command
     sleep 1
     echo "check mysql status..."
-    echo "select version();" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}
+    echo "select version();" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} 
     if [ $? == 0 ] ; then
         echo "======== mysql is on"
         break;
@@ -29,13 +29,13 @@ while true ; do
     fi
 done
 
-echo "${useCommand}" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}
+echo "${useCommand}" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} 
 if [ $? == 0 ]; then
     echo "database of [${WEBASE_DB_UNAME}] already exist, skip init"
 else
     # if return 1(db not exist), create db
     echo "now create database [${WEBASE_DB_NAME}]"
-    echo "${createCommand}" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT}
+    echo "${createCommand}" | mysql -u${WEBASE_DB_UNAME} -p${WEBASE_DB_PWD} -h${WEBASE_DB_IP} -P${WEBASE_DB_PORT} --default-character-set=utf8
     if [ $? == 0 ]; then
         echo "========create database success!"
     else
