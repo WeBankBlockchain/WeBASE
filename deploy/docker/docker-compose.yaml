@@ -10,7 +10,6 @@ services:
       SDK_IP: sdkIp
       SDK_CHANNEL_PORT: sdkChannelPort
       KEY_SERVER: signIpPort
-      NODE_PATH: frontNodePath
     volumes:
       - /webase-deploy/nodes/127.0.0.1/sdk:/dist/sdk 
       # - /webase-deploy/webase-front/application-docker.yml:/dist/conf/application-docker.yml
