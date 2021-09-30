@@ -6,6 +6,7 @@ import os
 import time
 from .utils import *
 from .mysql import *
+import comm.docker as docker
 
 baseDir = getBaseDir()
 currentDir = getCurrentBaseDir()
@@ -57,6 +58,28 @@ def visual_do():
     print ("============================================================")
     return
 
+# docker-compose do
+def docker_do():
+    print ("==============        starting  deploy        ==============")
+    # build chain by -d (docker mode) and start by docker(start_all.sh)
+    installNode(True)
+    docker.installDockerAll()
+    print ("============================================================")
+    print ("==============      deploy  has completed     ==============")
+    print ("============================================================")
+    os.chdir(currentDir)
+    web_version = getCommProperties("webase.web.version")
+    mgr_version = getCommProperties("webase.mgr.version")
+    sign_version = getCommProperties("webase.sign.version")
+    front_version = getCommProperties("webase.front.version")
+
+    print ("==============    webase-web version  {}        ========".format(web_version))
+    print ("==============    webase-node-mgr version  {}   ========".format(mgr_version))
+    print ("==============    webase-sign version  {}       ========".format(sign_version))
+    print ("==============    webase-front version  {}      ========".format(front_version))
+    print ("============================================================")
+    print ("======= check logs by [docker-compose -f docker/docker-compose.yaml logs -f]")
+    return
 
 def start():
     startNode()
@@ -85,7 +108,34 @@ def visualEnd():
     stopSign()
     return
 
-def installNode():
+def dockerStartAll():
+    print ("start nodes...")
+    startNode()
+    print ("start WeBASE by docker-compose...")
+    docker.startDockerCompose()
+    print ("Successfully start WeBASE by docker-compose...(30 seconds or more)")
+    print ("Please check by [docker ps]")
+
+def dockerEndAll():
+    print ("stop WeBASE by docker-compose...(30 seconds or more)")
+    docker.stopDockerCompose()
+    print ("stop nodes...")
+    stopNode()
+
+def dockerStart():
+    print ("start WeBASE by docker-compose...(30 seconds or more)")
+    docker.startDockerCompose()
+    print ("Please check by [docker ps]")
+
+def dockerEnd():
+    print ("stop WeBASE by docker-compose...(30 seconds or more)")
+    docker.stopDockerCompose()
+
+def dockerPull():
+    print ("start pull docker compose images...")
+    docker.pullDockerComposeImages()
+
+def installNode(docker_mode=False):
     if_exist_fisco = getCommProperties("if.exist.fisco")
     node_p2pPort = int(getCommProperties("node.p2pPort"))
     node_channelPort = int(getCommProperties("node.channelPort"))
@@ -94,6 +144,8 @@ def installNode():
     node_counts = getCommProperties("node.counts")
     encrypt_type = int(getCommProperties("encrypt.type"))
     encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
+    docker_on = 1 if docker_mode is True else 0
+
 
     if if_exist_fisco == "no":
         print ("============================================================")
@@ -133,12 +185,21 @@ def installNode():
             if encrypt_type == 1:
                 # guomi ssl
                 if encrypt_ssl_type == 1:
-                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                    if docker_on == 1:
+                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                    else: 
+                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
                 # standard ssl
                 else:
-                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                    if docker_on == 1:
+                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                    else:
+                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
             else:
-                os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                if docker_on == 1:
+                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                else:
+                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
         else:
             info = "n"
             if sys.version_info.major == 2:
@@ -152,12 +213,21 @@ def installNode():
                 if encrypt_type == 1:
                     # guomi ssl
                     if encrypt_ssl_type == 1:
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                        if docker_on == 1:
+                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                        
+                        else:
+                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
                     # standard ssl
                     else:
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                        if docker_on == 1:
+                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                            
+                        else:
+                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
                 else:
-                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                    if docker_on == 1:
+                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                    
+                    else:
+                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
     startNode()
 
 def startNode():
@@ -641,9 +711,6 @@ def installDockerImage():
         image_version = getCommProperties("fisco.webase.docker.cdn.version")
         gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
         pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
-
-        #gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase-gm.tar".format(image_version)
-        #pullDockerImage(gitComm,"docker-fisco-webase-gm.tar","fiscoorg/fisco-webase")
     else: 
         print ("============ Skip download docker image from CDN... =============")
     return

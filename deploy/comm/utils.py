@@ -26,6 +26,9 @@ import shutil
 import json
 from urllib import request
 from distutils.dir_util import copy_tree
+# support timeout
+import signal
+import subprocess
 
 log = deployLog.getLocalLogger()
 platformStr = platform.platform()
@@ -120,6 +123,45 @@ def doCmdIgnoreException(cmd):
     log.info(" execute cmd  end ,cmd : {},status :{} , output: {}".format(cmd, status, output))
     return result
 
+
+def doCmdTimeout(cmd_string, timeout=20):
+    log.info(" execute cmd  start, cmd: {}, timeout: {}".format(cmd_string, timeout))
+    p = subprocess.Popen(cmd_string, stderr=subprocess.STDOUT, stdout=subprocess.PIPE, shell=True, close_fds=True, start_new_session=True)
+    format = 'utf-8'
+    try:
+        (msg, errs) = p.communicate(timeout=timeout)
+        ret_code = p.poll()
+        if ret_code:
+            status = 1
+            output = "[Error]Called Error ： " + str(msg.decode(format))
+        else:
+            status = 0
+            output = str(msg.decode(format))
+    except subprocess.TimeoutExpired:
+        # 注意：不能只使用p.kill和p.terminate，无法杀干净所有的子进程，需要使用os.killpg
+        p.kill()
+        p.terminate()
+        os.killpg(p.pid, signal.SIGTERM)
+        # 注意：如果开启下面这两行的话，会等到执行完成才报超时错误，但是可以输出执行结果
+        # (outs, errs) = p.communicate()
+        # print(outs.decode('utf-8'))
+        status = 0
+        log.info("[ERROR]Timeout Error : Command '" + cmd_string + "' timed out after " + str(timeout) + " seconds")
+        output = "timeout"
+    except Exception as e:
+        status = 1
+        output = "[ERROR]Unknown Error : " + str(e)
+    
+    result = dict()
+    result["status"] = status
+    result["output"] = output
+    log.info(" execute cmd  end ,cmd : {},status :{} , output: {}".format(cmd_string, status, output))
+    if (0 != status):
+        raise Exception("execute cmd  error ,cmd : {}, status is {} ,output is {}".format(cmd_string, status, output))
+    return result
+
+ 
+
 def getCommProperties(paramsKey):
     current_dir = getCurrentBaseDir()
     cf = ConfigParser.ConfigParser()
@@ -180,6 +222,7 @@ def do_telnet(host,port):
 def pullDockerImage(gitComm,fileName,repo_name):
     if not os.path.exists("{}/{}".format(getCurrentBaseDir(),fileName)):
         print (gitComm)
+        # get tar file from this gitComm command
         os.system(gitComm)
     else:
         info = "n"
@@ -190,6 +233,7 @@ def pullDockerImage(gitComm,fileName,repo_name):
         if info == "y" or info == "Y":
             doCmd("rm -rf {}".format(fileName))
             print (gitComm)
+            # get tar file from this gitComm command
             os.system(gitComm)
 
     doCmd("docker load -i {}".format(fileName))
@@ -199,6 +243,16 @@ def pullDockerImage(gitComm,fileName,repo_name):
     if int(result["output"]) <= 1 :
         print ("Unzip docker image from file {} failed!".format(fileName))
         sys.exit(0)
+
+# repo_name ex: fiscoorg/fiscobcos, webasepro/webase-front:v1.5.3
+def checkDockerImageExist(repo_name):
+    result = doCmd("docker image ls {} | wc -l".format(repo_name))
+    log.info("local image result {} ".format(result))
+    if int(result["output"]) <= 1 :
+        print ("Local docker image {} not exist!".format(repo_name))
+        return False
+    else:
+        return True
 
 def pullSourceExtract(gitComm,fileName):
     if not os.path.exists("{}/{}.zip".format(getCurrentBaseDir(),fileName)):

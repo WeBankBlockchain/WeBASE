@@ -1,0 +1,95 @@
+services:
+ 
+  webase-front:
+    image: webasepro/webase-front:v0.0.2
+    container_name: webase-front-5002
+    network_mode: "host"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 5002
+      SDK_IP: sdkIp
+      SDK_CHANNEL_PORT: sdkChannelPort
+      KEY_SERVER: signIpPort
+    volumes:
+      - /webase-deploy/nodes/127.0.0.1/sdk:/dist/sdk 
+      # - /webase-deploy/webase-front/application-docker.yml:/dist/conf/application-docker.yml
+      - /webase-deploy/webase-front/log:/dist/log
+      - /webase-deploy/webase-front/h2:/h2
+      - ./script/wait-for-it.sh:/wait-for-it.sh # chmod +x wait-for-it.sh
+      - ./script/front-start.sh:/start.sh
+    depends_on:
+      - webase-sign
+    entrypoint: ["/wait-for-it.sh", "sdkIp:sdkChannelPort", "--timeout=10", "--strict", "--",  "bash", "/start.sh"]
+  
+  webase-node-mgr:
+    image: webasepro/webase-node-mgr:v0.0.2
+    container_name: webase-node-mgr-5001
+    network_mode: "host"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 5001
+      WEBASE_DB_IP: mgrDbIp
+      WEBASE_DB_PORT: mgrDbPort
+      WEBASE_DB_NAME: webasenodemanager
+      WEBASE_DB_UNAME: mgrDefaultAccount
+      WEBASE_DB_PWD: mgrDefaultPassword
+      ENCRYPT_TYPE: mgrEncryptType
+    volumes:
+      # - /webase-deploy/webase-node-mgr/application-docker.yml:/dist/conf/application-docker.yml
+      - /webase-deploy/webase-node-mgr/log:/dist/log
+      - ./script/wait-for-it.sh:/wait-for-it.sh
+      - ./script/mgr-start.sh:/start.sh
+    depends_on:
+      - mysql
+      - webase-sign
+      - webase-front
+    entrypoint: ["/wait-for-it.sh", "mgrDbIp:mgrDbPort", "--timeout=5", "--strict", "--", "bash", "/start.sh"]
+
+
+  webase-sign:
+    image: webasepro/webase-sign:v0.0.2
+    container_name: webase-sign-5004
+    network_mode: "host"
+    environment:
+      SPRING_PROFILES_ACTIVE: docker
+      SERVER_PORT: 5004
+      WEBASE_DB_IP: signDbIp
+      WEBASE_DB_PORT: signDbPort
+      WEBASE_DB_NAME: webasesign
+      WEBASE_DB_UNAME: signDefaultAccount
+      WEBASE_DB_PWD: signDefaultPassword      
+    volumes:
+      # - /webase-deploy/webase-sign/application-docker.yml:/dist/conf/application-docker.yml
+      - /webase-deploy/webase-sign/log:/dist/log
+      - ./script/wait-for-it.sh:/wait-for-it.sh    
+      - ./script/sign-start.sh:/start.sh
+    depends_on:
+      - mysql
+    entrypoint: ["/wait-for-it.sh", "signDbIp:signDbPort", "--timeout=5", "--strict", "--", "bash", "/start.sh"]
+
+  webase-web:
+    image: webasepro/webase-web:v0.0.2
+    container_name: webase-web-5000
+    network_mode: "host"
+    volumes:
+      - /webase-deploy/webase-web/nginx-docker.conf:/data/webase-web/nginx/nginx.conf
+      - /webase-deploy/webase-web/log:/dist/log
+      - ./script/wait-for-it.sh:/wait-for-it.sh
+      - ./script/web-start.sh:/start.sh
+    depends_on:
+      - webase-node-mgr
+    entrypoint: ["/wait-for-it.sh", "127.0.0.1:5001", "--timeout=30", "--", "bash", "/start.sh"]
+
+  mysql:
+    image: mysql:5.6
+    environment:
+      MYSQL_ROOT_PASSWORD: 123456
+    ports:
+      - "23306:3306"
+    container_name: mysql-webase-23306
+    volumes:
+    - /webase-deploy/mysql/data:/var/lib/mysql
+    # entrypoint: ["echo", "Service [mysql] disabled"]
+
+
+
