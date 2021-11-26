@@ -14,6 +14,7 @@ checkDependent = ["git","openssl","curl","wget","dos2unix"]
 # memery(B) and cpu(core counts logical)
 # mem=psutil.virtual_memory()
 # cpuCore=psutil.cpu_count()
+deploy_ip = "127.0.0.1"
 
 def do():
     print ("============================================================"),
@@ -44,7 +45,7 @@ def do():
     checkSignDbAuthorized()
     checkMgrDbVersion()
     checkSignDbVersion()
-    checkExitedChainInfo()
+    # checkExitedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -189,7 +190,6 @@ def checkExistedNodePort():
     listen_ip = getCommProperties("node.listenIp")
     node_rpcPort = int(getCommProperties("node.rpcPort"))
     node_p2pPort = int(getCommProperties("node.p2pPort"))
-    node_channelPort = int(getCommProperties("node.channelPort"))
     res_rpcPort = net_if_used_no_msg(listen_ip,node_rpcPort)
     if not res_rpcPort:
         print ("  error! rpc port {} is not alive. please check.".format(node_rpcPort))
@@ -197,10 +197,6 @@ def checkExistedNodePort():
     res_p2pPort = net_if_used_no_msg(listen_ip,node_p2pPort)
     if not res_p2pPort:
         print ("  error! p2p port {} is not alive. please check.".format(node_p2pPort))
-        sys.exit(0)
-    res_channelPort = net_if_used_no_msg(listen_ip,node_channelPort)
-    if not res_channelPort:
-        print ("  error! channel port {} is not alive. please check.".format(node_channelPort))
         sys.exit(0)
     return
     
@@ -212,7 +208,6 @@ def checkNewNodePort():
         node_counts = int(nodes)
     node_rpcPort = int(getCommProperties("node.rpcPort"))
     node_p2pPort = int(getCommProperties("node.p2pPort"))
-    node_channelPort = int(getCommProperties("node.channelPort"))
     for i in range(node_counts):
         res_rpcPort = net_if_used(listen_ip,node_rpcPort+i)
         if res_rpcPort:
@@ -220,14 +215,10 @@ def checkNewNodePort():
         res_p2pPort = net_if_used(listen_ip,node_p2pPort+i)
         if res_p2pPort:
             sys.exit(0)
-        res_channelPort = net_if_used(listen_ip,node_channelPort+i)
-        if res_channelPort:
-            sys.exit(0)
     return
     
 def checkWebPort():
     print ("check WeBASE-Web port...")
-    deploy_ip = "127.0.0.1"
     web_port = getCommProperties("web.port")
     res_web = net_if_used(deploy_ip,web_port)
     if res_web:
@@ -237,7 +228,6 @@ def checkWebPort():
     
 def checkMgrPort():
     print ("check WeBASE-Node-Manager port...")
-    deploy_ip = "127.0.0.1"
     mgr_port = getCommProperties("mgr.port")
     res_mgr = net_if_used(deploy_ip,mgr_port)
     if res_mgr:
@@ -247,7 +237,6 @@ def checkMgrPort():
     
 def checkFrontPort():
     print ("check WeBASE-Front port...")
-    deploy_ip = "127.0.0.1"
     front_port = getCommProperties("front.port")
 
     if front_port is None:
@@ -262,7 +251,6 @@ def checkFrontPort():
 
 def checkSignPort():
     print ("check WeBASE-Sign port...")
-    deploy_ip = "127.0.0.1"
     sign_port = getCommProperties("sign.port")
     res_sign = net_if_used(deploy_ip,sign_port)
     if res_sign:
@@ -357,11 +345,11 @@ def checkVersionUtil(fisco_ver_str,webase_front_ver_str):
     webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
     log.info("checkVersionUtil int webase: {} and fisco version: {}".format(webase_front_version_int, fisco_version_int))
     flag=False
-    # require if webase <= 1.3.2, fisco < 2.5.0
-    if ( webase_front_version_int <= 132 and fisco_version_int >= 250 ):
+    # require if webase < 2.0.0, fisco < 3.0.0
+    if ( webase_front_version_int < 200 and fisco_version_int >= 300 ):
         flag=True
-    # require if webase >= 1.3.1(dynamic group), fisco >= 2.4.1
-    if ( webase_front_version_int >= 131 and fisco_version_int < 241 ):
+    # require if webase >= 2.0.0, fisco >= 3.0.0
+    if ( webase_front_version_int >= 200 and fisco_version_int < 300 ):
         flag=True
 
     # if version conflicts, exit
