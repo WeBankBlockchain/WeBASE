@@ -176,7 +176,7 @@ def checkJava():
 def checkNodePort():
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco == "yes":
-        # checkExistedNodePort()
+        checkExistedNodePort()
         return
     elif if_exist_fisco == "no":
         print ("check FISCO-BCOS node port...")
