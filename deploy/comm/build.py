@@ -22,7 +22,7 @@ def do():
     installFront()
     installManager()
     installWeb()
-    # initFrontForMgr()
+    initFrontForMgr()
     print ("============================================================")
     print ("==============      deploy  has completed     ==============")
     print ("============================================================")
@@ -83,7 +83,9 @@ def docker_do():
     return
 
 def start():
-    startNode()
+    if_exist_fisco = getCommProperties("if.exist.fisco")
+    if if_exist_fisco == "no":
+        startNode()
     startSign()
     startFront()
     startManager()
@@ -91,11 +93,13 @@ def start():
     return
 
 def end():
+    if_exist_fisco = getCommProperties("if.exist.fisco")
     stopWeb()
     stopManager()
     stopFront()
     stopSign()
-    stopNode()
+    if if_exist_fisco == "no":
+        stopNode()
     return
 
 def visualStart():
@@ -232,9 +236,11 @@ def startNode():
         print ("======= FISCO-BCOS is not deploy. return! =======")
         return
 
-    fisco_dir = getCommProperties("fisco.dir")
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
+    if if_exist_fisco == "yes":
+        print ("[WARN]Use existing chain does not support start or stop.")
+        return
+        
+    fisco_dir = currentDir + "/nodes/127.0.0.1"
 
     if not os.path.exists(fisco_dir + "/start_all.sh"):
         print ("======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir))
@@ -253,10 +259,11 @@ def stopNode():
         print ("=======   FISCO-BCOS is not deploy. return! =======")
         return
 
-    fisco_dir = getCommProperties("fisco.dir")
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
+    if if_exist_fisco == "yes":
+        print ("[WARN]Use existing chain does not support start or stop.")
+        return
 
+    fisco_dir = currentDir + "/nodes/127.0.0.1"
     if not os.path.exists(fisco_dir + "/stop_all.sh"):
         print ("======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir))
         sys.exit(0)
@@ -521,14 +528,6 @@ def changeFrontConfig():
     frontDb = getCommProperties("front.h2.name")
     encrypt_type = int(getCommProperties("encrypt.type"))
 
-    if_exist_fisco = getCommProperties("if.exist.fisco")
-    fisco_dir = getCommProperties("fisco.dir")
-    node_dir = getCommProperties("node.dir")
-    final_node_dir = fisco_dir + "/" + node_dir
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
-        final_node_dir = currentDir + "/nodes/127.0.0.1/node0"
-
     # init file
     server_dir = currentDir + "/webase-front/conf"
     if not os.path.exists(server_dir + "/temp.yml"):
@@ -544,8 +543,6 @@ def changeFrontConfig():
         doCmd('sed -i "s%useSmSsl: false%useSmSsl: true%g" {}/application.yml'.format(server_dir))
     doCmd('sed -i "s/keyServer: 127.0.0.1:5004/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, sign_port, server_dir))
     doCmd('sed -i "s%/webasefront%/{}%g" {}/application.yml'.format(frontDb, server_dir))
-    # doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
-    doCmd('sed -i "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(final_node_dir, server_dir))
 
     return
 
@@ -576,18 +573,16 @@ def installFront():
 
     # copy node crt
     if_exist_fisco = getCommProperties("if.exist.fisco")
-    fisco_dir = getCommProperties("fisco.dir")
-    # encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
+    sdk_dir = getCommProperties("sdk.dir")
 
     if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
-    sdk_dir = fisco_dir + "/sdk"
+        sdk_dir = currentDir + "/nodes/127.0.0.1/sdk"
     if not os.path.exists(sdk_dir):
         print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
         sys.exit(0)
     os.chdir(server_dir)
-    # copy the whole sdk(sdk.key and gm dir) to conf/
-    copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # copy the sdk files to conf/
+    copyFiles(sdk_dir, server_dir + "/conf")
 
     startFront()
     return

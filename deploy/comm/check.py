@@ -138,6 +138,15 @@ def checkNginx():
     hasInstall = hasInstallServer(require)
     if not hasInstall:
         installByYum(require)
+    res = doCmd("which nginx")
+    if res["status"] == 0:
+        res2 = doCmd("sudo " + res["output"] + " -t ")
+        if res2["status"] != 0:
+            print ("  error! checking the path of nginx configuration fail!")
+            sys.exit(0)
+    else:
+        print ("  error! nginx has not been configured!")
+        sys.exit(0)
     print ("check finished sucessfully.")
 
 def checkDocker():
@@ -176,7 +185,7 @@ def checkJava():
 def checkNodePort():
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco == "yes":
-        # checkExistedNodePort()
+        checkExistedNodePort()
         return
     elif if_exist_fisco == "no":
         print ("check FISCO-BCOS node port...")
