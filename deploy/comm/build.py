@@ -142,17 +142,19 @@ def dockerPull():
 
 def installNode(docker_mode=False):
     if_exist_fisco = getCommProperties("if.exist.fisco")
-    node_p2pPort = int(getCommProperties("node.p2pPort"))
-    node_rpcPort = int(getCommProperties("node.rpcPort"))
-    fisco_version = getCommProperties("fisco.version")
-    node_counts = getCommProperties("node.counts")
-    encrypt_type = int(getCommProperties("encrypt.type"))
-    docker_on = 1 if docker_mode is True else 0
-
 
     if if_exist_fisco == "no":
         print ("============================================================")
         print ("==============      Installing FISCO-BCOS     ==============")
+        
+        nodeListenIp = getCommProperties("node.listenIp")
+        node_p2pPort = int(getCommProperties("node.p2pPort"))
+        node_rpcPort = int(getCommProperties("node.rpcPort"))
+        fisco_version = getCommProperties("fisco.version")
+        node_counts = getCommProperties("node.counts")
+        encrypt_type = int(getCommProperties("encrypt.type"))
+        docker_on = 1 if docker_mode is True else 0
+        
         # init configure file
         # if not os.path.exists(currentDir + "/nodetemp"):
         #     doCmd('cp -f nodeconf nodetemp')
@@ -192,9 +194,9 @@ def installNode(docker_mode=False):
         if not os.path.exists("{}/nodes".format(currentDir)):
             # guomi 
             if encrypt_type == 1:
-                os.system("bash build_chain.sh -p {},{} -l 127.0.0.1:{} -e ./fisco-bcos -s".format(node_p2pPort, node_rpcPort, node_nums))
+                os.system("bash build_chain.sh -p {},{} -l {}:{} -e ./fisco-bcos -s".format(node_p2pPort, node_rpcPort, nodeListenIp, node_nums))
             else:
-                os.system("bash build_chain.sh -p {},{} -l 127.0.0.1:{} -e ./fisco-bcos".format(node_p2pPort, node_rpcPort, node_nums))
+                os.system("bash build_chain.sh -p {},{} -l {}:{} -e ./fisco-bcos".format(node_p2pPort, node_rpcPort, nodeListenIp, node_nums))
         else:
             info = "n"
             if sys.version_info.major == 2:
@@ -227,7 +229,7 @@ def installNode(docker_mode=False):
                 #         os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                    
                 #     else:
                 #         os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-    startNode()
+        startNode()
 
 def startNode():
     print ("==============      Starting FISCO-BCOS       ==============")
@@ -525,8 +527,10 @@ def changeFrontConfig():
     frontPort = getCommProperties("front.port")
     nodeListenIp = getCommProperties("node.listenIp")
     nodeRpcPort = int(getCommProperties("node.rpcPort"))
+    nodeRpcPeers = getCommProperties("node.rpcPeers")
     frontDb = getCommProperties("front.h2.name")
     encrypt_type = int(getCommProperties("encrypt.type"))
+    if_exist_fisco = getCommProperties("if.exist.fisco")
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
@@ -537,8 +541,11 @@ def changeFrontConfig():
 
     # change server config
     doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
-    doCmd('sed -i "s/127.0.0.1:20200/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort, server_dir))
-    doCmd('sed -i "s/127.0.0.1:20201/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort+1, server_dir))
+    if if_exist_fisco == "no":
+        doCmd('sed -i "s/127.0.0.1:20200/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort, server_dir))
+        doCmd('sed -i "s/127.0.0.1:20201/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort+1, server_dir))
+    else:
+        doCmd('sed -i "s%\[\'127.0.0.1:20200\',\'127.0.0.1:20201\'\]%{}%" {}/application.yml'.format(nodeRpcPeers, server_dir))
     if encrypt_type == 1:
         doCmd('sed -i "s%useSmSsl: false%useSmSsl: true%g" {}/application.yml'.format(server_dir))
     doCmd('sed -i "s/keyServer: 127.0.0.1:5004/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, sign_port, server_dir))

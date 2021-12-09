@@ -45,7 +45,7 @@ def do():
     checkSignDbAuthorized()
     checkMgrDbVersion()
     checkSignDbVersion()
-    # checkExitedChainInfo()
+    # checkExistedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -104,7 +104,7 @@ def docker_do():
     checkFrontPort()
     # if not docker mysql, check connect, auth, version
     dockerCheckDb()
-    checkExitedChainInfo()
+    checkExistedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
     
@@ -183,30 +183,28 @@ def checkJava():
     return
 
 def checkNodePort():
+    print ("check FISCO-BCOS node port...")
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco == "yes":
         checkExistedNodePort()
-        return
     elif if_exist_fisco == "no":
-        print ("check FISCO-BCOS node port...")
         checkNewNodePort()
-        print ("check finished sucessfully.")
     else:
         print ("  error! param if.exist.fisco must be yes or no, current is {}. please check.".format(if_exist_fisco))
         sys.exit(0)
+    print ("check finished sucessfully.")
+    return
 
 def checkExistedNodePort():
-    listen_ip = getCommProperties("node.listenIp")
-    node_rpcPort = int(getCommProperties("node.rpcPort"))
-    node_p2pPort = int(getCommProperties("node.p2pPort"))
-    res_rpcPort = net_if_used_no_msg(listen_ip,node_rpcPort)
-    if not res_rpcPort:
-        print ("  error! rpc port {} is not alive. please check.".format(node_rpcPort))
-        sys.exit(0)
-    res_p2pPort = net_if_used_no_msg(listen_ip,node_p2pPort)
-    if not res_p2pPort:
-        print ("  error! p2p port {} is not alive. please check.".format(node_p2pPort))
-        sys.exit(0)
+    nodeRpcPeers = getCommProperties("node.rpcPeers")
+    peersArray = nodeRpcPeers.split(',')
+    for i in peersArray:
+        listen_ip = i.split('\'')[1].split(':')[0]
+        node_rpcPort = int(i.split('\'')[1].split(':')[1])
+        res_rpcPort = net_if_used_no_msg(listen_ip,node_rpcPort)
+        if not res_rpcPort:
+            print ("  error! ip:{} rpc port:{} is not alive. please check.".format(listen_ip, node_rpcPort))
+            sys.exit(0)
     return
     
 def checkNewNodePort():
@@ -408,10 +406,10 @@ def checkMemAndCpu():
         print ('check finished sucessfully.')
         return
 
-def checkExitedChainInfo():
+def checkExistedChainInfo():
     existChain = getCommProperties("if.exist.fisco")
     if (existChain == 'yes'):
-        print ("check exited chain info...")
+        print ("check existing chain info...")
         
         listenIp = getCommProperties("node.listenIp")
         rpcPort = getCommProperties("node.rpcPort")
@@ -427,9 +425,9 @@ def checkExitedChainInfo():
         # check encrypt type
         checkEncryptType(fiscoVersion)
         # check version
-        checkExitedChainVersion(fiscoVersion)
+        checkExistedChainVersion(fiscoVersion)
         
-        print ('check exited chain info sucessfully.')
+        print ('check existing chain info sucessfully.')
     else:
         return
 
@@ -446,7 +444,7 @@ def checkEncryptType(fiscoVersion):
         return
     print ('check encrypt type finished.')
 
-def checkExitedChainVersion(fisco_ver_str):
+def checkExistedChainVersion(fisco_ver_str):
     print ("check version...")
     webase_front_ver_str = getCommProperties("webase.front.version")
     checkVersionUtil(fisco_ver_str,webase_front_ver_str)
