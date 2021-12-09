@@ -45,7 +45,7 @@ contract HelloWorld{
 请参考[交易接口](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE-Front/interface.html#id235)
 
 从IDE中的输出信息，拷贝合约地址，合约名，方法名等信息，同时获取用户的公钥信息，调用交易接口。
-具体代码请参考 [HelloWorld范例](https://github.com/WeBankFinTech/WeBASE/tree/master/quick-start)
+具体代码请参考 [HelloWorld范例](https://github.com/WeBankBlockchain/WeBASE/tree/master/quick-start)
 
 ### 4.2 接口调用的主要代码：
 * application.yml
