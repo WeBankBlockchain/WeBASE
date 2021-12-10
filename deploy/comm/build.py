@@ -157,9 +157,12 @@ def installNode(docker_mode=False):
         node_nums = 2
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
+        if not fisco_version.startswith('v'):
+            fisco_version = 'v'+fisco_version
+        log.info("fisco_version: " + fisco_version)
 
-        gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
-        # gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        # gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if os.path.exists("{}/build_chain.sh".format(currentDir)):
             info = "n"      
             if sys.version_info.major == 2:
@@ -184,9 +187,8 @@ def installNode(docker_mode=False):
         if not os.path.exists("{}/nodes".format(currentDir)):
             # guomi 
             if encrypt_type == 1:
-                os.system(buildComm + " -s")
-            else:
-                os.system(buildComm)
+                buildComm = buildComm + " -s"
+            os.system(buildComm)
         else:
             info = "n"
             if sys.version_info.major == 2:
@@ -196,11 +198,11 @@ def installNode(docker_mode=False):
             if info == "y" or info == "Y":
                 doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
                 doCmd("rm -rf nodes")
+                doCmd("rm -rf sm_*")
                 # guomi 
                 if encrypt_type == 1:
-                    os.system(buildComm + " -s")
-                else:
-                    os.system(buildComm)
+                    buildComm = buildComm + " -s"
+                os.system(buildComm)
         log.info(buildComm)
         startNode()
 
