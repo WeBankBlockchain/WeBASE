@@ -11,7 +11,7 @@
 
 **WBC-WeBASE**屏蔽了区块链底层的复杂度，降低开发者的门槛，大幅提高区块链应用的开发效率，包含**节点前置**、**节点管理**、**Web管理平台**、**签名服务**等子系统。
 
-**WBC-WeBASE**将区块链应用开发标准化，搭建完FISCO BCOS节点后，只需按照五步标准流程进行区块链应用开发，开发流程请参阅 [使用WBC-WeBASE开发区块链应用](https://github.com/WeBankBlockchain/WeBASE-Doc/blob/master/docs/WeBASE/quick-start.md)
+**WBC-WeBASE**将区块链应用开发标准化，搭建完FISCO BCOS节点后，只需按照五步标准流程进行区块链应用开发，开发流程请参阅 [使用WBC-WeBASE开发区块链应用](https://github.com/WeBankBlockchain/WeBASE-Doc/blob/lab/docs/WeBASE/quick-start.md)
 
 **WBC-WeBASE一键部署**(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Sign + WeBASE-Web)可以参考[WBC-WeBASE一键部署文档](https://webasedoc.readthedocs.io/zh_CN/lab/docs/WeBASE/install.html)，**WBC-WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WBC-WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/lab/index.html)
 
