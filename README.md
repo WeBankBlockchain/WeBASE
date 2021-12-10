@@ -14,6 +14,8 @@
 
 **WeBASE一键部署**(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Sign + WeBASE-Web)可以参考[WeBASE一键部署文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/install.html)，**WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
 
+- **WeBASE v2.0.0版本**已适配**FISCO-BCOS 3.0.0**版本，相关文档与代码仓库可跳转至 [WeBASE-lab分支](https://webasedoc.readthedocs.io/zh_CN/lab)查看
+
 ## 各子系统简介
 * **节点前置服务 [WeBASE-Front](https://github.com/WeBankBlockchain/WeBASE-Front)** 
 集成java-sdk，提供restful风格的接口，客户端可以使用http的形式和节点进行交互，内置内存数据库，采集节点健康度数据。内置web控制台，实现节点的可视化、合约部署IDE等功能。
