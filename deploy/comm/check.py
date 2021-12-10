@@ -45,7 +45,7 @@ def do():
     checkSignDbAuthorized()
     checkMgrDbVersion()
     checkSignDbVersion()
-    # checkExistedChainInfo()
+    checkExistedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -411,21 +411,10 @@ def checkExistedChainInfo():
     if (existChain == 'yes'):
         print ("check existing chain info...")
         
-        listenIp = getCommProperties("node.listenIp")
-        rpcPort = getCommProperties("node.rpcPort")
-        chainRpcUrl = "http://{}:{}".format(listenIp,rpcPort)
-        
-        # check chain connect
-        checkExistChainConnect()
-        # request chain
-        clientVersion=rest_getClientVersion(chainRpcUrl)
-        # handle result
-        fiscoVersion=clientVersion['FISCO-BCOS Version']
-        log.info("fiscoVersion: {}".format(fiscoVersion))
-        # check encrypt type
-        checkEncryptType(fiscoVersion)
-        # check version
-        checkExistedChainVersion(fiscoVersion)
+        sdk_dir = getCommProperties("sdk.dir")
+        if not os.path.exists(sdk_dir):
+            print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
+            sys.exit(0)
         
         print ('check existing chain info sucessfully.')
     else:

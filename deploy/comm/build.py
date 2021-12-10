@@ -153,50 +153,40 @@ def installNode(docker_mode=False):
         fisco_version = getCommProperties("fisco.version")
         node_counts = getCommProperties("node.counts")
         encrypt_type = int(getCommProperties("encrypt.type"))
-        docker_on = 1 if docker_mode is True else 0
         
-        # init configure file
-        # if not os.path.exists(currentDir + "/nodetemp"):
-        #     doCmd('cp -f nodeconf nodetemp')
-        # else:
-        #     doCmd('cp -f nodetemp nodeconf')
-
         node_nums = 2
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
-        # doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
-        # doCmdIgnoreException("dos2unix nodeconf")
 
-        # gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         # gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
-        # if os.path.exists("{}/build_chain.sh".format(currentDir)):
-        #     info = "n"      
-        #     if sys.version_info.major == 2:
-        #         info =  raw_input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
-        #     else:
-        #         info = input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
-        #     if info == "y" or info == "Y":
-        #         doCmd("rm -f build_chain.sh")
-        #         # download build_chain script
-        #         print (gitComm)
-        #         os.system(gitComm)
-        # else:
-        #     # download build_chain script
-        #     print (gitComm)
-        #     os.system(gitComm)
+        if os.path.exists("{}/build_chain.sh".format(currentDir)):
+            info = "n"      
+            if sys.version_info.major == 2:
+                info =  raw_input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
+            else:
+                info = input("Build chain script “build_chain.sh” already exists. Re-download it or not? [y/n]: ")
+            if info == "y" or info == "Y":
+                doCmd("rm -f build_chain.sh")
+                # download build_chain script
+                print (gitComm)
+                os.system(gitComm)
+        else:
+            # download build_chain script
+            print (gitComm)
+            os.system(gitComm)
         if not os.path.exists("{}/build_chain.sh".format(currentDir)):
-            print ("======= build_chain.sh is not exist. please check! =======")
-            return
-        if not os.path.exists("{}/fisco-bcos".format(currentDir)):
-            print ("======= fisco-bcos is not exist. please check! =======")
-            return
+            print ("======= build_chain.sh download fail. please check! =======")
+            sys.exit(0)
+        
+        buildComm = "bash build_chain.sh -p {},{} -l {}:{} -v {}".format(node_p2pPort, node_rpcPort, nodeListenIp, node_nums, fisco_version)
         # if no nodes directory, run build_chain script
         if not os.path.exists("{}/nodes".format(currentDir)):
             # guomi 
             if encrypt_type == 1:
-                os.system("bash build_chain.sh -p {},{} -l {}:{} -e ./fisco-bcos -s".format(node_p2pPort, node_rpcPort, nodeListenIp, node_nums))
+                os.system(buildComm + " -s")
             else:
-                os.system("bash build_chain.sh -p {},{} -l {}:{} -e ./fisco-bcos".format(node_p2pPort, node_rpcPort, nodeListenIp, node_nums))
+                os.system(buildComm)
         else:
             info = "n"
             if sys.version_info.major == 2:
@@ -208,27 +198,10 @@ def installNode(docker_mode=False):
                 doCmd("rm -rf nodes")
                 # guomi 
                 if encrypt_type == 1:
-                    os.system("bash build_chain.sh -p {},{} -l 127.0.0.1:{} -e ./fisco-bcos -s".format(node_p2pPort, node_rpcPort, node_nums))
+                    os.system(buildComm + " -s")
                 else:
-                    os.system("bash build_chain.sh -p {},{} -l 127.0.0.1:{} -e ./fisco-bcos".format(node_p2pPort, node_rpcPort, node_nums))
-                # if encrypt_type == 1:
-                #     # guomi ssl
-                #     if encrypt_ssl_type == 1:
-                #         if docker_on == 1:
-                #             os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                        
-                #         else:
-                #             os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                #     # standard ssl
-                #     else:
-                #         if docker_on == 1:
-                #             os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                            
-                #         else:
-                #             os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                # else:
-                #     if docker_on == 1:
-                #         os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                    
-                #     else:
-                #         os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                    os.system(buildComm)
+        log.info(buildComm)
         startNode()
 
 def startNode():
