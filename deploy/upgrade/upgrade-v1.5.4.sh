@@ -245,7 +245,8 @@ function upgrade_mgr_sql() {
         mysql --user=$user --password=$password --host=$ip --port=$port --database=$database --default-character-set=utf8 -e "source ${mgr_script_name}"
     else
         LOG_WARN "node-mgr upgrade sql file of ${mgr_script_name} not exist!"
-        exit 1
+        # 不存在意味着版本没更新表结构
+        # exit 1
     fi
 }
 
