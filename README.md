@@ -1,6 +1,10 @@
 中文|[English](README-en.md)
 
+<<<<<<< HEAD
 [![Code Lines](https://tokei.rs/b1/github/WeBankBlockchain/WeBASE?category=code)](https://github.com/WeBankFinTech/WeBASE)
+=======
+[![Code Lines](https://tokei.rs/b1/github/WeBankBlockchain/WeBASE?category=code)](https://github.com/WeBankBlockchain/WeBASE)
+>>>>>>> upstream/lab-dev
 
 ![image](https://webasedoc.readthedocs.io/zh_CN/lab/_images/logo.jpg)
 
@@ -14,6 +18,8 @@
 **WBC-WeBASE**将区块链应用开发标准化，搭建完FISCO BCOS节点后，只需按照五步标准流程进行区块链应用开发，开发流程请参阅 [使用WBC-WeBASE开发区块链应用](https://github.com/WeBankBlockchain/WeBASE-Doc/blob/lab/docs/WeBASE/quick-start.md)
 
 **WBC-WeBASE一键部署**(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Sign + WeBASE-Web)可以参考[WBC-WeBASE一键部署文档](https://webasedoc.readthedocs.io/zh_CN/lab/docs/WeBASE/install.html)，**WBC-WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WBC-WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/lab/index.html)
+
+- **WeBASE v2.0.0版本**已适配**FISCO-BCOS 3.0.0**版本，相关文档与代码仓库可跳转至 [WeBASE-lab分支](https://webasedoc.readthedocs.io/zh_CN/lab)查看
 
 ## 各子系统简介
 * **节点前置服务 [WeBASE-Front](https://github.com/WeBankBlockchain/WeBASE-Front)** 
