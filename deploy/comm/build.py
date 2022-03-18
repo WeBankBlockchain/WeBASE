@@ -153,7 +153,8 @@ def installNode(docker_mode=False):
         fisco_version = getCommProperties("fisco.version")
         node_counts = getCommProperties("node.counts")
         encrypt_type = int(getCommProperties("encrypt.type"))
-        
+        use_liquid = int(getCommProperties("fisco.wasm"))
+
         node_nums = 2
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
@@ -188,6 +189,9 @@ def installNode(docker_mode=False):
             # guomi 
             if encrypt_type == 1:
                 buildComm = buildComm + " -s"
+            # use wasm 
+            if use_liquid == 1:
+                buildComm = buildComm + " -w"
             os.system(buildComm)
         else:
             info = "n"
@@ -202,6 +206,9 @@ def installNode(docker_mode=False):
                 # guomi 
                 if encrypt_type == 1:
                     buildComm = buildComm + " -s"
+                # use wasm 
+                if use_liquid == 1:
+                    buildComm = buildComm + " -w"
                 os.system(buildComm)
         log.info(buildComm)
         startNode()
