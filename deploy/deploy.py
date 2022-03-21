@@ -28,30 +28,6 @@ def do():
         commBuild.start()
     elif "stopAll" == param:
         commBuild.end()
-    elif "installWeBASE" == param:
-        gl.set_visual_deploy()
-        commCheck.visual_do()
-        commBuild.visual_do()
-    elif "startWeBASE" == param:
-        commCheck.visualCheckPort()
-        commBuild.visualStart()
-    elif "stopWeBASE" == param:
-        commBuild.visualEnd()
-    elif "installDockerAll" == param:
-        commCheck.docker_do()
-        commBuild.docker_do()
-    elif "startDockerAll" == param:
-        commCheck.checkPort()
-        commBuild.dockerStartAll()
-    elif "stopDockerAll" == param:
-        commBuild.dockerEndAll()
-    elif "pullDockerAll" == param:
-        commBuild.dockerPull()
-    elif "startDocker" == param:
-        commCheck.checkPort()
-        commBuild.dockerStart()
-    elif "stopDocker" == param:
-        commBuild.dockerEnd()
     elif "startNode" == param:
         commBuild.startNode()
     elif "stopNode" == param:
@@ -85,29 +61,20 @@ def help():
 Usage: python deploy [Parameter]
 
 Parameter:
-    check:          check the environment [one-click mode]
-    installAll:     check the environment, deploy FISCO-BCOS and all service [one-click mode] 
-    startAll:       check service port, start all service [one-click mode] 
-    stopAll:        stop all service [one-click mode] 
-    installWeBASE:  check the environment, deploy without FISCO-BCOS nodes and WeBASE-Front service [visual mode] 
-    startWeBASE:    check service port, start all service deploy under visual deploy model [visual mode] 
-    stopWeBASE:     stop all service deploy under visual deploy model [visual mode] 
-    startNode:      start FISCO-BCOS nodes [one-click mode or docker mode]
-    stopNode:       stop FISCO-BCOS nodes [one-click mode or docker mode]
-    startWeb:       start WeBASE-Web service [one-click mode or visual mode]
-    stopWeb:        stop WeBASE-Web service [one-click mode or visual mode]
-    startManager:   start WeBASE-Node-Manager service [one-click mode or visual mode]
-    stopManager:    stop WeBASE-Node-Manager service [one-click mode or visual mode]
-    startFront:     start WeBASE-Front service [one-click mode]
-    stopFront:      stop WeBASE-Front service [one-click mode]
-    startSign:      start WeBASE-Sign service [one-click mode or visual mode]
-    stopSign:       stop WeBASE-Sign service [one-click mode or visual mode]
-    installDockerAll    check dependency, deploy FISCO-BCOS nodes and all service, start by docker
-    startDockerAll      check docker container, start FISCO-BCOS nodes and all service by docker
-    stopDockerAll       stop FISCO-BCOS nodes and all service in docker
-    pullDockerAll       pull FISCO-BCOS, WeBASE and mysql images from dockerhub
-    startDocker         check docker container, start all webase service by docker
-    stopDocker          stop all webase service in docker
+    check:          check the environment
+    installAll:     check the environment, deploy FISCO-BCOS and all service 
+    startAll:       check service port, start all service 
+    stopAll:        stop all service
+    startNode:      start FISCO-BCOS nodes
+    stopNode:       stop FISCO-BCOS nodes
+    startWeb:       start WeBASE-Web service
+    stopWeb:        stop WeBASE-Web service
+    startManager:   start WeBASE-Node-Manager service
+    stopManager:    stop WeBASE-Node-Manager service
+    startFront:     start WeBASE-Front service
+    stopFront:      stop WeBASE-Front service
+    startSign:      start WeBASE-Sign service
+    stopSign:       stop WeBASE-Sign service
 
 Attention:
     1. Need to install python3.6, jdk, mysql, PyMySQL first

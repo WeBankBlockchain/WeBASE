@@ -14,6 +14,7 @@ checkDependent = ["git","openssl","curl","wget","dos2unix"]
 # memery(B) and cpu(core counts logical)
 # mem=psutil.virtual_memory()
 # cpuCore=psutil.cpu_count()
+deploy_ip = "127.0.0.1"
 
 def do():
     print ("============================================================"),
@@ -44,7 +45,7 @@ def do():
     checkSignDbAuthorized()
     checkMgrDbVersion()
     checkSignDbVersion()
-    checkExitedChainInfo()
+    checkExistedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
 
@@ -103,7 +104,7 @@ def docker_do():
     checkFrontPort()
     # if not docker mysql, check connect, auth, version
     dockerCheckDb()
-    checkExitedChainInfo()
+    checkExistedChainInfo()
     print ("==============      envrionment available     ==============")
     print ("============================================================")
     
@@ -137,6 +138,15 @@ def checkNginx():
     hasInstall = hasInstallServer(require)
     if not hasInstall:
         installByYum(require)
+    res = doCmd("which nginx")
+    if res["status"] == 0:
+        res2 = doCmd("sudo " + res["output"] + " -t ")
+        if res2["status"] != 0:
+            print ("  error! checking the path of nginx configuration fail!")
+            sys.exit(0)
+    else:
+        print ("  error! nginx has not been configured!")
+        sys.exit(0)
     print ("check finished sucessfully.")
 
 def checkDocker():
@@ -173,35 +183,28 @@ def checkJava():
     return
 
 def checkNodePort():
+    print ("check FISCO-BCOS node port...")
     if_exist_fisco = getCommProperties("if.exist.fisco")
     if if_exist_fisco == "yes":
-        # checkExistedNodePort()
-        return
+        checkExistedNodePort()
     elif if_exist_fisco == "no":
-        print ("check FISCO-BCOS node port...")
         checkNewNodePort()
-        print ("check finished sucessfully.")
     else:
         print ("  error! param if.exist.fisco must be yes or no, current is {}. please check.".format(if_exist_fisco))
         sys.exit(0)
+    print ("check finished sucessfully.")
+    return
 
 def checkExistedNodePort():
-    listen_ip = getCommProperties("node.listenIp")
-    node_rpcPort = int(getCommProperties("node.rpcPort"))
-    node_p2pPort = int(getCommProperties("node.p2pPort"))
-    node_channelPort = int(getCommProperties("node.channelPort"))
-    res_rpcPort = net_if_used_no_msg(listen_ip,node_rpcPort)
-    if not res_rpcPort:
-        print ("  error! rpc port {} is not alive. please check.".format(node_rpcPort))
-        sys.exit(0)
-    res_p2pPort = net_if_used_no_msg(listen_ip,node_p2pPort)
-    if not res_p2pPort:
-        print ("  error! p2p port {} is not alive. please check.".format(node_p2pPort))
-        sys.exit(0)
-    res_channelPort = net_if_used_no_msg(listen_ip,node_channelPort)
-    if not res_channelPort:
-        print ("  error! channel port {} is not alive. please check.".format(node_channelPort))
-        sys.exit(0)
+    nodeRpcPeers = getCommProperties("node.rpcPeers")
+    peersArray = nodeRpcPeers.split(',')
+    for i in peersArray:
+        listen_ip = i.split('\'')[1].split(':')[0]
+        node_rpcPort = int(i.split('\'')[1].split(':')[1])
+        res_rpcPort = net_if_used_no_msg(listen_ip,node_rpcPort)
+        if not res_rpcPort:
+            print ("  error! ip:{} rpc port:{} is not alive. please check.".format(listen_ip, node_rpcPort))
+            sys.exit(0)
     return
     
 def checkNewNodePort():
@@ -212,7 +215,6 @@ def checkNewNodePort():
         node_counts = int(nodes)
     node_rpcPort = int(getCommProperties("node.rpcPort"))
     node_p2pPort = int(getCommProperties("node.p2pPort"))
-    node_channelPort = int(getCommProperties("node.channelPort"))
     for i in range(node_counts):
         res_rpcPort = net_if_used(listen_ip,node_rpcPort+i)
         if res_rpcPort:
@@ -220,14 +222,10 @@ def checkNewNodePort():
         res_p2pPort = net_if_used(listen_ip,node_p2pPort+i)
         if res_p2pPort:
             sys.exit(0)
-        res_channelPort = net_if_used(listen_ip,node_channelPort+i)
-        if res_channelPort:
-            sys.exit(0)
     return
     
 def checkWebPort():
     print ("check WeBASE-Web port...")
-    deploy_ip = "127.0.0.1"
     web_port = getCommProperties("web.port")
     res_web = net_if_used(deploy_ip,web_port)
     if res_web:
@@ -237,7 +235,6 @@ def checkWebPort():
     
 def checkMgrPort():
     print ("check WeBASE-Node-Manager port...")
-    deploy_ip = "127.0.0.1"
     mgr_port = getCommProperties("mgr.port")
     res_mgr = net_if_used(deploy_ip,mgr_port)
     if res_mgr:
@@ -247,7 +244,6 @@ def checkMgrPort():
     
 def checkFrontPort():
     print ("check WeBASE-Front port...")
-    deploy_ip = "127.0.0.1"
     front_port = getCommProperties("front.port")
 
     if front_port is None:
@@ -262,7 +258,6 @@ def checkFrontPort():
 
 def checkSignPort():
     print ("check WeBASE-Sign port...")
-    deploy_ip = "127.0.0.1"
     sign_port = getCommProperties("sign.port")
     res_sign = net_if_used(deploy_ip,sign_port)
     if res_sign:
@@ -354,14 +349,14 @@ def checkVersionUtil(fisco_ver_str,webase_front_ver_str):
     log.info("checkVersionUtil webase: {} and fisco version: {}".format(webase_front_ver_str, fisco_ver_str))
     fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
     # webase-front version greater or equal with other webase version
-    webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
-    log.info("checkVersionUtil int webase: {} and fisco version: {}".format(webase_front_version_int, fisco_version_int))
+    # webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
+    # log.info("checkVersionUtil int webase: {} and fisco version: {}".format(webase_front_version_int, fisco_version_int))
     flag=False
-    # require if webase <= 1.3.2, fisco < 2.5.0
-    if ( webase_front_version_int <= 132 and fisco_version_int >= 250 ):
+    # require if webase = 'lab*'
+    if not webase_front_ver_str.startswith('lab'):
         flag=True
-    # require if webase >= 1.3.1(dynamic group), fisco >= 2.4.1
-    if ( webase_front_version_int >= 131 and fisco_version_int < 241 ):
+    # require if webase = 'lab*', fisco >= 3.0.0
+    if (webase_front_ver_str.startswith('lab') and fisco_version_int < 300 ):
         flag=True
 
     # if version conflicts, exit
@@ -411,28 +406,17 @@ def checkMemAndCpu():
         print ('check finished sucessfully.')
         return
 
-def checkExitedChainInfo():
+def checkExistedChainInfo():
     existChain = getCommProperties("if.exist.fisco")
     if (existChain == 'yes'):
-        print ("check exited chain info...")
+        print ("check existing chain info...")
         
-        listenIp = getCommProperties("node.listenIp")
-        rpcPort = getCommProperties("node.rpcPort")
-        chainRpcUrl = "http://{}:{}".format(listenIp,rpcPort)
+        sdk_dir = getCommProperties("sdk.dir")
+        if not os.path.exists(sdk_dir):
+            print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
+            sys.exit(0)
         
-        # check chain connect
-        checkExistChainConnect()
-        # request chain
-        clientVersion=rest_getClientVersion(chainRpcUrl)
-        # handle result
-        fiscoVersion=clientVersion['FISCO-BCOS Version']
-        log.info("fiscoVersion: {}".format(fiscoVersion))
-        # check encrypt type
-        checkEncryptType(fiscoVersion)
-        # check version
-        checkExitedChainVersion(fiscoVersion)
-        
-        print ('check exited chain info sucessfully.')
+        print ('check existing chain info sucessfully.')
     else:
         return
 
@@ -449,7 +433,7 @@ def checkEncryptType(fiscoVersion):
         return
     print ('check encrypt type finished.')
 
-def checkExitedChainVersion(fisco_ver_str):
+def checkExistedChainVersion(fisco_ver_str):
     print ("check version...")
     webase_front_ver_str = getCommProperties("webase.front.version")
     checkVersionUtil(fisco_ver_str,webase_front_ver_str)

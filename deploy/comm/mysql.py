@@ -18,7 +18,6 @@ def addFrontToDb():
     mysql_password_raw = getCommProperties("mysql.password")
     mysql_password = parse.unquote_plus(mysql_password_raw)
     mysql_database = getCommProperties("mysql.database")
-    front_org = getCommProperties("front.org")
     front_port = getCommProperties("front.port")
     fisco_version = getCommProperties("fisco.version")
 
@@ -30,8 +29,8 @@ def addFrontToDb():
         
         # add db
         add_db = "INSERT INTO tb_front (node_id,front_ip,front_port,agency,client_version, create_time, modify_time) \
-                  VALUES ('init','127.0.0.1',%s,\'%s\',\'%s\', NOW(),NOW())" % \
-                  (front_port, front_org, fisco_version)
+                  VALUES ('init','127.0.0.1',%s,'fisco',\'%s\', NOW(),NOW())" % \
+                  (front_port, fisco_version)
         log.info(add_db)
         cursor.execute(add_db)
         conn.commit()

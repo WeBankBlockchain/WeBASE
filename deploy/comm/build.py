@@ -13,6 +13,7 @@ currentDir = getCurrentBaseDir()
 # check init node mgr's tb_front 
 initDbEnable = False
 serverWaitTime = 5
+deploy_ip = "127.0.0.1"
 
 def do():
     print ("==============        starting  deploy        ==============")
@@ -82,7 +83,9 @@ def docker_do():
     return
 
 def start():
-    startNode()
+    if_exist_fisco = getCommProperties("if.exist.fisco")
+    if if_exist_fisco == "no":
+        startNode()
     startSign()
     startFront()
     startManager()
@@ -90,11 +93,13 @@ def start():
     return
 
 def end():
+    if_exist_fisco = getCommProperties("if.exist.fisco")
     stopWeb()
     stopManager()
     stopFront()
     stopSign()
-    stopNode()
+    if if_exist_fisco == "no":
+        stopNode()
     return
 
 def visualStart():
@@ -137,33 +142,28 @@ def dockerPull():
 
 def installNode(docker_mode=False):
     if_exist_fisco = getCommProperties("if.exist.fisco")
-    node_p2pPort = int(getCommProperties("node.p2pPort"))
-    node_channelPort = int(getCommProperties("node.channelPort"))
-    node_rpcPort = int(getCommProperties("node.rpcPort"))
-    fisco_version = getCommProperties("fisco.version")
-    node_counts = getCommProperties("node.counts")
-    encrypt_type = int(getCommProperties("encrypt.type"))
-    encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
-    docker_on = 1 if docker_mode is True else 0
-
 
     if if_exist_fisco == "no":
         print ("============================================================")
         print ("==============      Installing FISCO-BCOS     ==============")
-        # init configure file
-        if not os.path.exists(currentDir + "/nodetemp"):
-            doCmd('cp -f nodeconf nodetemp')
-        else:
-            doCmd('cp -f nodetemp nodeconf')
+        
+        nodeListenIp = getCommProperties("node.listenIp")
+        node_p2pPort = int(getCommProperties("node.p2pPort"))
+        node_rpcPort = int(getCommProperties("node.rpcPort"))
+        fisco_version = getCommProperties("fisco.version")
+        node_counts = getCommProperties("node.counts")
+        encrypt_type = int(getCommProperties("encrypt.type"))
+        use_liquid = int(getCommProperties("fisco.wasm"))
 
         node_nums = 2
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
-        doCmd('sed -i "s/nodeCounts/{}/g" nodeconf'.format(node_nums))
-        doCmdIgnoreException("dos2unix nodeconf")
+        if not fisco_version.startswith('v'):
+            fisco_version = 'v'+fisco_version
+        log.info("fisco_version: " + fisco_version)
 
-        # gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
-        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/v{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        # gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if os.path.exists("{}/build_chain.sh".format(currentDir)):
             info = "n"      
             if sys.version_info.major == 2:
@@ -179,27 +179,20 @@ def installNode(docker_mode=False):
             # download build_chain script
             print (gitComm)
             os.system(gitComm)
+        if not os.path.exists("{}/build_chain.sh".format(currentDir)):
+            print ("======= build_chain.sh download fail. please check! =======")
+            sys.exit(0)
+        
+        buildComm = "bash build_chain.sh -p {},{} -l {}:{} -v {}".format(node_p2pPort, node_rpcPort, nodeListenIp, node_nums, fisco_version)
         # if no nodes directory, run build_chain script
         if not os.path.exists("{}/nodes".format(currentDir)):
             # guomi 
             if encrypt_type == 1:
-                # guomi ssl
-                if encrypt_ssl_type == 1:
-                    if docker_on == 1:
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                    else: 
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                # standard ssl
-                else:
-                    if docker_on == 1:
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                    else:
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-            else:
-                if docker_on == 1:
-                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                else:
-                    os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
+                buildComm = buildComm + " -s"
+            # use wasm 
+            if use_liquid == 1:
+                buildComm = buildComm + " -w"
+            os.system(buildComm)
         else:
             info = "n"
             if sys.version_info.major == 2:
@@ -209,26 +202,16 @@ def installNode(docker_mode=False):
             if info == "y" or info == "Y":
                 doCmdIgnoreException("bash nodes/127.0.0.1/stop_all.sh")
                 doCmd("rm -rf nodes")
+                doCmd("rm -rf sm_*")
                 # guomi 
                 if encrypt_type == 1:
-                    # guomi ssl
-                    if encrypt_ssl_type == 1:
-                        if docker_on == 1:
-                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                        
-                        else:
-                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -G".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                    # standard ssl
-                    else:
-                        if docker_on == 1:
-                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                            
-                        else:
-                            os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -g".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-                else:
-                    if docker_on == 1:
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i -d".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))                    
-                    else:
-                        os.system("bash build_chain.sh -f nodeconf -p {},{},{} -v {} -i".format(node_p2pPort, node_channelPort, node_rpcPort, fisco_version))
-    startNode()
+                    buildComm = buildComm + " -s"
+                # use wasm 
+                if use_liquid == 1:
+                    buildComm = buildComm + " -w"
+                os.system(buildComm)
+        log.info(buildComm)
+        startNode()
 
 def startNode():
     print ("==============      Starting FISCO-BCOS       ==============")
@@ -237,9 +220,11 @@ def startNode():
         print ("======= FISCO-BCOS is not deploy. return! =======")
         return
 
-    fisco_dir = getCommProperties("fisco.dir")
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
+    if if_exist_fisco == "yes":
+        print ("[WARN]Use existing chain does not support start or stop.")
+        return
+        
+    fisco_dir = currentDir + "/nodes/127.0.0.1"
 
     if not os.path.exists(fisco_dir + "/start_all.sh"):
         print ("======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir))
@@ -258,10 +243,11 @@ def stopNode():
         print ("=======   FISCO-BCOS is not deploy. return! =======")
         return
 
-    fisco_dir = getCommProperties("fisco.dir")
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
+    if if_exist_fisco == "yes":
+        print ("[WARN]Use existing chain does not support start or stop.")
+        return
 
+    fisco_dir = currentDir + "/nodes/127.0.0.1"
     if not os.path.exists(fisco_dir + "/stop_all.sh"):
         print ("======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir))
         sys.exit(0)
@@ -273,7 +259,6 @@ def stopNode():
 
 def changeWebConfig():
     # get properties
-    deploy_ip = "127.0.0.1"
     web_port = getCommProperties("web.port")
     mgr_port = getCommProperties("mgr.port")
     pid_file = currentDir + "/nginx-webase-web.pid"
@@ -287,11 +272,11 @@ def changeWebConfig():
 
     # change web config
     web_dir = currentDir + "/webase-web"
-    h5_enable = int(getCommProperties("web.h5.enable"))
+    # h5_enable = int(getCommProperties("web.h5.enable"))
     h5_web_dir = web_dir
-    if h5_enable == 1:
+    # if h5_enable == 1:
         # mobile phone h5 dir
-        h5_web_dir = currentDir + "/webase-web-mobile"
+    #     h5_web_dir = currentDir + "/webase-web-mobile"
     web_log_dir = web_dir + "/log"
     doCmd('mkdir -p {}'.format(web_log_dir))
     doCmd('sed -i "s/127.0.0.1/{}/g" {}/comm/nginx.conf'.format(deploy_ip, currentDir))
@@ -333,10 +318,10 @@ def installWeb():
     web_version = getCommProperties("webase.web.version")
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web.zip ".format(web_version)
     pullSourceExtract(gitComm,"webase-web")
-    web_h5_enable = int(getCommProperties("web.h5.enable"))
-    if web_h5_enable == 1:
-        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web-mobile.zip ".format(web_version)
-        pullSourceExtract(gitComm,"webase-web-mobile")    
+    # web_h5_enable = int(getCommProperties("web.h5.enable"))
+    # if web_h5_enable == 1:
+    #     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web-mobile.zip ".format(web_version)
+    #     pullSourceExtract(gitComm,"webase-web-mobile")    
     changeWebConfig()
     startWeb()
 
@@ -394,7 +379,7 @@ def changeManagerConfig(visual_deploy=False):
     mysql_user = getCommProperties("mysql.user")
     mysql_password = getCommProperties("mysql.password")
     mysql_database = getCommProperties("mysql.database")
-    encrypt_type = int(getCommProperties("encrypt.type"))
+    # encrypt_type = int(getCommProperties("encrypt.type"))
     deploy_type = 1 if visual_deploy is True else 0
 
     if visual_deploy:
@@ -425,8 +410,8 @@ def changeManagerConfig(visual_deploy=False):
     doCmd('sed -i "s/defaultAccount/{}/g" {}/application.yml'.format(mysql_user, conf_dir))
     doCmd('sed -i "s/defaultPassword/{}/g" {}/application.yml'.format(mysql_password, conf_dir))
     doCmd('sed -i "s/webasenodemanager/{}/g" {}/application.yml'.format(mysql_database, conf_dir))
-    doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, conf_dir))
-    doCmd('sed -i "s%deployType:.*$%deployType: {}%g" {}/application.yml'.format(deploy_type, conf_dir))
+    # doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, conf_dir))
+    # doCmd('sed -i "s%deployType:.*$%deployType: {}%g" {}/application.yml'.format(deploy_type, conf_dir))
 
     if visual_deploy:
         if (sign_ip == '127.0.0.1' or sign_ip == 'localhost'):
@@ -440,7 +425,6 @@ def installManager(visual_deploy=False):
     print ("============== Installing WeBASE-Node-Manager ==============")
     os.chdir(currentDir)
     mgr_version = getCommProperties("webase.mgr.version")
-    encrypt_type = int(getCommProperties("encrypt.type"))
     gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-node-mgr.zip ".format(mgr_version)
     pullSourceExtract(gitComm,"webase-node-mgr")
     changeManagerConfig(visual_deploy)
@@ -521,21 +505,14 @@ def stopManager():
 
 def changeFrontConfig():
     # get properties
-    deploy_ip = "127.0.0.1"
     sign_port = getCommProperties("sign.port")
     frontPort = getCommProperties("front.port")
     nodeListenIp = getCommProperties("node.listenIp")
-    nodeChannelPort = getCommProperties("node.channelPort")
+    nodeRpcPort = int(getCommProperties("node.rpcPort"))
+    nodeRpcPeers = getCommProperties("node.rpcPeers")
     frontDb = getCommProperties("front.h2.name")
-    #encrypt_type = int(getCommProperties("encrypt.type"))
-
+    encrypt_type = int(getCommProperties("encrypt.type"))
     if_exist_fisco = getCommProperties("if.exist.fisco")
-    fisco_dir = getCommProperties("fisco.dir")
-    node_dir = getCommProperties("node.dir")
-    final_node_dir = fisco_dir + "/" + node_dir
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
-        final_node_dir = currentDir + "/nodes/127.0.0.1/node0"
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
@@ -546,13 +523,15 @@ def changeFrontConfig():
 
     # change server config
     doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
-    doCmd('sed -i "s/ip: 127.0.0.1/ip: {}/g" {}/application.yml'.format(nodeListenIp, server_dir))
-    doCmd('sed -i "s/20200/{}/g" {}/application.yml'.format(nodeChannelPort, server_dir))
-    #doCmd('sed -i "s%encryptType: 0%encryptType: {}%g" {}/application.yml'.format(encrypt_type, server_dir))
+    if if_exist_fisco == "no":
+        doCmd('sed -i "s/127.0.0.1:20200/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort, server_dir))
+        doCmd('sed -i "s/127.0.0.1:20201/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort+1, server_dir))
+    else:
+        doCmd('sed -i "s%\[\'127.0.0.1:20200\',\'127.0.0.1:20201\'\]%{}%" {}/application.yml'.format(nodeRpcPeers, server_dir))
+    if encrypt_type == 1:
+        doCmd('sed -i "s%useSmSsl: false%useSmSsl: true%g" {}/application.yml'.format(server_dir))
     doCmd('sed -i "s/keyServer: 127.0.0.1:5004/keyServer: {}:{}/g" {}/application.yml'.format(deploy_ip, sign_port, server_dir))
     doCmd('sed -i "s%/webasefront%/{}%g" {}/application.yml'.format(frontDb, server_dir))
-    doCmd('sed -i "s%monitorDisk: /%monitorDisk: {}%g" {}/application.yml'.format(fisco_dir, server_dir))
-    doCmd('sed -i "s%nodePath: /fisco/nodes/127.0.0.1/node0%nodePath: {}%g" {}/application.yml'.format(final_node_dir, server_dir))
 
     return
 
@@ -583,18 +562,16 @@ def installFront():
 
     # copy node crt
     if_exist_fisco = getCommProperties("if.exist.fisco")
-    fisco_dir = getCommProperties("fisco.dir")
-    #encrypt_ssl_type = int(getCommProperties("encrypt.sslType"))
+    sdk_dir = getCommProperties("sdk.dir")
 
     if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
-    sdk_dir = fisco_dir + "/sdk"
+        sdk_dir = currentDir + "/nodes/127.0.0.1/sdk"
     if not os.path.exists(sdk_dir):
         print ("======= FISCO-BCOS sdk dir:{} is not exist. please check! =======".format(sdk_dir))
         sys.exit(0)
     os.chdir(server_dir)
-    # copy the whole sdk(sdk.key and gm dir) to conf/
-    copyFiles(fisco_dir + "/sdk", server_dir + "/conf")
+    # copy the sdk files to conf/
+    copyFiles(sdk_dir, server_dir + "/conf")
 
     startFront()
     return
