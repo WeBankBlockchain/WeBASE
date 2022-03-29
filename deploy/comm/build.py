@@ -154,6 +154,7 @@ def installNode(docker_mode=False):
         node_counts = getCommProperties("node.counts")
         encrypt_type = int(getCommProperties("encrypt.type"))
         use_liquid = int(getCommProperties("fisco.wasm"))
+        enable_auth = int(getCommProperties("fisco.auth"))
 
         node_nums = 2
         if node_counts != "nodeCounts":
@@ -192,6 +193,8 @@ def installNode(docker_mode=False):
             # use wasm 
             if use_liquid == 1:
                 buildComm = buildComm + " -w"
+            if enable_auth == 1:
+                buildComm = buildComm + " -A"
             os.system(buildComm)
         else:
             info = "n"
@@ -209,6 +212,8 @@ def installNode(docker_mode=False):
                 # use wasm 
                 if use_liquid == 1:
                     buildComm = buildComm + " -w"
+                if enable_auth == 1:
+                    buildComm = buildComm + " -A"
                 os.system(buildComm)
         log.info(buildComm)
         startNode()
