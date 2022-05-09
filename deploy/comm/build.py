@@ -153,7 +153,9 @@ def installNode(docker_mode=False):
         fisco_version = getCommProperties("fisco.version")
         node_counts = getCommProperties("node.counts")
         encrypt_type = int(getCommProperties("encrypt.type"))
-        
+        use_liquid = int(getCommProperties("fisco.wasm"))
+        enable_auth = int(getCommProperties("fisco.auth"))
+
         node_nums = 2
         if node_counts != "nodeCounts":
             node_nums = int(node_counts)
@@ -188,6 +190,11 @@ def installNode(docker_mode=False):
             # guomi 
             if encrypt_type == 1:
                 buildComm = buildComm + " -s"
+            # use wasm 
+            if use_liquid == 1:
+                buildComm = buildComm + " -w"
+            if enable_auth == 1:
+                buildComm = buildComm + " -A"
             os.system(buildComm)
         else:
             info = "n"
@@ -202,6 +209,11 @@ def installNode(docker_mode=False):
                 # guomi 
                 if encrypt_type == 1:
                     buildComm = buildComm + " -s"
+                # use wasm 
+                if use_liquid == 1:
+                    buildComm = buildComm + " -w"
+                if enable_auth == 1:
+                    buildComm = buildComm + " -A"
                 os.system(buildComm)
         log.info(buildComm)
         startNode()
@@ -506,6 +518,10 @@ def changeFrontConfig():
     frontDb = getCommProperties("front.h2.name")
     encrypt_type = int(getCommProperties("encrypt.type"))
     if_exist_fisco = getCommProperties("if.exist.fisco")
+    node_counts = getCommProperties("node.counts")
+    node_nums = 2
+    if node_counts != "nodeCounts":
+        node_nums = int(node_counts)
 
     # init file
     server_dir = currentDir + "/webase-front/conf"
@@ -518,8 +534,12 @@ def changeFrontConfig():
     doCmd('sed -i "s/5002/{}/g" {}/application.yml'.format(frontPort, server_dir))
     if if_exist_fisco == "no":
         doCmd('sed -i "s/127.0.0.1:20200/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort, server_dir))
-        doCmd('sed -i "s/127.0.0.1:20201/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort+1, server_dir))
+        if node_nums != 1:
+          doCmd('sed -i "s/127.0.0.1:20201/{}:{}/g" {}/application.yml'.format(nodeListenIp, nodeRpcPort+1, server_dir))
     else:
+        # 尝试设置单个节点的配置文件为.properties配置的内容
+        doCmd('sed -i "s%\[\'127.0.0.1:20200\'\]%{}%" {}/application.yml'.format(nodeRpcPeers, server_dir))
+        # 尝试设置两个节点的配置文件为.properties配置的内容
         doCmd('sed -i "s%\[\'127.0.0.1:20200\',\'127.0.0.1:20201\'\]%{}%" {}/application.yml'.format(nodeRpcPeers, server_dir))
     if encrypt_type == 1:
         doCmd('sed -i "s%useSmSsl: false%useSmSsl: true%g" {}/application.yml'.format(server_dir))
