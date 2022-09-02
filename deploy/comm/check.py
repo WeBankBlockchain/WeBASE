@@ -349,14 +349,15 @@ def checkVersionUtil(fisco_ver_str,webase_front_ver_str):
     log.info("checkVersionUtil webase: {} and fisco version: {}".format(webase_front_ver_str, fisco_ver_str))
     fisco_version_int = int(re.findall("\d+", fisco_ver_str)[0]) * 100 + int(re.findall("\d+", fisco_ver_str)[1]) * 10 + int(re.findall("\d+", fisco_ver_str)[2]) * 1
     # webase-front version greater or equal with other webase version
-    # webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
+    webase_front_version_int = int(re.findall("\d+", webase_front_ver_str)[0]) * 100 + int(re.findall("\d+", webase_front_ver_str)[1]) * 10 + int(re.findall("\d+", webase_front_ver_str)[2]) * 1
     # log.info("checkVersionUtil int webase: {} and fisco version: {}".format(webase_front_version_int, fisco_version_int))
     flag=False
-    # require if webase = 'lab*'
-    if not webase_front_ver_str.startswith('lab'):
-        flag=True
     # require if webase = 'lab*', fisco >= 3.0.0
-    if (webase_front_ver_str.startswith('lab') and fisco_version_int < 300 ):
+    if (webase_front_ver_str.startswith('lab')):
+        print ('[Error]Please use webase v3.0 version instead of lab version')
+        flag=True
+    if (not webase_front_version_int >= 300 and fisco_version_int >= 300):
+        print ('[Error]Please use webase v3.0 version with fisco v3.0 official version')
         flag=True
 
     # if version conflicts, exit
