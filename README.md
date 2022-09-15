@@ -14,7 +14,10 @@
 
 **WeBASE一键部署**(FISCO BCOS + WeBASE-Front + WeBASE-Node-Manager + WeBASE-Sign + WeBASE-Web)可以参考[WeBASE一键部署文档](https://webasedoc.readthedocs.io/zh_CN/latest/docs/WeBASE/install.html)，**WeBASE**整体结构设计与各子系统功能与安装部署的详细介绍，请参考[WeBASE在线文档](https://webasedoc.readthedocs.io/zh_CN/latest/index.html)
 
-- **WeBASE v2.0.0版本**已适配**FISCO-BCOS 3.0.0**版本，相关文档与代码仓库可跳转至 [WeBASE-lab分支](https://webasedoc.readthedocs.io/zh_CN/lab)查看
+
+## 技术文档
+- **WeBASE 1.x版本** 适用于FISCO-BCOS **2.x版本**，可查看 [WeBASE 1.x文档](https://webasedoc.readthedocs.io/zh_CN/latest/index.html) (stable)
+- **WeBASE 3.x版本** 适用于FISCO-BCOS **3.x版本**，可查看 [WeBASE 3.x文档](https://webasedoc.readthedocs.io/zh_CN/lab)，相关代码位于master-3.0分支
 
 ## 各子系统简介
 * **节点前置服务 [WeBASE-Front](https://github.com/WeBankBlockchain/WeBASE-Front)** 
