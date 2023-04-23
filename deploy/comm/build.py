@@ -236,10 +236,11 @@ def startNode():
     if if_exist_fisco is None:
         print ("======= FISCO-BCOS is not deploy. return! =======")
         return
-
-    fisco_dir = getCommProperties("fisco.dir")
-    if if_exist_fisco == "no":
-        fisco_dir = currentDir + "/nodes/127.0.0.1"
+    if if_exist_fisco == "yes":
+        print ("[WARN]Use existing chain does not support start or stop.")
+        return
+        
+    fisco_dir = currentDir + "/nodes/127.0.0.1"
 
     if not os.path.exists(fisco_dir + "/start_all.sh"):
         print ("======= FISCO-BCOS dir:{} is not correct. please check! =======".format(fisco_dir))
