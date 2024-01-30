@@ -218,7 +218,7 @@ def installNode(docker_mode=False):
                 # use wasm 
                 if use_liquid == 1:
                     buildComm = buildComm + " -w"
-                if enable_auth == 1:
+                if fisco_version_int < 330 and enable_auth == 1:
                     buildComm = buildComm + " -A"
                 os.system(buildComm)
         log.info(buildComm)
