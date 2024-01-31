@@ -158,7 +158,7 @@ def installNode(docker_mode=False):
 
         # fisco版本号转为数字，方便比较
         fisco_version_int = int(re.findall("\d+", fisco_version)[0]) * 100 + int(re.findall("\d+", fisco_version)[1]) * 10 + int(re.findall("\d+", fisco_version)[2]) * 1
-        log.info("fisco_version_int: " + fisco_version_int)
+        log.info("fisco_version_int: " + str(fisco_version_int))
 
         node_nums = 2
         if node_counts != "nodeCounts":
@@ -218,7 +218,7 @@ def installNode(docker_mode=False):
                 # use wasm 
                 if use_liquid == 1:
                     buildComm = buildComm + " -w"
-                if enable_auth == 1:
+                if fisco_version_int < 330 and enable_auth == 1:
                     buildComm = buildComm + " -A"
                 os.system(buildComm)
         log.info(buildComm)
