@@ -22,7 +22,7 @@ def do():
     installFront()
     installManager()
     installWeb()
-    initFrontForMgr()
+    initFrontForMgr()   
     print ("============================================================")
     print ("==============      deploy  has completed     ==============")
     print ("============================================================")
@@ -41,7 +41,7 @@ def do():
 
 def visual_do():
     print ("==============        starting  deploy        ==============")
-    installDockerImage()
+    #installDockerImage()
     installSign()
     installManager(True)
     installWeb()
@@ -167,8 +167,8 @@ def installNode(docker_mode=False):
             fisco_version = 'v'+fisco_version
         log.info("fisco_version: " + fisco_version)
 
-        # gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
-        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        gitComm = "wget https://github.com/FISCO-BCOS/FISCO-BCOS/releases/download/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
+        # gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/FISCO-BCOS/FISCO-BCOS/releases/{}/build_chain.sh && chmod u+x build_chain.sh".format(fisco_version)
         if os.path.exists("{}/build_chain.sh".format(currentDir)):
             info = "n"      
             if sys.version_info.major == 2:
@@ -327,7 +327,8 @@ def installWeb():
     print ("==============      Installing WeBASE-Web     ==============")
     os.chdir(currentDir)
     web_version = getCommProperties("webase.web.version")
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web.zip ".format(web_version)
+    # gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-web.zip ".format(web_version)
+    gitComm = "wget https://github.com/WeBankBlockchain/WeBASELargeFiles/releases/download/{}/webase-web.zip ".format(web_version)
     pullSourceExtract(gitComm,"webase-web")
     # web_h5_enable = int(getCommProperties("web.h5.enable"))
     # if web_h5_enable == 1:
@@ -436,7 +437,8 @@ def installManager(visual_deploy=False):
     print ("============== Installing WeBASE-Node-Manager ==============")
     os.chdir(currentDir)
     mgr_version = getCommProperties("webase.mgr.version")
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-node-mgr.zip ".format(mgr_version)
+    # gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-node-mgr.zip ".format(mgr_version)
+    gitComm = "wget https://github.com/WeBankBlockchain/WeBASELargeFiles/releases/download/{}/webase-node-mgr.zip ".format(mgr_version)
     pullSourceExtract(gitComm,"webase-node-mgr")
     changeManagerConfig(visual_deploy)
     
@@ -559,7 +561,8 @@ def installFront():
     print ("==============     Installing WeBASE-Front    ==============")
     os.chdir(currentDir)
     front_version = getCommProperties("webase.front.version")
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-front.zip ".format(front_version)
+    gitComm = "wget https://github.com/WeBankBlockchain/WeBASELargeFiles/releases/download/{}/webase-front.zip ".format(front_version)
+    #gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-front.zip ".format(front_version)
     frontPackage = "webase-front"
     server_dir = currentDir + "/" + frontPackage
     pullSourceExtract(gitComm,frontPackage)
@@ -689,7 +692,8 @@ def installSign():
     print ("==============     Installing WeBASE-Sign     ==============")
     os.chdir(currentDir)
     sign_version = getCommProperties("webase.sign.version")
-    gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip".format(sign_version)
+    #gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/webase-sign.zip".format(sign_version)
+    gitComm = "wget https://github.com/WeBankBlockchain/WeBASELargeFiles/releases/download/{}/webase-sign.zip ".format(sign_version)
     pullSourceExtract(gitComm,"webase-sign")
     changeSignConfig()
     signDbInit()
@@ -698,18 +702,18 @@ def installSign():
 
 # download by visual deploy
 # deprecated in 1.4.3
-def installDockerImage():
-    ifLoad = getCommProperties("if.load.image")
-    if (ifLoad == "yes"):
-        print ("============================================================")
-        print ("============ Download docker image from CDN... =============")
-        os.chdir(currentDir)
-        image_version = getCommProperties("fisco.webase.docker.cdn.version")
-        gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
-        pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
-    else: 
-        print ("============ Skip download docker image from CDN... =============")
-    return
+# def installDockerImage():
+#     ifLoad = getCommProperties("if.load.image")
+#     if (ifLoad == "yes"):
+#         print ("============================================================")
+#         print ("============ Download docker image from CDN... =============")
+#         os.chdir(currentDir)
+#         image_version = getCommProperties("fisco.webase.docker.cdn.version")
+#         gitComm = "wget https://osp-1257653870.cos.ap-guangzhou.myqcloud.com/WeBASE/releases/download/{}/docker-fisco-webase.tar".format(image_version)
+#         pullDockerImage(gitComm,"docker-fisco-webase.tar","fiscoorg/fisco-webase")
+#     else: 
+#         print ("============ Skip download docker image from CDN... =============")
+#     return
 
 def startSign():
     print ("==============      Starting WeBASE-Sign      ==============")
