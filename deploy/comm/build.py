@@ -199,8 +199,8 @@ def installNode(docker_mode=False):
                 buildComm = buildComm + " -w"
             # fisco version >= 3.3.0, no need enable auth, default enable_auth=1
             # < 3.3.0, need
-            if fisco_version_int < 330 and enable_auth == 1:
-                buildComm = buildComm + " -A"
+            # if fisco_version_int < 330 and enable_auth == 1:
+            #     buildComm = buildComm + " -A"
             os.system(buildComm)
         else:
             info = "n"
